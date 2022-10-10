@@ -1,0 +1,9 @@
+{
+	"id": "archive-pengolahan",
+	"name": "Archive-pengolahan",
+	"description": "Arsip module untuk pengolahan arsip seksi pelestarian",
+	"keywords": [
+		"archive, pelestarian, pengolahan"
+	],
+	"version": "1.0"
+}
