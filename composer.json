@@ -1,0 +1,46 @@
+{
+	"name": "ommu/archive-pengolahan",
+	"description": "Archive pengolahan module for OMMU",
+	"type": "ommu-module",
+	"keywords": [
+		"module",
+		"archive",
+		"pengolahan",
+		"archive-pengolahan",
+		"siks",
+		"media-akses",
+		"sikn",
+		"jikn",
+		"anri",
+		"ommu",
+		"ommu-platform",
+		"yii2"
+	],
+	"license": "Apache-2.0",
+	"homepage": "https://bitbucket.org/ommu/archive-pengolahan",
+	"support": {
+		"issues": "https://bitbucket.org/ommu/archive-pengolahan/issues",
+		"wiki": "https://bitbucket.org/ommu/archive-pengolahan/wiki",
+		"source": "https://bitbucket.org/ommu/archive-pengolahan"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://bitbucket.org/ommu/archive-pengolahan.git"
+	},
+	"authors": [
+		{
+			"name": "Putra Sudaryanto",
+			"email": "putra@ommu.id",
+			"homepage": "https://ommu.id",
+			"role": "Creator"
+		}
+	],
+	"require": {
+		"php": "~7.0"
+	},
+	"autoload": {
+		"psr-4": {
+			"ommu\\archivePengolahan\\": ""
+		}
+	}
+}
