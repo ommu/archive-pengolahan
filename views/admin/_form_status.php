@@ -36,46 +36,17 @@ use yii\helpers\ArrayHelper;
 
 <?php //echo $form->errorSummary($model);?>
 
-<?php $type = ArchivePengolahanPenyerahanType::getType();
-echo $form->field($model, 'type_id')
-	->dropDownList($type, ['prompt' => ''])
-	->label($model->getAttributeLabel('type_id')); ?>
+<?php $status = [
+    '1' =>  Yii::t('app', 'Sudah'),
+    '0' =>  Yii::t('app', 'Belum'),
+];
+echo $form->field($model, 'pengolahan_status')
+	->dropDownList($status, ['prompt' => ''])
+	->label($model->getAttributeLabel('pengolahan_status')); ?>
 
-<?php echo $form->field($model, 'kode_box')
+<?php echo $form->field($model, 'pengolahan_tahun')
 	->textInput(['maxlength' => true])
-	->label($model->getAttributeLabel('kode_box')); ?>
-
-<?php echo $form->field($model, 'pencipta_arsip')
-	->textarea(['rows' => 3, 'cols' => 50])
-	->label($model->getAttributeLabel('pencipta_arsip')); ?>
-
-<?php echo $form->field($model, 'tahun')
-	->textInput(['maxlength' => true])
-	->label($model->getAttributeLabel('tahun')); ?>
-
-<?php echo $form->field($model, 'nomor_arsip')
-	->textInput(['maxlength' => true])
-	->label($model->getAttributeLabel('nomor_arsip')); ?>
-
-<?php echo $form->field($model, 'jumlah_arsip')
-	->textInput(['maxlength' => true])
-	->label($model->getAttributeLabel('jumlah_arsip')); ?>
-
-<?php echo $form->field($model, 'nomor_box')
-	->textInput(['maxlength' => true])
-	->label($model->getAttributeLabel('nomor_box')); ?>
-
-<?php echo $form->field($model, 'jumlah_box')
-	->textInput(['maxlength' => true])
-	->label($model->getAttributeLabel('jumlah_box')); ?>
-
-<?php echo $form->field($model, 'nomor_box_urutan')
-	->textInput(['maxlength' => true])
-	->label($model->getAttributeLabel('nomor_box_urutan')); ?>
-
-    <?php echo $form->field($model, 'lokasi')
-        ->textarea(['rows' => 2, 'cols' => 50])
-	->label($model->getAttributeLabel('lokasi')); ?>
+	->label($model->getAttributeLabel('pengolahan_tahun')); ?>
 
 <hr/>
 

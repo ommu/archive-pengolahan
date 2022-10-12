@@ -57,6 +57,8 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 	public $creationDisplayname;
 	public $modifiedDisplayname;
 
+	const SCENARIO_PENGOLAHAN_STATUS = 'pengolahanStatusForm';
+
 	/**
 	 * @return string the associated database table name
 	 */
@@ -71,11 +73,13 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 	public function rules()
 	{
 		return [
-			[['type_id', 'kode_box', 'pencipta_arsip', 'tahun', 'nomor_arsip', 'jumlah_arsip', 'nomor_box', 'jumlah_box', 'nomor_box_urutan', 'lokasi'], 'required'],
+			[['type_id', 'kode_box', 'pencipta_arsip'], 'required'],
+			[['pengolahan_status', 'pengolahan_tahun'], 'required', 'on' => self::SCENARIO_PENGOLAHAN_STATUS],
 			[['publish', 'type_id', 'pengolahan_status', 'creation_id', 'modified_id'], 'integer'],
 			[['pencipta_arsip', 'pengolahan_tahun'], 'string'],
-			[['pengolahan_tahun'], 'safe'],
-			[['kode_box', 'lokasi'], 'string', 'max' => 64],
+			[['tahun', 'nomor_arsip', 'jumlah_arsip', 'nomor_box', 'jumlah_box', 'nomor_box_urutan', 'lokasi', 'pengolahan_tahun'], 'safe'],
+			[['lokasi'], 'string', 'max' => 128],
+			[['kode_box'], 'string', 'max' => 64],
 			[['tahun', 'pengolahan_tahun'], 'string', 'max' => 16],
 			[['nomor_arsip', 'jumlah_arsip', 'nomor_box', 'jumlah_box', 'nomor_box_urutan'], 'string', 'max' => 32],
 			[['type_id'], 'exist', 'skipOnError' => true, 'targetClass' => ArchivePengolahanPenyerahanType::className(), 'targetAttribute' => ['type_id' => 'id']],
@@ -111,6 +115,16 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 			'creationDisplayname' => Yii::t('app', 'Creation'),
 			'modifiedDisplayname' => Yii::t('app', 'Modified'),
 		];
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function scenarios()
+	{
+		$scenarios = parent::scenarios();
+		$scenarios[self::SCENARIO_PENGOLAHAN_STATUS] = ['publish', 'type_id', 'kode_box', 'pencipta_arsip', 'tahun', 'nomor_arsip', 'jumlah_arsip', 'nomor_box', 'jumlah_box', 'nomor_box_urutan', 'lokasi', 'pengolahan_status', 'pengolahan_tahun'];
+		return $scenarios;
 	}
 
 	/**
@@ -298,17 +312,6 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 			},
 			'filter' => $this->filterYesNo(),
 			'contentOptions' => ['class' => 'text-center'],
-		];
-		$this->templateColumns['publish'] = [
-			'attribute' => 'publish',
-			'value' => function($model, $key, $index, $column) {
-				$url = Url::to(['publish', 'id' => $model->primaryKey]);
-				return $this->quickAction($url, $model->publish, 'deleted');
-			},
-			'filter' => $this->filterYesNo(),
-			'contentOptions' => ['class' => 'text-center'],
-			'format' => 'raw',
-			'visible' => !Yii::$app->request->get('trash') ? true : false,
 		];
 	}
 

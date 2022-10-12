@@ -13,6 +13,7 @@
  *  Update
  *  View
  *  Delete
+ *  Status
  *
  *  findModel
  *
@@ -197,6 +198,42 @@ class AdminController extends Controller
 
 		Yii::$app->session->setFlash('success', Yii::t('app', 'Archive Penyerahan success deleted.'));
 		return $this->redirect(Yii::$app->request->referrer ?: ['manage']);
+	}
+
+	/**
+	 * Updates an existing ArchivePengolahanPenyerahan model.
+	 * If update is successful, the browser will be redirected to the 'view' page.
+	 * @param integer $id
+	 * @return mixed
+	 */
+	public function actionStatus($id)
+	{
+		$model = $this->findModel($id);
+        $model->scenario = ArchivePengolahanPenyerahan::SCENARIO_PENGOLAHAN_STATUS;
+
+        if (Yii::$app->request->isPost) {
+            $model->load(Yii::$app->request->post());
+            // $postData = Yii::$app->request->post();
+            // $model->load($postData);
+            // $model->order = $postData['order'] ? $postData['order'] : 0;
+
+            if ($model->save()) {
+                Yii::$app->session->setFlash('success', Yii::t('app', 'Archive Penyerahan success updated status pengolahan.'));
+                return $this->redirect(['manage']);
+
+            } else {
+                if (Yii::$app->request->isAjax) {
+                    return \yii\helpers\Json::encode(\app\components\widgets\ActiveForm::validate($model));
+                }
+            }
+        }
+
+		$this->view->title = Yii::t('app', 'Update Status Pengolahan: {type-id}', ['type-id' => $model->type->type_name]);
+		$this->view->description = '';
+		$this->view->keywords = '';
+		return $this->render('admin_status', [
+			'model' => $model,
+		]);
 	}
 
 	/**
