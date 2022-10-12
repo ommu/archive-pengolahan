@@ -39,6 +39,19 @@ class AdminController extends Controller
 	/**
 	 * {@inheritdoc}
 	 */
+	public function init()
+	{
+        parent::init();
+
+        if (Yii::$app->request->get('id')) {
+            $this->subMenu = $this->module->params['penyerahan_submenu'];
+        }
+
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
 	public function behaviors()
 	{
         return [
@@ -231,7 +244,7 @@ class AdminController extends Controller
 		$this->view->title = Yii::t('app', 'Update Status Pengolahan: {type-id}', ['type-id' => $model->type->type_name]);
 		$this->view->description = '';
 		$this->view->keywords = '';
-		return $this->render('admin_status', [
+		return $this->oRender('admin_status', [
 			'model' => $model,
 		]);
 	}

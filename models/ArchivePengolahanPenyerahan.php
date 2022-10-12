@@ -308,10 +308,12 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 		$this->templateColumns['pengolahan_status'] = [
 			'attribute' => 'pengolahan_status',
 			'value' => function($model, $key, $index, $column) {
-				return $this->filterYesNo($model->pengolahan_status);
+                $pengolahanStatus = $this->filterYesNo($model->pengolahan_status);
+				return Html::a($pengolahanStatus, ['status', 'id' => $model->primaryKey], ['title' => Yii::t('app', 'Update Status Pengolahan'), 'class' => 'modal-btn']);
 			},
 			'filter' => $this->filterYesNo(),
 			'contentOptions' => ['class' => 'text-center'],
+			'format' => 'html',
 		];
 	}
 

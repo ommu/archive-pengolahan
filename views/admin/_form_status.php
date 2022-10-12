@@ -50,12 +50,7 @@ echo $form->field($model, 'pengolahan_status')
 
 <hr/>
 
-<?php $submitButtonOption = [];
-if (!$model->isNewRecord && Yii::$app->request->isAjax) {
-    $submitButtonOption = ArrayHelper::merge($submitButtonOption, [
-        'backTo' => Html::a(Html::tag('span', '&laquo;', ['class' => 'mr-1']).Yii::t('app', 'Back to detail'), ['view', 'id' => $model->primaryKey], ['title' => Yii::t('app', 'Detail Penyerahan'), 'class' => 'ml-4 modal-btn']),
-    ]);
-}
+<?php $submitButtonOption = ['button' => Html::submitButton(Yii::t('app', 'Update Status'), ['class' => 'btn btn-primary'])];
 echo $form->field($model, 'submitButton')
 	->submitButton($submitButtonOption); ?>
 

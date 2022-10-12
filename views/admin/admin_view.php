@@ -20,11 +20,6 @@ use yii\widgets\DetailView;
 if (!$small) {
     $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Penyerahans'), 'url' => ['index']];
     $this->params['breadcrumbs'][] = $model->type->type_name;
-
-    $this->params['menu']['content'] = [
-        ['label' => Yii::t('app', 'Update'), 'url' => Url::to(['update', 'id' => $model->id]), 'icon' => 'pencil', 'htmlOptions' => ['class' => 'btn btn-primary']],
-        ['label' => Yii::t('app', 'Delete'), 'url' => Url::to(['delete', 'id' => $model->id]), 'htmlOptions' => ['data-confirm' => Yii::t('app', 'Are you sure you want to delete this item?'), 'data-method' => 'post', 'class' => 'btn btn-danger'], 'icon' => 'trash'],
-    ];
 } ?>
 
 <div class="archive-pengolahan-penyerahan-view">
@@ -41,7 +36,7 @@ $attributes = [
 		'value' => function ($model) {
             $typeName = isset($model->type) ? $model->type->type_name : '-';
             if ($typeName != '-') {
-                return Html::a($typeName, ['type/view', 'id' => $model->type_id], ['title' => $typeName, 'class' => 'modal-btn']);
+                return Html::a($typeName, ['setting/type/view', 'id' => $model->type_id], ['title' => $typeName, 'class' => 'modal-btn']);
             }
             return $typeName;
 		},
