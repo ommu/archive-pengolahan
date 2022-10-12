@@ -18,6 +18,8 @@ use yii\helpers\Html;
 use app\components\widgets\ActiveForm;
 use ommu\archivePengolahan\models\ArchivePengolahanPenyerahanType;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Url;
+use ommu\selectize\Selectize;
 ?>
 
 <div class="archive-pengolahan-penyerahan-form">
@@ -73,9 +75,27 @@ echo $form->field($model, 'type_id')
 	->textInput(['maxlength' => true])
 	->label($model->getAttributeLabel('nomor_box_urutan')); ?>
 
-    <?php echo $form->field($model, 'lokasi')
-        ->textarea(['rows' => 2, 'cols' => 50])
+<?php echo $form->field($model, 'lokasi')
+	->textarea(['rows' => 2, 'cols' => 50])
 	->label($model->getAttributeLabel('lokasi')); ?>
+
+<?php
+$subjectSuggestUrl = Url::to(['/admin/tag/suggest']);
+echo $form->field($model, 'jenisArsip', ['options' => ['class' => 'form-group row field-item']])
+	->widget(Selectize::className(), [
+        'cascade' => true,
+		'url' => $subjectSuggestUrl,
+		'queryParam' => 'term',
+		'pluginOptions' => [
+			'valueField' => 'label',
+			'labelField' => 'label',
+			'searchField' => ['label'],
+			'persist' => false,
+			'createOnBlur' => false,
+			'create' => true,
+		],
+	])
+	->label($model->getAttributeLabel('jenisArsip'));?>
 
 <hr/>
 

@@ -45,19 +45,24 @@ use Yii;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use app\models\Users;
+use yii\base\Event;
 
 class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 {
 	use \ommu\traits\UtilityTrait;
 
     public $gridForbiddenColumn = ['jumlah_arsip', 'jumlah_box', 'nomor_box_urutan', 'lokasi', 'creation_date', 'modified_date', 'updated_date', 
-        'typeName', 'creationDisplayname', 'modifiedDisplayname'];
+        'jenisArsip', 'typeName', 'creationDisplayname', 'modifiedDisplayname'];
+
+	public $jenisArsip;
 
 	public $typeName;
 	public $creationDisplayname;
 	public $modifiedDisplayname;
+	public $jenisId;
 
 	const SCENARIO_PENGOLAHAN_STATUS = 'pengolahanStatusForm';
+	const EVENT_BEFORE_SAVE_PENYERAHAN = 'BeforeSavePenyerahan';
 
 	/**
 	 * @return string the associated database table name
@@ -77,7 +82,7 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 			[['pengolahan_status', 'pengolahan_tahun'], 'required', 'on' => self::SCENARIO_PENGOLAHAN_STATUS],
 			[['publish', 'type_id', 'pengolahan_status', 'creation_id', 'modified_id'], 'integer'],
 			[['pencipta_arsip', 'pengolahan_tahun'], 'string'],
-			[['tahun', 'nomor_arsip', 'jumlah_arsip', 'nomor_box', 'jumlah_box', 'nomor_box_urutan', 'lokasi', 'pengolahan_tahun'], 'safe'],
+			[['tahun', 'nomor_arsip', 'jumlah_arsip', 'nomor_box', 'jumlah_box', 'nomor_box_urutan', 'lokasi', 'pengolahan_tahun', 'jenisArsip'], 'safe'],
 			[['lokasi'], 'string', 'max' => 128],
 			[['kode_box'], 'string', 'max' => 64],
 			[['tahun', 'pengolahan_tahun'], 'string', 'max' => 16],
@@ -111,6 +116,7 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 			'modified_date' => Yii::t('app', 'Modified Date'),
 			'modified_id' => Yii::t('app', 'Modified'),
 			'updated_date' => Yii::t('app', 'Updated Date'),
+			'jenisArsip' => Yii::t('app', 'Jenis Arsip'),
 			'typeName' => Yii::t('app', 'Type'),
 			'creationDisplayname' => Yii::t('app', 'Creation'),
 			'modifiedDisplayname' => Yii::t('app', 'Modified'),
@@ -132,24 +138,21 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 	 */
 	public function getType()
 	{
-		return $this->hasOne(ArchivePengolahanPenyerahanType::className(), ['id' => 'type_id']);
+		return $this->hasOne(ArchivePengolahanPenyerahanType::className(), ['id' => 'type_id'])
+            ->select(['id', 'type_name']);
 	}
 
 	/**
 	 * @return \yii\db\ActiveQuery
 	 */
-	public function getJenis($count=false)
+	public function getJenis($relation=true, $val='id')
 	{
-        if ($count == false) {
-            return $this->hasMany(ArchivePengolahanPenyerahanJenis::className(), ['penyerahan_id' => 'id']);
+        if ($relation == false) {
+            return \yii\helpers\ArrayHelper::map($this->jenis, 'tag_id', $val == 'id' ? 'id' : 'tag.body');
         }
 
-		$model = ArchivePengolahanPenyerahanJenis::find()
-            ->alias('t')
-            ->where(['t.penyerahan_id' => $this->id]);
-		$jenis = $model->count();
-
-		return $jenis ? $jenis : 0;
+        return $this->hasMany(ArchivePengolahanPenyerahanJenis::className(), ['penyerahan_id' => 'id'])
+            ->select(['id', 'penyerahan_id', 'tag_id']);
 	}
 
 	/**
@@ -262,6 +265,13 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 				return $model->lokasi;
 			},
 		];
+		$this->templateColumns['jenisArsip'] = [
+			'attribute' => 'jenisArsip',
+			'value' => function($model, $key, $index, $column) {
+				return self::parseJenisArsip($model->getJenis(false, 'title'), 'jenis', ', ');
+			},
+			'format' => 'html',
+		];
 		$this->templateColumns['pengolahan_tahun'] = [
 			'attribute' => 'pengolahan_tahun',
 			'value' => function($model, $key, $index, $column) {
@@ -339,6 +349,29 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 	}
 
 	/**
+	 * function parseJenisArsip
+	 */
+	public static function parseJenisArsip($subjects, $attr='subjectId', $sep='li')
+	{
+        if (!is_array($subjects) || (is_array($subjects) && empty($subjects))) {
+            return '-';
+        }
+
+		$items = [];
+		foreach ($subjects as $key => $val) {
+			$items[$val] = Html::a($val, ['admin/manage', $attr => $key], ['title' => $val]);
+		}
+
+        if ($sep == 'li') {
+			return Html::ul($items, ['item' => function($item, $index) {
+				return Html::tag('li', $item);
+			}, 'class' => 'list-boxed']);
+		}
+
+		return implode($sep, $items);
+	}
+
+	/**
 	 * after find attributes
 	 */
 	public function afterFind()
@@ -368,6 +401,37 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
                 }
             }
         }
+
         return true;
+	}
+
+	/**
+	 * before save attributes
+	 */
+	public function beforeSave($insert)
+	{
+		parent::beforeSave($insert);
+		
+        if (!$insert) {
+			// set jenisArsip
+			$event = new Event(['sender' => $this]);
+			Event::trigger(self::className(), self::EVENT_BEFORE_SAVE_PENYERAHAN, $event);
+		}
+
+		return true;
+	}
+
+	/**
+	 * After save attributes
+	 */
+	public function afterSave($insert, $changedAttributes)
+	{
+        parent::afterSave($insert, $changedAttributes);
+
+        if ($insert) {
+			// set jenisArsip
+			$event = new Event(['sender' => $this]);
+			Event::trigger(self::className(), self::EVENT_BEFORE_SAVE_PENYERAHAN, $event);
+		}
 	}
 }

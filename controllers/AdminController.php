@@ -33,6 +33,7 @@ use mdm\admin\components\AccessControl;
 use yii\filters\VerbFilter;
 use ommu\archivePengolahan\models\ArchivePengolahanPenyerahan;
 use ommu\archivePengolahan\models\search\ArchivePengolahanPenyerahan as ArchivePengolahanPenyerahanSearch;
+use yii\helpers\ArrayHelper;
 
 class AdminController extends Controller
 {
@@ -82,7 +83,11 @@ class AdminController extends Controller
 	public function actionManage()
 	{
         $searchModel = new ArchivePengolahanPenyerahanSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $queryParams = Yii::$app->request->queryParams;
+        if (($jenis = Yii::$app->request->get('jenis')) != null) {
+            $queryParams = ArrayHelper::merge(Yii::$app->request->queryParams, ['jenisId' => $jenis]);
+        }
+		$dataProvider = $searchModel->search($queryParams);
 
         $gridColumn = Yii::$app->request->get('GridColumn', null);
         $cols = [];
@@ -98,6 +103,9 @@ class AdminController extends Controller
         if (($type = Yii::$app->request->get('type')) != null) {
             $type = \ommu\archivePengolahan\models\ArchivePengolahanPenyerahanType::findOne($type);
         }
+        if (($jenis = Yii::$app->request->get('jenis')) != null) {
+            $jenis = \app\models\CoreTags::findOne($jenis);
+        }
 
 		$this->view->title = Yii::t('app', 'Penyerahans');
 		$this->view->description = '';
@@ -107,6 +115,7 @@ class AdminController extends Controller
 			'dataProvider' => $dataProvider,
 			'columns' => $columns,
 			'type' => $type,
+			'jenis' => $jenis,
 		]);
 	}
 
@@ -259,6 +268,7 @@ class AdminController extends Controller
 	protected function findModel($id)
 	{
         if (($model = ArchivePengolahanPenyerahan::findOne($id)) !== null) {
+            $model->jenisArsip = implode(',', $model->getJenis(false, 'title'));
 
             return $model;
         }

@@ -27,6 +27,7 @@
 namespace ommu\archivePengolahan\models;
 
 use Yii;
+use yii\helpers\Html;
 use yii\helpers\Inflector;
 use app\models\CoreTags;
 use app\models\Users;
@@ -106,7 +107,7 @@ class ArchivePengolahanPenyerahanJenis extends \app\components\ActiveRecord
 	public function getTag()
 	{
 		return $this->hasOne(CoreTags::className(), ['tag_id' => 'tag_id'])
-            ->select(['id', 'body']);
+            ->select(['tag_id', 'body']);
 	}
 
 	/**
@@ -239,7 +240,7 @@ class ArchivePengolahanPenyerahanJenis extends \app\components\ActiveRecord
 	{
 		parent::afterFind();
 
-		$this->tagBody = isset($this->tag) ? $this->tag->body : '';
+		// $this->tagBody = isset($this->tag) ? $this->tag->body : '';
 		// $this->penyerahanArsip = isset($this->penyerahan) ? $this->penyerahan->type->type_name : '-';
 		// $this->creationDisplayname = isset($this->creation) ? $this->creation->displayname : '-';
 	}

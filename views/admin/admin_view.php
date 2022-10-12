@@ -45,17 +45,14 @@ $attributes = [
 	[
 		'attribute' => 'kode_box',
 		'value' => $model->kode_box ? $model->kode_box : '-',
-		'visible' => !$small,
 	],
 	[
 		'attribute' => 'pencipta_arsip',
 		'value' => $model->pencipta_arsip ? $model->pencipta_arsip : '-',
-		'visible' => !$small,
 	],
 	[
 		'attribute' => 'tahun',
 		'value' => $model->tahun ? $model->tahun : '-',
-		'visible' => !$small,
 	],
 	[
 		'attribute' => 'nomor_arsip',
@@ -85,6 +82,12 @@ $attributes = [
 	[
 		'attribute' => 'lokasi',
 		'value' => $model->lokasi ? $model->lokasi : '-',
+		'visible' => !$small,
+	],
+	[
+		'attribute' => 'jenisArsip',
+		'value' => $model::parseJenisArsip($model->getJenis(false, 'title'), 'jenis', ', '),
+		'format' => 'html',
 		'visible' => !$small,
 	],
 	[

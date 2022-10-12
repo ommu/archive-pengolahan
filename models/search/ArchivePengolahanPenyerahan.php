@@ -27,8 +27,10 @@ class ArchivePengolahanPenyerahan extends ArchivePengolahanPenyerahanModel
 	public function rules()
 	{
 		return [
-			[['id', 'publish', 'type_id', 'pengolahan_status', 'creation_id', 'modified_id'], 'integer'],
-			[['kode_box', 'pencipta_arsip', 'tahun', 'nomor_arsip', 'jumlah_arsip', 'nomor_box', 'jumlah_box', 'nomor_box_urutan', 'lokasi', 'pengolahan_tahun', 'creation_date', 'modified_date', 'updated_date', 'typeName', 'creationDisplayname', 'modifiedDisplayname'], 'safe'],
+			[['id', 'publish', 'type_id', 'pengolahan_status', 'creation_id', 'modified_id', 
+                'jenisId'], 'integer'],
+			[['kode_box', 'pencipta_arsip', 'tahun', 'nomor_arsip', 'jumlah_arsip', 'nomor_box', 'jumlah_box', 'nomor_box_urutan', 'lokasi', 'pengolahan_tahun', 'creation_date', 'modified_date', 'updated_date', 
+                'jenisArsip', 'typeName', 'creationDisplayname', 'modifiedDisplayname'], 'safe'],
 		];
 	}
 
@@ -86,6 +88,14 @@ class ArchivePengolahanPenyerahan extends ArchivePengolahanPenyerahanModel
         ) {
             $query->joinWith(['modified modified']);
         }
+        if (isset($params['jenis']) && $params['jenis'] != '') {
+            $query->joinWith(['jenis jenis']);
+        }
+        if ((isset($params['sort']) && in_array($params['sort'], ['jenisArsip', '-jenisArsip'])) || 
+            (isset($params['jenisArsip']) && $params['jenisArsip'] != '')
+        ) {
+            $query->joinWith(['jenis.tag jenisArsip']);
+        }
 
 		$query->groupBy(['id']);
 
@@ -139,6 +149,7 @@ class ArchivePengolahanPenyerahan extends ArchivePengolahanPenyerahanModel
 			'cast(t.modified_date as date)' => $this->modified_date,
 			't.modified_id' => isset($params['modified']) ? $params['modified'] : $this->modified_id,
 			'cast(t.updated_date as date)' => $this->updated_date,
+			'jenis.tag_id' => $this->jenisId,
 		]);
 
         if (!isset($params['publish']) || (isset($params['publish']) && $params['publish'] == '')) {
@@ -161,6 +172,7 @@ class ArchivePengolahanPenyerahan extends ArchivePengolahanPenyerahanModel
 			->andFilterWhere(['like', 't.nomor_box_urutan', $this->nomor_box_urutan])
 			->andFilterWhere(['like', 't.lokasi', $this->lokasi])
 			->andFilterWhere(['like', 't.pengolahan_tahun', $this->pengolahan_tahun])
+			->andFilterWhere(['like', 'jenisArsip.body', $this->jenisArsip])
 			->andFilterWhere(['like', 'type.type_name', $this->typeName])
 			->andFilterWhere(['like', 'creation.displayname', $this->creationDisplayname])
 			->andFilterWhere(['like', 'modified.displayname', $this->modifiedDisplayname]);
