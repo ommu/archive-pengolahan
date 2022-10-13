@@ -18,8 +18,8 @@ use yii\helpers\Url;
 use yii\widgets\DetailView;
 
 if (!$small) {
-    $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Penyerahans'), 'url' => ['index']];
-    $this->params['breadcrumbs'][] = $model->type->type_name;
+    $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Penyerahan'), 'url' => ['index']];
+    $this->params['breadcrumbs'][] = $model->kode_box;
 } ?>
 
 <div class="archive-pengolahan-penyerahan-view">

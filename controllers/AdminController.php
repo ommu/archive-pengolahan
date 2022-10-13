@@ -107,7 +107,7 @@ class AdminController extends Controller
             $jenis = \app\models\CoreTags::findOne($jenis);
         }
 
-		$this->view->title = Yii::t('app', 'Penyerahans');
+		$this->view->title = Yii::t('app', 'Penyerahan');
 		$this->view->description = '';
 		$this->view->keywords = '';
 		return $this->render('admin_manage', [
@@ -181,7 +181,7 @@ class AdminController extends Controller
             }
         }
 
-		$this->view->title = Yii::t('app', 'Update Penyerahan: {type-id}', ['type-id' => $model->type->type_name]);
+		$this->view->title = Yii::t('app', 'Update Penyerahan: {type-id}', ['type-id' => $model->kode_box]);
 		$this->view->description = '';
 		$this->view->keywords = '';
 		return $this->render('admin_update', [
@@ -198,7 +198,7 @@ class AdminController extends Controller
 	{
         $model = $this->findModel($id);
 
-		$this->view->title = Yii::t('app', 'Detail Penyerahan: {type-id}', ['type-id' => $model->type->type_name]);
+		$this->view->title = Yii::t('app', 'Detail Penyerahan: {type-id}', ['type-id' => $model->kode_box]);
 		$this->view->description = '';
 		$this->view->keywords = '';
 		return $this->oRender('admin_view', [
@@ -250,7 +250,7 @@ class AdminController extends Controller
             }
         }
 
-		$this->view->title = Yii::t('app', 'Update Status Pengolahan: {type-id}', ['type-id' => $model->type->type_name]);
+		$this->view->title = Yii::t('app', 'Update Status Pengolahan: {type-id}', ['type-id' => $model->kode_box]);
 		$this->view->description = '';
 		$this->view->keywords = '';
 		return $this->oRender('admin_status', [

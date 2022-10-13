@@ -16,11 +16,12 @@
 
 use yii\helpers\Url;
 
-$this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Penyerahans'), 'url' => ['index']];
-$this->params['breadcrumbs'][] = Yii::t('app', 'Create');
+$this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Penyerahan'), 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => $model->kode_box, 'url' => ['view', 'id' => $model->id]];
+$this->params['breadcrumbs'][] = Yii::t('app', 'Update');
 ?>
 
-<div class="archive-pengolahan-penyerahan-create">
+<div class="archive-pengolahan-penyerahan-update">
 
 <?php echo $this->render('_form_status', [
 	'model' => $model,

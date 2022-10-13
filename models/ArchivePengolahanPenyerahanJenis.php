@@ -169,7 +169,7 @@ class ArchivePengolahanPenyerahanJenis extends \app\components\ActiveRecord
 		$this->templateColumns['penyerahanArsip'] = [
 			'attribute' => 'penyerahanArsip',
 			'value' => function($model, $key, $index, $column) {
-				return isset($model->penyerahan) ? $model->penyerahan->type->type_name : '-';
+				return isset($model->penyerahan) ? $model->penyerahan->kode_box : '-';
 				// return $model->penyerahanArsip;
 			},
 			'visible' => $this->isData ? (!Yii::$app->request->get('penyerahan') ? true : false) : false,
@@ -241,7 +241,7 @@ class ArchivePengolahanPenyerahanJenis extends \app\components\ActiveRecord
 		parent::afterFind();
 
 		// $this->tagBody = isset($this->tag) ? $this->tag->body : '';
-		// $this->penyerahanArsip = isset($this->penyerahan) ? $this->penyerahan->type->type_name : '-';
+		// $this->penyerahanArsip = isset($this->penyerahan) ? $this->penyerahan->kode_box : '-';
 		// $this->creationDisplayname = isset($this->creation) ? $this->creation->displayname : '-';
 	}
 
