@@ -71,7 +71,8 @@ class TypeController extends Controller
 	public function actionManage()
 	{
         $searchModel = new ArchivePengolahanPenyerahanTypeSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $queryParams = Yii::$app->request->queryParams;
+		$dataProvider = $searchModel->search($queryParams);
 
         $gridColumn = Yii::$app->request->get('GridColumn', null);
         $cols = [];

@@ -16,6 +16,7 @@
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\widgets\DetailView;
+use yii\helpers\Json;
 
 if (!$small) {
     $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Penyerahan Types'), 'url' => ['index']];
@@ -49,6 +50,26 @@ $attributes = [
 	[
 		'attribute' => 'type_desc',
 		'value' => $model->type_desc ? $model->type_desc : '-',
+		'visible' => !$small,
+	],
+	[
+		'attribute' => 'field',
+		'value' => function ($model) {
+            if (is_array($model->field) && empty($model->field)) {
+                return '-';
+            }
+            return Json::encode($model->field);
+		},
+		'visible' => !$small,
+	],
+	[
+		'attribute' => 'feature',
+		'value' => function ($model) {
+            if (is_array($model->feature) && empty($model->feature)) {
+                return '-';
+            }
+            return Json::encode($model->feature);
+		},
 		'visible' => !$small,
 	],
 	[

@@ -15,6 +15,8 @@
  * @property integer $publish
  * @property string $type_name
  * @property string $type_desc
+ * @property string $field
+ * @property string $feature
  * @property string $creation_date
  * @property integer $creation_id
  * @property string $modified_date
@@ -33,6 +35,7 @@ namespace ommu\archivePengolahan\models;
 use Yii;
 use yii\helpers\Html;
 use yii\helpers\Url;
+use yii\helpers\Json;
 use app\models\Users;
 
 class ArchivePengolahanPenyerahanType extends \app\components\ActiveRecord
@@ -60,6 +63,8 @@ class ArchivePengolahanPenyerahanType extends \app\components\ActiveRecord
 		return [
 			[['type_name', 'type_desc'], 'required'],
 			[['publish', 'creation_id', 'modified_id'], 'integer'],
+			//[['field', 'feature'], 'json'],
+			[['field', 'feature'], 'safe'],
 			[['type_name'], 'string', 'max' => 64],
 			[['type_desc'], 'string', 'max' => 256],
 		];
@@ -75,6 +80,8 @@ class ArchivePengolahanPenyerahanType extends \app\components\ActiveRecord
 			'publish' => Yii::t('app', 'Publish'),
 			'type_name' => Yii::t('app', 'Type Name'),
 			'type_desc' => Yii::t('app', 'Type Desc'),
+			'field' => Yii::t('app', 'Field'),
+			'feature' => Yii::t('app', 'Feature'),
 			'creation_date' => Yii::t('app', 'Creation Date'),
 			'creation_id' => Yii::t('app', 'Creation'),
 			'modified_date' => Yii::t('app', 'Modified Date'),
@@ -262,12 +269,62 @@ class ArchivePengolahanPenyerahanType extends \app\components\ActiveRecord
 	}
 
 	/**
+	 * function getField
+	 */
+	public static function getField($type='field', $field=null, $sep='li')
+	{
+        if ($type == 'field') {
+            $items = array(
+                'publication' => Yii::t('app', 'Unggah Publikasi'),
+            );
+        } else if ($type == 'feature') {
+            $items = array(
+                'item' => Yii::t('app', 'Tambahkan Item Arsip'),
+            );
+        }
+
+        if ($field !== null) {
+            if (!is_array($field) || (is_array($field) && empty($field))) {
+                return '-';
+            }
+
+			$item = [];
+			foreach ($items as $key => $val) {
+                if (in_array($key, $field)) {
+                    $item[$key] = $val;
+                }
+			}
+
+            if ($sep == 'li') {
+				return Html::ul($item, ['item' => function($item, $index) {
+					return Html::tag('li', "($index) $item");
+				}, 'class' => 'list-boxed']);
+			}
+
+			return implode(', ', $item);
+
+		} else {
+			return $items;
+        }
+	}
+
+	/**
 	 * after find attributes
 	 */
 	public function afterFind()
 	{
 		parent::afterFind();
 
+        if ($this->field == '') {
+            $this->field = [];
+        } else {
+            $this->field = Json::decode($this->field);
+        }
+        if ($this->feature == '') {
+            $this->feature = [];
+        } else {
+            $this->feature = Json::decode($this->feature);
+        }
 		// $this->creationDisplayname = isset($this->creation) ? $this->creation->displayname : '-';
 		// $this->modifiedDisplayname = isset($this->modified) ? $this->modified->displayname : '-';
 		// $this->penyerahan = $this->getPenyerahans(true) ? 1 : 0;
@@ -288,6 +345,18 @@ class ArchivePengolahanPenyerahanType extends \app\components\ActiveRecord
                     $this->modified_id = !Yii::$app->user->isGuest ? Yii::$app->user->id : null;
                 }
             }
+        }
+        return true;
+	}
+
+	/**
+	 * before save attributes
+	 */
+	public function beforeSave($insert)
+	{
+        if (parent::beforeSave($insert)) {
+			$this->field = Json::encode($this->field);
+			$this->feature = Json::encode($this->feature);
         }
         return true;
 	}
