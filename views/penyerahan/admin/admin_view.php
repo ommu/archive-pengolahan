@@ -101,6 +101,16 @@ $attributes = [
 		'visible' => !$small,
 	],
 	[
+		'attribute' => 'oItem',
+		'value' => function ($model) {
+            $items = $model->getItems(true);
+            // $items = $model->grid->item;
+            return Html::a($items, ['penyerahan/item/manage', 'penyerahan' => $model->primaryKey, 'publish' => 1], ['title' => Yii::t('app', '{count} items', ['count' => $items]), 'data-pjax' => 0]);
+		},
+		'format' => 'raw',
+		'visible' => !$small,
+	],
+	[
 		'attribute' => 'publication_file',
 		'value' => function ($model) {
 			$uploadPath = $model::getUploadPath(false);

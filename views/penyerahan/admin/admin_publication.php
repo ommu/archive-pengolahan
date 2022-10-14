@@ -18,7 +18,7 @@ use yii\helpers\Url;
 
 $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Penyerahan'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = ['label' => $model->type->type_name. ': ' .$model->kode_box, 'url' => ['view', 'id' => $model->id]];
-$this->params['breadcrumbs'][] = Yii::t('app', 'Update');
+$this->params['breadcrumbs'][] = Yii::t('app', 'Publication');
 ?>
 
 <div class="archive-pengolahan-penyerahan-update">

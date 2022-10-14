@@ -36,6 +36,7 @@
  *
  * The followings are the available model relations:
  * @property ArchivePengolahanPenyerahanType $type
+ * @property ArchivePengolahanPenyerahanItem[] $items
  * @property ArchivePengolahanPenyerahanJenis[] $jenis
  * @property Users $creation
  * @property Users $modified
@@ -68,6 +69,7 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 	public $modifiedDisplayname;
 	public $jenisId;
 	public $oPublication;
+    public $oItem;
 
 	const SCENARIO_PENGOLAHAN_STATUS = 'pengolahanStatusForm';
 	const SCENARIO_PUBLICATION = 'publicationForm';
@@ -133,6 +135,7 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 			'creationDisplayname' => Yii::t('app', 'Creation'),
 			'modifiedDisplayname' => Yii::t('app', 'Modified'),
 			'oPublication' => Yii::t('app', 'Publication File'),
+            'oItem' => Yii::t('app', 'Items'),
 		];
 	}
 
@@ -155,6 +158,32 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 		return $this->hasOne(ArchivePengolahanPenyerahanType::className(), ['id' => 'type_id'])
             ->select(['id', 'type_name', 'feature']);
 	}
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getItems($count=false, $publish=1)
+    {
+        if ($count == false) {
+            return $this->hasMany(ArchivePengolahanPenyerahanItem::className(), ['penyerahan_id' => 'id'])
+                ->alias('items')
+                ->andOnCondition([sprintf('%s.publish', 'items') => $publish]);
+        }
+
+        $model = ArchivePengolahanPenyerahanItem::find()
+            ->alias('t')
+            ->where(['t.penyerahan_id' => $this->id]);
+        if ($publish == 0) {
+            $model->unpublish();
+        } else if ($publish == 1) {
+            $model->published();
+        } else if ($publish == 2) {
+            $model->deleted();
+        }
+        $items = $model->count();
+
+        return $items ? $items : 0;
+    }
 
 	/**
 	 * @return \yii\db\ActiveQuery
@@ -341,12 +370,28 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 			},
 			'filter' => $this->filterDatepicker($this, 'updated_date'),
 		];
+        $this->templateColumns['oItem'] = [
+            'attribute' => 'oItem',
+            'value' => function($model, $key, $index, $column) {
+                $items = $model->getItems(true);
+                // $items = $model->grid->item;
+                return Html::a($items, ['penyerahan/item/manage', 'penyerahan' => $model->primaryKey, 'publish' => 1], ['title' => Yii::t('app', '{count} items', ['count' => $items]), 'data-pjax' => 0]);
+            },
+            'filter' => false,
+            'contentOptions' => ['class' => 'text-center'],
+            'format' => 'raw',
+        ];
 		$this->templateColumns['oPublication'] = [
 			'attribute' => 'oPublication',
 			'value' => function($model, $key, $index, $column) {
-				return $this->filterYesNo($model->oPublication);
+                if (!empty($model->type->feature) && in_array('publication', $model->type->feature)) {
+                    return Html::a($model->oPublication ? '<span class="glyphicon glyphicon-ok"></span>' : Yii::t('app', 'Upload'), ['publication', 'id' => $model->primaryKey], ['title' => $model->oPublication ? Yii::t('app', 'View Publication File') : Yii::t('app', 'Upload Publication File'), 'data-pjax' => 0]);
+                }
+				return '-';
 			},
 			'filter' => $this->filterYesNo(),
+			'contentOptions' => ['class' => 'text-center'],
+			'format' => 'raw',
 		];
 		$this->templateColumns['pengolahan_status'] = [
 			'attribute' => 'pengolahan_status',
@@ -425,6 +470,7 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 		// $this->typeName = isset($this->type) ? $this->type->type_name : '-';
 		// $this->creationDisplayname = isset($this->creation) ? $this->creation->displayname : '-';
 		// $this->modifiedDisplayname = isset($this->modified) ? $this->modified->displayname : '-';
+        // $this->item = $this->getItems(true) ? 1 : 0;
 		// $this->jenisArsip = $this->getJenis(true) ? 1 : 0;
         $this->pengolahan_status = $this->pengolahan_status != '' && $this->pengolahan_status == 1 ? $this->pengolahan_status : 0;
 	}
