@@ -14,6 +14,7 @@
  *  View
  *  Delete
  *  Status
+ *  Publication
  *
  *  findModel
  *
@@ -34,6 +35,7 @@ use yii\filters\VerbFilter;
 use ommu\archivePengolahan\models\ArchivePengolahanPenyerahan;
 use ommu\archivePengolahan\models\search\ArchivePengolahanPenyerahan as ArchivePengolahanPenyerahanSearch;
 use yii\helpers\ArrayHelper;
+use yii\web\UploadedFile;
 
 class AdminController extends Controller
 {
@@ -141,7 +143,7 @@ class AdminController extends Controller
             // $model->order = $postData['order'] ? $postData['order'] : 0;
 
             if ($model->save()) {
-                Yii::$app->session->setFlash('success', Yii::t('app', 'Archive Penyerahan success created.'));
+                Yii::$app->session->setFlash('success', Yii::t('app', 'Archive penyerahan success created.'));
                 return $this->redirect(['manage']);
                 //return $this->redirect(['view', 'id' => $model->id]);
 
@@ -183,7 +185,7 @@ class AdminController extends Controller
             // $model->order = $postData['order'] ? $postData['order'] : 0;
 
             if ($model->save()) {
-                Yii::$app->session->setFlash('success', Yii::t('app', 'Archive Penyerahan success updated.'));
+                Yii::$app->session->setFlash('success', Yii::t('app', 'Archive penyerahan success updated.'));
                 return $this->redirect(['manage']);
 
             } else {
@@ -236,8 +238,51 @@ class AdminController extends Controller
 		$model->publish = 2;
 		$model->save(false, ['publish','modified_id']);
 
-		Yii::$app->session->setFlash('success', Yii::t('app', 'Archive Penyerahan success deleted.'));
+		Yii::$app->session->setFlash('success', Yii::t('app', 'Archive penyerahan success deleted.'));
 		return $this->redirect(Yii::$app->request->referrer ?: ['manage']);
+	}
+
+	/**
+	 * Updates an existing ArchivePengolahanPenyerahan model.
+	 * If update is successful, the browser will be redirected to the 'view' page.
+	 * @param integer $id
+	 * @return mixed
+	 */
+	public function actionPublication($id)
+	{
+		$model = $this->findModel($id);
+        $model->scenario = ArchivePengolahanPenyerahan::SCENARIO_PUBLICATION;
+        if (empty($model->type->feature) || !in_array('item', $model->type->feature)) {
+            unset($this->subMenu[1]['item']);
+        }
+        if (empty($model->type->feature) || !in_array('publication', $model->type->feature)) {
+            unset($this->subMenu[1]['publication']);
+        }
+
+        if (Yii::$app->request->isPost) {
+            $model->load(Yii::$app->request->post());
+            $model->publication_file = UploadedFile::getInstance($model, 'publication_file');
+            // $postData = Yii::$app->request->post();
+            // $model->load($postData);
+            // $model->order = $postData['order'] ? $postData['order'] : 0;
+
+            if ($model->save()) {
+                Yii::$app->session->setFlash('success', Yii::t('app', 'Archive penyerahan success add publication item.'));
+                return $this->redirect(['manage']);
+
+            } else {
+                if (Yii::$app->request->isAjax) {
+                    return \yii\helpers\Json::encode(\app\components\widgets\ActiveForm::validate($model));
+                }
+            }
+        }
+
+		$this->view->title = Yii::t('app', 'Upload Publikasi Item Penyerahan: {type-id}', ['type-id' => $model->type->type_name. ' ' .$model->kode_box]);
+		$this->view->description = '';
+		$this->view->keywords = '';
+		return $this->oRender('admin_publication', [
+			'model' => $model,
+		]);
 	}
 
 	/**
@@ -264,7 +309,7 @@ class AdminController extends Controller
             // $model->order = $postData['order'] ? $postData['order'] : 0;
 
             if ($model->save()) {
-                Yii::$app->session->setFlash('success', Yii::t('app', 'Archive Penyerahan success updated status pengolahan.'));
+                Yii::$app->session->setFlash('success', Yii::t('app', 'Archive penyerahan success updated status pengolahan.'));
                 return $this->redirect(['manage']);
 
             } else {

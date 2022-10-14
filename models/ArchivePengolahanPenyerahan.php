@@ -25,6 +25,7 @@
  * @property string $lokasi
  * @property string $color_code
  * @property string $description
+ * @property string $publication_file
  * @property integer $pengolahan_status
  * @property string $pengolahan_tahun
  * @property string $creation_date
@@ -46,24 +47,30 @@ namespace ommu\archivePengolahan\models;
 use Yii;
 use yii\helpers\Html;
 use yii\helpers\Url;
+use yii\web\UploadedFile;
 use app\models\Users;
 use yii\base\Event;
+use yii\helpers\Inflector;
 
 class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 {
 	use \ommu\traits\UtilityTrait;
+	use \ommu\traits\FileTrait;
 
-    public $gridForbiddenColumn = ['jumlah_arsip', 'jumlah_box', 'nomor_box_urutan', 'lokasi', 'creation_date', 'modified_date', 'updated_date', 
+    public $gridForbiddenColumn = ['jumlah_arsip', 'jumlah_box', 'nomor_box_urutan', 'lokasi', 'color_code', 'description', 'pengolahan_tahun', 'creation_date', 'modified_date', 'updated_date', 
         'jenisArsip', 'typeName', 'creationDisplayname', 'modifiedDisplayname'];
 
 	public $jenisArsip;
+	public $old_publication_file;
 
 	public $typeName;
 	public $creationDisplayname;
 	public $modifiedDisplayname;
 	public $jenisId;
+	public $oPublication;
 
 	const SCENARIO_PENGOLAHAN_STATUS = 'pengolahanStatusForm';
+	const SCENARIO_PUBLICATION = 'publicationForm';
 	const EVENT_BEFORE_SAVE_PENYERAHAN = 'BeforeSavePenyerahan';
 
 	/**
@@ -84,7 +91,7 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 			[['pengolahan_status', 'pengolahan_tahun'], 'required', 'on' => self::SCENARIO_PENGOLAHAN_STATUS],
 			[['publish', 'type_id', 'pengolahan_status', 'creation_id', 'modified_id'], 'integer'],
 			[['pencipta_arsip', 'lokasi', 'description'], 'string'],
-			[['tahun', 'nomor_arsip', 'jumlah_arsip', 'nomor_box', 'jumlah_box', 'nomor_box_urutan', 'lokasi', 'color_code', 'description', 'pengolahan_status', 'pengolahan_tahun', 'jenisArsip'], 'safe'],
+			[['tahun', 'nomor_arsip', 'jumlah_arsip', 'nomor_box', 'jumlah_box', 'nomor_box_urutan', 'lokasi', 'color_code', 'description', 'publication_file', 'pengolahan_status', 'pengolahan_tahun', 'jenisArsip'], 'safe'],
 			[['kode_box'], 'string', 'max' => 64],
 			[['tahun', 'pengolahan_tahun'], 'string', 'max' => 16],
 			[['nomor_arsip', 'jumlah_arsip', 'nomor_box', 'jumlah_box', 'nomor_box_urutan', 'color_code'], 'string', 'max' => 32],
@@ -114,15 +121,18 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 			'pengolahan_tahun' => Yii::t('app', 'Tahun Pengolahan'),
 			'color_code' => Yii::t('app', 'Color Code'),
 			'description' => Yii::t('app', 'Description'),
+			'publication_file' => Yii::t('app', 'Publication File'),
 			'creation_date' => Yii::t('app', 'Creation Date'),
 			'creation_id' => Yii::t('app', 'Creation'),
 			'modified_date' => Yii::t('app', 'Modified Date'),
 			'modified_id' => Yii::t('app', 'Modified'),
 			'updated_date' => Yii::t('app', 'Updated Date'),
 			'jenisArsip' => Yii::t('app', 'Jenis Arsip'),
+			'old_publication_file' => Yii::t('app', 'Old Publication File'),
 			'typeName' => Yii::t('app', 'Type'),
 			'creationDisplayname' => Yii::t('app', 'Creation'),
 			'modifiedDisplayname' => Yii::t('app', 'Modified'),
+			'oPublication' => Yii::t('app', 'Publication File'),
 		];
 	}
 
@@ -133,6 +143,7 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 	{
 		$scenarios = parent::scenarios();
 		$scenarios[self::SCENARIO_PENGOLAHAN_STATUS] = ['publish', 'type_id', 'kode_box', 'pencipta_arsip', 'tahun', 'nomor_arsip', 'jumlah_arsip', 'nomor_box', 'jumlah_box', 'nomor_box_urutan', 'lokasi', 'color_code', 'description', 'pengolahan_status', 'pengolahan_tahun'];
+		$scenarios[self::SCENARIO_PUBLICATION] = ['publish', 'type_id', 'kode_box', 'pencipta_arsip', 'tahun', 'nomor_arsip', 'jumlah_arsip', 'nomor_box', 'jumlah_box', 'nomor_box_urutan', 'lokasi', 'color_code', 'description', 'publication_file', 'pengolahan_status', 'pengolahan_tahun'];
 		return $scenarios;
 	}
 
@@ -330,6 +341,13 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 			},
 			'filter' => $this->filterDatepicker($this, 'updated_date'),
 		];
+		$this->templateColumns['oPublication'] = [
+			'attribute' => 'oPublication',
+			'value' => function($model, $key, $index, $column) {
+				return $this->filterYesNo($model->oPublication);
+			},
+			'filter' => $this->filterYesNo(),
+		];
 		$this->templateColumns['pengolahan_status'] = [
 			'attribute' => 'pengolahan_status',
 			'value' => function($model, $key, $index, $column) {
@@ -387,12 +405,23 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 	}
 
 	/**
+	 * @param returnAlias set true jika ingin kembaliannya path alias atau false jika ingin string
+	 * relative path. default true.
+	 */
+	public static function getUploadPath($returnAlias=true) 
+	{
+		return ($returnAlias ? Yii::getAlias('@public/archive/penyerahan') : 'archive/penyerahan');
+	}
+
+	/**
 	 * after find attributes
 	 */
 	public function afterFind()
 	{
 		parent::afterFind();
 
+		$this->old_publication_file = $this->publication_file;
+        $this->oPublication = $this->publication_file ? 1 : 0;
 		// $this->typeName = isset($this->type) ? $this->type->type_name : '-';
 		// $this->creationDisplayname = isset($this->creation) ? $this->creation->displayname : '-';
 		// $this->modifiedDisplayname = isset($this->modified) ? $this->modified->displayname : '-';
@@ -406,6 +435,23 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 	public function beforeValidate()
 	{
         if (parent::beforeValidate()) {
+            if ($this->scenario == self::SCENARIO_PUBLICATION) {
+                // $this->publication_file = UploadedFile::getInstance($this, 'publication_file');
+                if ($this->publication_file instanceof UploadedFile && !$this->publication_file->getHasError()) {
+                    $publicationFileFileType = ['pdf'];
+                    if (!in_array(strtolower($this->publication_file->getExtension()), $publicationFileFileType)) {
+                        $this->addError('publication_file', Yii::t('app', 'The file {name} cannot be uploaded. Only files with these extensions are allowed: {extensions}', [
+                            'name' => $this->publication_file->name,
+                            'extensions' => $this->formatFileType($publicationFileFileType, false),
+                        ]));
+                    }
+                } else {
+                    if ($this->isNewRecord || (!$this->isNewRecord && $this->old_publication_file == '')) {
+                        $this->addError('publication_file', Yii::t('app', '{attribute} cannot be blank.', ['attribute' => $this->getAttributeLabel('publication_file')]));
+                    }
+                }
+            }
+
             if ($this->isNewRecord) {
                 if ($this->creation_id == null) {
                     $this->creation_id = !Yii::$app->user->isGuest ? Yii::$app->user->id : null;
@@ -425,16 +471,34 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 	 */
 	public function beforeSave($insert)
 	{
-		parent::beforeSave($insert);
-		
-        if (!$insert) {
-			// set jenisArsip
-			$event = new Event(['sender' => $this]);
-			Event::trigger(self::className(), self::EVENT_BEFORE_SAVE_PENYERAHAN, $event);
-		}
-        $this->color_code = strtolower($this->color_code);
+        if (parent::beforeSave($insert)) {
+            if (!$insert) {
+                // set jenisArsip
+                $event = new Event(['sender' => $this]);
+                Event::trigger(self::className(), self::EVENT_BEFORE_SAVE_PENYERAHAN, $event);
 
-		return true;
+                $uploadPath = self::getUploadPath();
+                $verwijderenPath = join('/', [self::getUploadPath(), 'verwijderen']);
+                $this->createUploadDirectory(self::getUploadPath());
+
+                // $this->publication_file = UploadedFile::getInstance($this, 'publication_file');
+                if ($this->publication_file instanceof UploadedFile && !$this->publication_file->getHasError()) {
+                    $fileName = join('-', [Inflector::camelize($this->type->type_name), time(), $this->id, $this->kode_box]).'.'.strtolower($this->publication_file->getExtension()); 
+                    if ($this->publication_file->saveAs(join('/', [$uploadPath, $fileName]))) {
+                        if ($this->old_publication_file != '' && file_exists(join('/', [$uploadPath, $this->old_publication_file]))) {
+                            rename(join('/', [$uploadPath, $this->old_publication_file]), join('/', [$verwijderenPath, $this->id.'-'.time().'_change_'.$this->old_publication_file]));
+                        }
+                        $this->publication_file = $fileName;
+                    }
+                } else {
+                    if ($this->publication_file == '') {
+                        $this->publication_file = $this->old_publication_file;
+                    }
+                }
+            }
+            $this->color_code = strtolower($this->color_code);
+        }
+        return true;
 	}
 
 	/**
@@ -444,10 +508,38 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 	{
         parent::afterSave($insert, $changedAttributes);
 
+        $uploadPath = self::getUploadPath();
+        $verwijderenPath = join('/', [self::getUploadPath(), 'verwijderen']);
+        $this->createUploadDirectory(self::getUploadPath());
+
         if ($insert) {
 			// set jenisArsip
 			$event = new Event(['sender' => $this]);
 			Event::trigger(self::className(), self::EVENT_BEFORE_SAVE_PENYERAHAN, $event);
+
+            // $this->publication_file = UploadedFile::getInstance($this, 'publication_file');
+            if ($this->publication_file instanceof UploadedFile && !$this->publication_file->getHasError()) {
+                $fileName = join('-', [Inflector::camelize($this->type->type_name), time(), $this->id, $this->kode_box]).'.'.strtolower($this->publication_file->getExtension()); 
+                if ($this->publication_file->saveAs(join('/', [$uploadPath, $fileName]))) {
+                    self::updateAll(['publication_file' => $fileName], ['id' => $this->id]);
+                }
+            }
 		}
+    }
+
+	/**
+	 * After delete attributes
+	 */
+	public function afterDelete()
+	{
+        parent::afterDelete();
+
+		$uploadPath = self::getUploadPath();
+		$verwijderenPath = join('/', [self::getUploadPath(), 'verwijderen']);
+
+        if ($this->publication_file != '' && file_exists(join('/', [$uploadPath, $this->publication_file]))) {
+            rename(join('/', [$uploadPath, $this->publication_file]), join('/', [$verwijderenPath, $this->id.'-'.time().'_deleted_'.$this->publication_file]));
+        }
+
 	}
 }

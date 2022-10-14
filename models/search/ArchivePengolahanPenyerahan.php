@@ -28,8 +28,8 @@ class ArchivePengolahanPenyerahan extends ArchivePengolahanPenyerahanModel
 	{
 		return [
 			[['id', 'publish', 'type_id', 'pengolahan_status', 'creation_id', 'modified_id', 
-                'jenisId'], 'integer'],
-			[['kode_box', 'pencipta_arsip', 'tahun', 'nomor_arsip', 'jumlah_arsip', 'nomor_box', 'jumlah_box', 'nomor_box_urutan', 'lokasi', 'pengolahan_tahun', 'creation_date', 'modified_date', 'updated_date', 
+                'jenisId', 'oPublication'], 'integer'],
+			[['kode_box', 'pencipta_arsip', 'tahun', 'nomor_arsip', 'jumlah_arsip', 'nomor_box', 'jumlah_box', 'nomor_box_urutan', 'lokasi', 'color_code', 'description', 'publication_file', 'pengolahan_tahun', 'creation_date', 'modified_date', 'updated_date', 
                 'jenisArsip', 'typeName', 'creationDisplayname', 'modifiedDisplayname'], 'safe'],
 		];
 	}
@@ -122,6 +122,10 @@ class ArchivePengolahanPenyerahan extends ArchivePengolahanPenyerahanModel
 			'asc' => ['modified.displayname' => SORT_ASC],
 			'desc' => ['modified.displayname' => SORT_DESC],
 		];
+		$attributes['oPublication'] = [
+			'asc' => ['t.publication_file' => SORT_ASC],
+			'desc' => ['t.publication_file' => SORT_DESC],
+		];
 		$dataProvider->setSort([
 			'attributes' => $attributes,
 			'defaultOrder' => ['id' => SORT_DESC],
@@ -152,6 +156,14 @@ class ArchivePengolahanPenyerahan extends ArchivePengolahanPenyerahanModel
 			'jenis.tag_id' => $this->jenisId,
 		]);
 
+        if (isset($params['oPublication']) && $params['oPublication'] != '') {
+            if ($this->oPublication == 1) {
+                $query->andWhere(['<>', 't.publication_file', '']);
+            } else if ($this->oPublication == 0) {
+                $query->andWhere(['=', 't.publication_file', '']);
+            }
+        }
+
         if (!isset($params['publish']) || (isset($params['publish']) && $params['publish'] == '')) {
             $query->andFilterWhere(['IN', 't.publish', [0,1]]);
         } else {
@@ -171,6 +183,9 @@ class ArchivePengolahanPenyerahan extends ArchivePengolahanPenyerahanModel
 			->andFilterWhere(['like', 't.jumlah_box', $this->jumlah_box])
 			->andFilterWhere(['like', 't.nomor_box_urutan', $this->nomor_box_urutan])
 			->andFilterWhere(['like', 't.lokasi', $this->lokasi])
+			->andFilterWhere(['like', 't.color_code', $this->color_code])
+			->andFilterWhere(['like', 't.description', $this->description])
+			->andFilterWhere(['like', 't.publication_file', $this->publication_file])
 			->andFilterWhere(['like', 't.pengolahan_tahun', $this->pengolahan_tahun])
 			->andFilterWhere(['like', 'jenisArsip.body', $this->jenisArsip])
 			->andFilterWhere(['like', 'type.type_name', $this->typeName])

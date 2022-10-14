@@ -12,6 +12,12 @@ penyerahan_submenu:
         0: 'penyerahan/admin/update'
         id: $_GET*id
       select: action
+    pengolahan:
+      label: Status Pengolahan
+      url:
+        0: 'penyerahan/admin/status'
+        id: $_GET*id
+      select: action
   1:
     publication:
       label: Publication Document

@@ -101,6 +101,15 @@ $attributes = [
 		'visible' => !$small,
 	],
 	[
+		'attribute' => 'publication_file',
+		'value' => function ($model) {
+			$uploadPath = $model::getUploadPath(false);
+			return $model->publication_file ? Html::a($model->publication_file, Url::to(join('/', ['@webpublic', $uploadPath, $model->publication_file])), ['alt' => $model->publication_file, 'target' => '_blank']): '-';
+		},
+		'format' => 'raw',
+		'visible' => !$small,
+	],
+	[
 		'attribute' => 'pengolahan_status',
 		'value' => $model->filterYesNo($model->pengolahan_status),
 		'visible' => !$small,

@@ -51,6 +51,12 @@ use ommu\archivePengolahan\models\ArchivePengolahanPenyerahanType;
 
 		<?php echo $form->field($model, 'lokasi');?>
 
+		<?php echo $form->field($model, 'color_code');?>
+
+		<?php echo $form->field($model, 'description');?>
+
+		<?php echo $form->field($model, 'publication_file');?>
+
 		<?php echo $form->field($model, 'pengolahan_tahun');?>
 
 		<?php echo $form->field($model, 'creation_date')
