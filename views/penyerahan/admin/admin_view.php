@@ -91,6 +91,16 @@ $attributes = [
 		'visible' => !$small,
 	],
 	[
+		'attribute' => 'color_code',
+		'value' => $model->color_code ? $model->color_code : '-',
+		'visible' => !$small,
+	],
+	[
+		'attribute' => 'description',
+		'value' => $model->description ? $model->description : '-',
+		'visible' => !$small,
+	],
+	[
 		'attribute' => 'pengolahan_status',
 		'value' => $model->filterYesNo($model->pengolahan_status),
 		'visible' => !$small,

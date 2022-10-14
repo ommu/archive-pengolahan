@@ -23,6 +23,8 @@
  * @property string $jumlah_box
  * @property string $nomor_box_urutan
  * @property string $lokasi
+ * @property string $color_code
+ * @property string $description
  * @property integer $pengolahan_status
  * @property string $pengolahan_tahun
  * @property string $creation_date
@@ -81,11 +83,11 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 			[['type_id', 'kode_box', 'pencipta_arsip'], 'required'],
 			[['pengolahan_status', 'pengolahan_tahun'], 'required', 'on' => self::SCENARIO_PENGOLAHAN_STATUS],
 			[['publish', 'type_id', 'pengolahan_status', 'creation_id', 'modified_id'], 'integer'],
-			[['pencipta_arsip', 'lokasi'], 'string'],
-			[['tahun', 'nomor_arsip', 'jumlah_arsip', 'nomor_box', 'jumlah_box', 'nomor_box_urutan', 'lokasi', 'pengolahan_status', 'pengolahan_tahun', 'jenisArsip'], 'safe'],
+			[['pencipta_arsip', 'lokasi', 'description'], 'string'],
+			[['tahun', 'nomor_arsip', 'jumlah_arsip', 'nomor_box', 'jumlah_box', 'nomor_box_urutan', 'lokasi', 'color_code', 'description', 'pengolahan_status', 'pengolahan_tahun', 'jenisArsip'], 'safe'],
 			[['kode_box'], 'string', 'max' => 64],
 			[['tahun', 'pengolahan_tahun'], 'string', 'max' => 16],
-			[['nomor_arsip', 'jumlah_arsip', 'nomor_box', 'jumlah_box', 'nomor_box_urutan'], 'string', 'max' => 32],
+			[['nomor_arsip', 'jumlah_arsip', 'nomor_box', 'jumlah_box', 'nomor_box_urutan', 'color_code'], 'string', 'max' => 32],
 			[['type_id'], 'exist', 'skipOnError' => true, 'targetClass' => ArchivePengolahanPenyerahanType::className(), 'targetAttribute' => ['type_id' => 'id']],
 		];
 	}
@@ -110,6 +112,8 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 			'lokasi' => Yii::t('app', 'Lokasi'),
 			'pengolahan_status' => Yii::t('app', 'Status Pengolahan'),
 			'pengolahan_tahun' => Yii::t('app', 'Tahun Pengolahan'),
+			'color_code' => Yii::t('app', 'Color Code'),
+			'description' => Yii::t('app', 'Description'),
 			'creation_date' => Yii::t('app', 'Creation Date'),
 			'creation_id' => Yii::t('app', 'Creation'),
 			'modified_date' => Yii::t('app', 'Modified Date'),
@@ -128,7 +132,7 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 	public function scenarios()
 	{
 		$scenarios = parent::scenarios();
-		$scenarios[self::SCENARIO_PENGOLAHAN_STATUS] = ['publish', 'type_id', 'kode_box', 'pencipta_arsip', 'tahun', 'nomor_arsip', 'jumlah_arsip', 'nomor_box', 'jumlah_box', 'nomor_box_urutan', 'lokasi', 'pengolahan_status', 'pengolahan_tahun'];
+		$scenarios[self::SCENARIO_PENGOLAHAN_STATUS] = ['publish', 'type_id', 'kode_box', 'pencipta_arsip', 'tahun', 'nomor_arsip', 'jumlah_arsip', 'nomor_box', 'jumlah_box', 'nomor_box_urutan', 'lokasi', 'color_code', 'description', 'pengolahan_status', 'pengolahan_tahun'];
 		return $scenarios;
 	}
 
@@ -271,6 +275,18 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 			},
 			'format' => 'html',
 		];
+		$this->templateColumns['color_code'] = [
+			'attribute' => 'color_code',
+			'value' => function($model, $key, $index, $column) {
+				return $model->color_code;
+			},
+		];
+		$this->templateColumns['description'] = [
+			'attribute' => 'description',
+			'value' => function($model, $key, $index, $column) {
+				return $model->description;
+			},
+		];
 		$this->templateColumns['pengolahan_tahun'] = [
 			'attribute' => 'pengolahan_tahun',
 			'value' => function($model, $key, $index, $column) {
@@ -380,7 +396,7 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 		// $this->typeName = isset($this->type) ? $this->type->type_name : '-';
 		// $this->creationDisplayname = isset($this->creation) ? $this->creation->displayname : '-';
 		// $this->modifiedDisplayname = isset($this->modified) ? $this->modified->displayname : '-';
-		// $this->jeni = $this->getJenis(true) ? 1 : 0;
+		// $this->jenisArsip = $this->getJenis(true) ? 1 : 0;
         $this->pengolahan_status = $this->pengolahan_status != '' && $this->pengolahan_status == 1 ? $this->pengolahan_status : 0;
 	}
 
@@ -416,6 +432,7 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 			$event = new Event(['sender' => $this]);
 			Event::trigger(self::className(), self::EVENT_BEFORE_SAVE_PENYERAHAN, $event);
 		}
+        $this->color_code = strtolower($this->color_code);
 
 		return true;
 	}

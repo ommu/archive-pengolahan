@@ -97,6 +97,14 @@ echo $form->field($model, 'jenisArsip', ['options' => ['class' => 'form-group ro
 	])
 	->label($model->getAttributeLabel('jenisArsip'));?>
 
+<?php echo $form->field($model, 'color_code')
+	->textInput(['maxlength' => true])
+	->label($model->getAttributeLabel('color_code')); ?>
+
+<?php echo $form->field($model, 'description')
+	->textarea(['rows' => 2, 'cols' => 50])
+	->label($model->getAttributeLabel('description')); ?>
+
 <hr/>
 
 <?php $submitButtonOption = [];
