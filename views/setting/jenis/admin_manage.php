@@ -31,7 +31,7 @@ $this->params['menu']['option'] = [
 <?php Pjax::begin(); ?>
 
 <?php if ($penyerahan != null) {
-	echo $this->render('/admin/admin_view', ['model' => $penyerahan, 'small' => true]);
+	echo $this->render('/penyerahan/admin/admin_view', ['model' => $penyerahan, 'small' => true]);
 } ?>
 
 <?php //echo $this->render('_search', ['model' => $searchModel]); ?>

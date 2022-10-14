@@ -2,7 +2,7 @@
 /**
  * Archive Pengolahan Penyerahans (archive-pengolahan-penyerahan)
  * @var $this app\components\View
- * @var $this ommu\archivePengolahan\controllers\AdminController
+ * @var $this ommu\archivePengolahan\controllers\penyerahan\AdminController
  * @var $model ommu\archivePengolahan\models\ArchivePengolahanPenyerahan
  *
  * @author Putra Sudaryanto <putra@ommu.id>
@@ -19,7 +19,7 @@ use yii\widgets\DetailView;
 
 if (!$small) {
     $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Penyerahan'), 'url' => ['index']];
-    $this->params['breadcrumbs'][] = $model->kode_box;
+    $this->params['breadcrumbs'][] = $model->type->type_name. ': ' .$model->kode_box;
 } ?>
 
 <div class="archive-pengolahan-penyerahan-view">

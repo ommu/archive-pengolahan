@@ -1,7 +1,7 @@
 <?php
 /**
  * AdminController
- * @var $this ommu\archivePengolahan\controllers\AdminController
+ * @var $this ommu\archivePengolahan\controllers\penyerahan\AdminController
  * @var $model ommu\archivePengolahan\models\ArchivePengolahanPenyerahan
  *
  * AdminController implements the CRUD actions for ArchivePengolahanPenyerahan model.
@@ -25,7 +25,7 @@
  *
  */
 
-namespace ommu\archivePengolahan\controllers;
+namespace ommu\archivePengolahan\controllers\penyerahan;
 
 use Yii;
 use app\components\Controller;
@@ -48,6 +48,12 @@ class AdminController extends Controller
             $this->subMenu = $this->module->params['penyerahan_submenu'];
         }
 
+		// $setting = ArchiveSetting::find()
+		// 	->select(['breadcrumb_param'])
+		// 	->where(['id' => 1])
+		// 	->one();
+		// $this->breadcrumbApp = $setting->breadcrumb;
+		// $this->breadcrumbAppParam = $setting->getBreadcrumbAppParam();
 	}
 
 	/**
@@ -163,6 +169,12 @@ class AdminController extends Controller
 	public function actionUpdate($id)
 	{
 		$model = $this->findModel($id);
+        if (empty($model->type->feature) || !in_array('item', $model->type->feature)) {
+            unset($this->subMenu[1]['item']);
+        }
+        if (empty($model->type->feature) || !in_array('publication', $model->type->feature)) {
+            unset($this->subMenu[1]['publication']);
+        }
 
         if (Yii::$app->request->isPost) {
             $model->load(Yii::$app->request->post());
@@ -181,7 +193,7 @@ class AdminController extends Controller
             }
         }
 
-		$this->view->title = Yii::t('app', 'Update Penyerahan: {type-id}', ['type-id' => $model->kode_box]);
+		$this->view->title = Yii::t('app', 'Update Penyerahan: {type-id}', ['type-id' => $model->type->type_name. ' ' .$model->kode_box]);
 		$this->view->description = '';
 		$this->view->keywords = '';
 		return $this->render('admin_update', [
@@ -197,8 +209,14 @@ class AdminController extends Controller
 	public function actionView($id)
 	{
         $model = $this->findModel($id);
+        if (empty($model->type->feature) || !in_array('item', $model->type->feature)) {
+            unset($this->subMenu[1]['item']);
+        }
+        if (empty($model->type->feature) || !in_array('publication', $model->type->feature)) {
+            unset($this->subMenu[1]['publication']);
+        }
 
-		$this->view->title = Yii::t('app', 'Detail Penyerahan: {type-id}', ['type-id' => $model->kode_box]);
+		$this->view->title = Yii::t('app', 'Detail Penyerahan: {type-id}', ['type-id' => $model->type->type_name. ' ' .$model->kode_box]);
 		$this->view->description = '';
 		$this->view->keywords = '';
 		return $this->oRender('admin_view', [
@@ -232,6 +250,12 @@ class AdminController extends Controller
 	{
 		$model = $this->findModel($id);
         $model->scenario = ArchivePengolahanPenyerahan::SCENARIO_PENGOLAHAN_STATUS;
+        if (empty($model->type->feature) || !in_array('item', $model->type->feature)) {
+            unset($this->subMenu[1]['item']);
+        }
+        if (empty($model->type->feature) || !in_array('publication', $model->type->feature)) {
+            unset($this->subMenu[1]['publication']);
+        }
 
         if (Yii::$app->request->isPost) {
             $model->load(Yii::$app->request->post());
@@ -250,7 +274,7 @@ class AdminController extends Controller
             }
         }
 
-		$this->view->title = Yii::t('app', 'Update Status Pengolahan: {type-id}', ['type-id' => $model->kode_box]);
+		$this->view->title = Yii::t('app', 'Update Status Pengolahan: {type-id}', ['type-id' => $model->type->type_name. ' ' .$model->kode_box]);
 		$this->view->description = '';
 		$this->view->keywords = '';
 		return $this->oRender('admin_status', [

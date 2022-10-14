@@ -15,7 +15,6 @@
  * @property integer $publish
  * @property string $type_name
  * @property string $type_desc
- * @property string $field
  * @property string $feature
  * @property string $creation_date
  * @property integer $creation_id
@@ -63,8 +62,8 @@ class ArchivePengolahanPenyerahanType extends \app\components\ActiveRecord
 		return [
 			[['type_name', 'type_desc'], 'required'],
 			[['publish', 'creation_id', 'modified_id'], 'integer'],
-			//[['field', 'feature'], 'json'],
-			[['field', 'feature'], 'safe'],
+			//[['feature'], 'json'],
+			[['feature'], 'safe'],
 			[['type_name'], 'string', 'max' => 64],
 			[['type_desc'], 'string', 'max' => 256],
 		];
@@ -80,7 +79,6 @@ class ArchivePengolahanPenyerahanType extends \app\components\ActiveRecord
 			'publish' => Yii::t('app', 'Publish'),
 			'type_name' => Yii::t('app', 'Type Name'),
 			'type_desc' => Yii::t('app', 'Type Desc'),
-			'field' => Yii::t('app', 'Field'),
 			'feature' => Yii::t('app', 'Feature'),
 			'creation_date' => Yii::t('app', 'Creation Date'),
 			'creation_id' => Yii::t('app', 'Creation'),
@@ -269,28 +267,23 @@ class ArchivePengolahanPenyerahanType extends \app\components\ActiveRecord
 	}
 
 	/**
-	 * function getField
+	 * function getFeature
 	 */
-	public static function getField($type='field', $field=null, $sep='li')
+	public static function getFeature($feature=null, $sep='li')
 	{
-        if ($type == 'field') {
-            $items = array(
-                'publication' => Yii::t('app', 'Unggah Publikasi'),
-            );
-        } else if ($type == 'feature') {
-            $items = array(
-                'item' => Yii::t('app', 'Tambahkan Item Arsip'),
-            );
-        }
+        $items = array(
+            'publication' => Yii::t('app', 'Unggah Publikasi'),
+            'item' => Yii::t('app', 'Tambahkan Item Arsip'),
+        );
 
-        if ($field !== null) {
-            if (!is_array($field) || (is_array($field) && empty($field))) {
+        if ($feature !== null) {
+            if (!is_array($feature) || (is_array($feature) && empty($feature))) {
                 return '-';
             }
 
 			$item = [];
 			foreach ($items as $key => $val) {
-                if (in_array($key, $field)) {
+                if (in_array($key, $feature)) {
                     $item[$key] = $val;
                 }
 			}
@@ -315,11 +308,6 @@ class ArchivePengolahanPenyerahanType extends \app\components\ActiveRecord
 	{
 		parent::afterFind();
 
-        if ($this->field == '') {
-            $this->field = [];
-        } else {
-            $this->field = Json::decode($this->field);
-        }
         if ($this->feature == '') {
             $this->feature = [];
         } else {
@@ -355,7 +343,6 @@ class ArchivePengolahanPenyerahanType extends \app\components\ActiveRecord
 	public function beforeSave($insert)
 	{
         if (parent::beforeSave($insert)) {
-			$this->field = Json::encode($this->field);
 			$this->feature = Json::encode($this->feature);
         }
         return true;

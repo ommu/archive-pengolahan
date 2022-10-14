@@ -2,7 +2,7 @@
 /**
  * Archive Pengolahan Penyerahans (archive-pengolahan-penyerahan)
  * @var $this app\components\View
- * @var $this ommu\archivePengolahan\controllers\AdminController
+ * @var $this ommu\archivePengolahan\controllers\penyerahan\AdminController
  * @var $model ommu\archivePengolahan\models\ArchivePengolahanPenyerahan
  * @var $form app\components\widgets\ActiveForm
  *
@@ -17,12 +17,13 @@
 use yii\helpers\Url;
 
 $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Penyerahan'), 'url' => ['index']];
-$this->params['breadcrumbs'][] = Yii::t('app', 'Create');
+$this->params['breadcrumbs'][] = ['label' => $model->type->type_name. ': ' .$model->kode_box, 'url' => ['view', 'id' => $model->id]];
+$this->params['breadcrumbs'][] = Yii::t('app', 'Update');
 ?>
 
-<div class="archive-pengolahan-penyerahan-create">
+<div class="archive-pengolahan-penyerahan-update">
 
-<?php echo $this->render('_form', [
+<?php echo $this->render('_form_status', [
 	'model' => $model,
 ]); ?>
 

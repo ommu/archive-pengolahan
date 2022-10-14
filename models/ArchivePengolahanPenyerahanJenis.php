@@ -187,7 +187,7 @@ class ArchivePengolahanPenyerahanJenis extends \app\components\ActiveRecord
 			'attribute' => 'penyerahans',
 			'value' => function($model, $key, $index, $column) {
                 $penyerahans = $model->penyerahans;
-				return Html::a($penyerahans, ['admin/manage', 'tag' => $model->tag_id], ['title' => Yii::t('app', '{count} penyerahan', ['count' => $penyerahans]), 'data-pjax' => 0]);
+				return Html::a($penyerahans, ['penyerahan/admin/manage', 'tag' => $model->tag_id], ['title' => Yii::t('app', '{count} penyerahan', ['count' => $penyerahans]), 'data-pjax' => 0]);
 			},
 			'filter' => false,
             'contentOptions' => ['class' => 'text-center'],

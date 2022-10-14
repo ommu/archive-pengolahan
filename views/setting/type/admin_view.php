@@ -53,16 +53,6 @@ $attributes = [
 		'visible' => !$small,
 	],
 	[
-		'attribute' => 'field',
-		'value' => function ($model) {
-            if (is_array($model->field) && empty($model->field)) {
-                return '-';
-            }
-            return Json::encode($model->field);
-		},
-		'visible' => !$small,
-	],
-	[
 		'attribute' => 'feature',
 		'value' => function ($model) {
             if (is_array($model->feature) && empty($model->feature)) {

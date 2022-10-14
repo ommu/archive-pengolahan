@@ -3,16 +3,35 @@ penyerahan_submenu:
     view:
       label: Detail
       url:
-        0: 'admin/view'
+        0: 'penyerahan/admin/view'
         id: $_GET*id
       select: action
     update:
       label: Update
       url:
-        0: 'admin/update'
+        0: 'penyerahan/admin/update'
         id: $_GET*id
       select: action
   1:
+    publication:
+      label: Publication Document
+      url:
+        0: 'penyerahan/admin/publication'
+        id: $_GET*id
+      select: action
+    item:
+      label: Item(s) Publish
+      url:
+        0: 'penyerahan/item/manage'
+        penyerahan: $_GET*id
+      select: controller
+    card:
+      label: Description Card
+      url:
+        0: 'card/manage'
+        penyerahan: $_GET*id
+      select: controller
+  2:
     delete:
       label: Delete
       url:

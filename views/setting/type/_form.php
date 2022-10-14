@@ -45,14 +45,7 @@ use yii\helpers\ArrayHelper;
 
 <hr/>
 
-<?php $field = $model::getField('field');
-echo $form->field($model, 'field')
-	->checkboxList($field)
-	->label($model->getAttributeLabel('field')); ?>
-
-<hr/>
-
-<?php $feature = $model::getField('feature');
+<?php $feature = $model::getFeature();
 echo $form->field($model, 'feature')
 	->checkboxList($feature)
 	->label($model->getAttributeLabel('feature')); ?>

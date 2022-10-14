@@ -138,7 +138,7 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 	public function getType()
 	{
 		return $this->hasOne(ArchivePengolahanPenyerahanType::className(), ['id' => 'type_id'])
-            ->select(['id', 'type_name']);
+            ->select(['id', 'type_name', 'feature']);
 	}
 
 	/**
@@ -358,7 +358,7 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 
 		$items = [];
 		foreach ($subjects as $key => $val) {
-			$items[$val] = Html::a($val, ['admin/manage', $attr => $key], ['title' => $val]);
+			$items[$val] = Html::a($val, ['penyerahan/admin/manage', $attr => $key], ['title' => $val]);
 		}
 
         if ($sep == 'li') {

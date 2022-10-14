@@ -2,7 +2,7 @@
 /**
  * Archive Pengolahan Penyerahans (archive-pengolahan-penyerahan)
  * @var $this app\components\View
- * @var $this ommu\archivePengolahan\controllers\AdminController
+ * @var $this ommu\archivePengolahan\controllers\penyerahan\AdminController
  * @var $model ommu\archivePengolahan\models\ArchivePengolahanPenyerahan
  * @var $searchModel ommu\archivePengolahan\models\search\ArchivePengolahanPenyerahan
  *
