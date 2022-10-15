@@ -36,7 +36,9 @@
 		}
 	],
 	"require": {
-		"php": "~7.0"
+		"php": "~7.0",
+		"ommu/archive": "dev-master",
+		"phpoffice/phpspreadsheet": "~1.5"
 	},
 	"autoload": {
 		"psr-4": {
