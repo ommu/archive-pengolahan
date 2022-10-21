@@ -524,8 +524,8 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
                 Event::trigger(self::className(), self::EVENT_BEFORE_SAVE_PENYERAHAN, $event);
 
                 $uploadPath = self::getUploadPath();
-                $verwijderenPath = join('/', [self::getUploadPath(), 'verwijderen']);
-                $this->createUploadDirectory(self::getUploadPath());
+                $verwijderenPath = join('/', [$uploadPath, 'verwijderen']);
+                $this->createUploadDirectory($uploadPath);
 
                 // $this->publication_file = UploadedFile::getInstance($this, 'publication_file');
                 if ($this->publication_file instanceof UploadedFile && !$this->publication_file->getHasError()) {
@@ -555,8 +555,8 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
         parent::afterSave($insert, $changedAttributes);
 
         $uploadPath = self::getUploadPath();
-        $verwijderenPath = join('/', [self::getUploadPath(), 'verwijderen']);
-        $this->createUploadDirectory(self::getUploadPath());
+        $verwijderenPath = join('/', [$uploadPath, 'verwijderen']);
+        $this->createUploadDirectory($uploadPath);
 
         if ($insert) {
 			// set jenisArsip
@@ -581,7 +581,7 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
         parent::afterDelete();
 
 		$uploadPath = self::getUploadPath();
-		$verwijderenPath = join('/', [self::getUploadPath(), 'verwijderen']);
+		$verwijderenPath = join('/', [$uploadPath, 'verwijderen']);
 
         if ($this->publication_file != '' && file_exists(join('/', [$uploadPath, $this->publication_file]))) {
             rename(join('/', [$uploadPath, $this->publication_file]), join('/', [$verwijderenPath, join('_', [$this->publication_file, time(), 'deleted'])]));
