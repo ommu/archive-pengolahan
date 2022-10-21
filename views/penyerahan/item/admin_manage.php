@@ -29,7 +29,7 @@ if ($penyerahan) {
 
 if ($penyerahan) {
     $this->params['menu']['content'] = [
-        ['label' => Yii::t('app', 'Add Penyerahan Item'), 'url' => Url::to(['create', 'id' => $penyerahan->id]), 'icon' => 'plus-square', 'htmlOptions' => ['class' => 'btn btn-success']],
+        ['label' => Yii::t('app', 'Add Item'), 'url' => Url::to(['create', 'id' => $penyerahan->id]), 'icon' => 'plus-square', 'htmlOptions' => ['class' => 'btn btn-success']],
     ];
 }
 $this->params['menu']['option'] = [

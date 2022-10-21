@@ -49,7 +49,7 @@ echo $form->field($model, 'publication_file', ['template' => '{label}{beginWrapp
 
 <hr/>
 
-<?php $submitButtonOption = [];
+<?php $submitButtonOption = ['button' => Html::submitButton(Yii::t('app', 'Upload'), ['class' => 'btn btn-primary'])];
 if (!$model->isNewRecord && Yii::$app->request->isAjax) {
     $submitButtonOption = ArrayHelper::merge($submitButtonOption, [
         'backTo' => Html::a(Html::tag('span', '&laquo;', ['class' => 'mr-1']).Yii::t('app', 'Back to detail'), ['view', 'id' => $model->primaryKey], ['title' => Yii::t('app', 'Detail Penyerahan'), 'class' => 'ml-4 modal-btn']),

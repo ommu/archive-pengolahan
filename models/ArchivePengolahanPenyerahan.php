@@ -375,7 +375,7 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
             'value' => function($model, $key, $index, $column) {
                 $items = $model->getItems(true);
                 // $items = $model->grid->item;
-                return Html::a($items, ['penyerahan/item/manage', 'penyerahan' => $model->primaryKey, 'publish' => 1], ['title' => Yii::t('app', '{count} items', ['count' => $items]), 'data-pjax' => 0]);
+                return Html::a($items, ['penyerahan/item/manage', 'penyerahan' => $model->primaryKey], ['title' => Yii::t('app', '{count} items', ['count' => $items]), 'data-pjax' => 0]);
             },
             'filter' => false,
             'contentOptions' => ['class' => 'text-center'],
@@ -529,10 +529,10 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 
                 // $this->publication_file = UploadedFile::getInstance($this, 'publication_file');
                 if ($this->publication_file instanceof UploadedFile && !$this->publication_file->getHasError()) {
-                    $fileName = join('-', [Inflector::camelize($this->type->type_name), time(), $this->id, $this->kode_box]).'.'.strtolower($this->publication_file->getExtension()); 
+                    $fileName = join('_', [Inflector::camelize($this->type->type_name), time(), $this->id, $this->kode_box]).'.'.strtolower($this->publication_file->getExtension()); 
                     if ($this->publication_file->saveAs(join('/', [$uploadPath, $fileName]))) {
                         if ($this->old_publication_file != '' && file_exists(join('/', [$uploadPath, $this->old_publication_file]))) {
-                            rename(join('/', [$uploadPath, $this->old_publication_file]), join('/', [$verwijderenPath, $this->id.'-'.time().'_change_'.$this->old_publication_file]));
+                            rename(join('/', [$uploadPath, $this->old_publication_file]), join('/', [$verwijderenPath, join('_', [$this->old_publication_file, time(), 'change'])]));
                         }
                         $this->publication_file = $fileName;
                     }
@@ -565,7 +565,7 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 
             // $this->publication_file = UploadedFile::getInstance($this, 'publication_file');
             if ($this->publication_file instanceof UploadedFile && !$this->publication_file->getHasError()) {
-                $fileName = join('-', [Inflector::camelize($this->type->type_name), time(), $this->id, $this->kode_box]).'.'.strtolower($this->publication_file->getExtension()); 
+                $fileName = join('_', [Inflector::camelize($this->type->type_name), time(), $this->id, $this->kode_box]).'.'.strtolower($this->publication_file->getExtension()); 
                 if ($this->publication_file->saveAs(join('/', [$uploadPath, $fileName]))) {
                     self::updateAll(['publication_file' => $fileName], ['id' => $this->id]);
                 }
@@ -584,7 +584,7 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 		$verwijderenPath = join('/', [self::getUploadPath(), 'verwijderen']);
 
         if ($this->publication_file != '' && file_exists(join('/', [$uploadPath, $this->publication_file]))) {
-            rename(join('/', [$uploadPath, $this->publication_file]), join('/', [$verwijderenPath, $this->id.'-'.time().'_deleted_'.$this->publication_file]));
+            rename(join('/', [$uploadPath, $this->publication_file]), join('/', [$verwijderenPath, join('_', [$this->publication_file, time(), 'deleted'])]));
         }
 
 	}
