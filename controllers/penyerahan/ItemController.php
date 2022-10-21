@@ -13,6 +13,7 @@
  *  Update
  *  View
  *  Delete
+ *	Import
  *
  *  findModel
  *
@@ -32,9 +33,16 @@ use mdm\admin\components\AccessControl;
 use yii\filters\VerbFilter;
 use ommu\archivePengolahan\models\ArchivePengolahanPenyerahanItem;
 use ommu\archivePengolahan\models\search\ArchivePengolahanPenyerahanItem as ArchivePengolahanPenyerahanItemSearch;
+use yii\web\UploadedFile;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use yii\helpers\Inflector;
+use thamtech\uuid\helpers\UuidHelper;
+use ommu\archivePengolahan\models\ArchivePengolahanImport;
 
 class ItemController extends Controller
 {
+	use \ommu\traits\FileTrait;
+
 	/**
 	 * {@inheritdoc}
 	 */
@@ -211,6 +219,134 @@ class ItemController extends Controller
 		return $this->oRender('admin_view', [
 			'model' => $model,
 			'small' => false,
+		]);
+	}
+
+	/**
+	 * Import a new ArchivePengolahanPenyerahanItem model.
+	 * If creation is successful, the browser will be redirected to the 'view' page.
+	 * @return mixed
+	 */
+	public function actionImport()
+	{
+        if (($id = Yii::$app->request->get('id')) == null) {
+            throw new \yii\web\ForbiddenHttpException(Yii::t('app', 'The requested page does not exist.'));
+        }
+
+        $penyerahanAsset = \ommu\archivePengolahan\components\assets\ImportTemplateAsset::register($this->getView());
+        $template = join('/', [$penyerahanAsset->baseUrl, 'penyerahanItemImport_template.xlsx']);
+
+		$model = new ArchivePengolahanPenyerahanItem(['penyerahan_id' => $id]);
+		$this->subMenuParam = $id;
+        $penyerahan = $model->penyerahan;
+
+        if (Yii::$app->request->isPost) {
+			$penyerahanPath = $model->penyerahan::getUploadPath();
+			$itemImportPath = join('/', [$penyerahanPath, '_import']);
+			$verwijderenPath = join('/', [$itemImportPath, 'verwijderen']);
+			$this->createUploadDirectory($itemImportPath);
+
+			$errors = [];
+			$importFilename = UploadedFile::getInstanceByName('importFilename');
+            if ($importFilename instanceof UploadedFile && !$importFilename->getHasError()) {
+				$importFileType = ['xlsx', 'xls'];
+                if (in_array(strtolower($importFilename->getExtension()), $importFileType)) {
+					$fileName = join('_', [Inflector::camelize($model->type->type_name), $model->penyerahan_id, time(), $model->penyerahan->kode_box, 'import', UuidHelper::uuid()]);
+					$fileNameExtension = $fileName.'.'.strtolower($importFilename->getExtension());
+
+                    $importId = 0;
+                    $import = new ArchivePengolahanImport;
+                    $import->type = 'item';
+                    $import->original_filename = $importFilename->name;
+                    $import->custom_filename = $fileNameExtension;
+                    if($import->save()) {
+                        $importId = $import->id;
+                    }
+
+                    if ($importFilename->saveAs(join('/', [$itemImportPath, $fileNameExtension]))) {
+						$spreadsheet = IOFactory::load(join('/', [$itemImportPath, $fileNameExtension]));
+						$sheetData = $spreadsheet->getActiveSheet()->toArray();
+
+						try {
+                            $i = 0;
+                            $j = 0;
+							foreach ($sheetData as $key => $value) {
+                                if ($key == 0) {
+                                    continue;
+                                }
+                                $i++;
+								$archive_number         = trim($value[0]);
+								$archive_description    = trim($value[1]);
+								$year                   = trim($value[2]);
+								$volume                 = trim($value[3]);
+								$code                   = trim($value[4]);
+								$description            = trim($value[5]);
+
+								$model = new ArchivePengolahanPenyerahanItem;
+								$model->penyerahan_id = $id;
+								$model->archive_number = $archive_number;
+								$model->archive_description = $archive_description;
+								$model->year = $year;
+								$model->volume = $volume;
+								$model->code = $code;
+								$model->description = $description;
+                                if ($importId) {
+								    $model->import_id = $importId;
+                                }
+                                if (!$model->save()) {
+                                    $j++;
+                                    $errors['row#'.$key] = $model->getErrors();
+                                }
+							}
+							Yii::$app->session->setFlash('success', Yii::t('app', 'Archive penyerahan item success imported.'));
+						} catch (\Exception $e) {
+							throw $e;
+						} catch (\Throwable $e) {
+							throw $e;
+						}
+					}
+
+                    if ($importId) {
+                        $import = ArchivePengolahanImport::findOne($importId);
+                        $import->all = $i;
+                        $import->error = $j;
+                        $import->log = $errors;
+                        $import->save();
+                    }
+	
+				} else {
+					Yii::$app->session->setFlash('error', Yii::t('app', 'The file {name} cannot be uploaded. Only files with these extensions are allowed: {extensions}', [
+						'name' => $importFilename->name,
+						'extensions' => $importFileType,
+					]));
+				}
+			} else {
+				Yii::$app->session->setFlash('error', Yii::t('app', 'Import file cannot be blank.'));
+            }
+
+            if (!empty($errors)) {
+				$obligationImportErrorFile = join('/', [$itemImportPath, $fileName.'.json']);
+                if (!file_exists($obligationImportErrorFile)) {
+					file_put_contents($obligationImportErrorFile, Json::encode($errors));
+                }
+			}
+
+            if (!Yii::$app->request->isAjax) {
+				return $this->redirect(['import', 'id' => $id]);
+            }
+			return $this->redirect(Yii::$app->request->referrer ?: ['import', 'id' => $id]);
+		}
+
+		$this->view->title = Yii::t('app', 'Import Penyerahan Item: {penyerahan-id}', ['penyerahan-id' => $model->penyerahan->type->type_name]);
+		$this->view->description = '';
+        if (Yii::$app->request->isAjax) {
+			$this->view->description = Yii::t('app', 'Are you sure you want to import penyerahan item data?');
+        }
+		$this->view->keywords = '';
+		return $this->oRender('admin_import', [
+			'model' => $model,
+			'template' => $template,
+			'penyerahan' => $penyerahan,
 		]);
 	}
 

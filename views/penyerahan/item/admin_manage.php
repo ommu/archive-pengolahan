@@ -30,11 +30,13 @@ if ($penyerahan) {
 if ($penyerahan) {
     $this->params['menu']['content'] = [
         ['label' => Yii::t('app', 'Add Item'), 'url' => Url::to(['create', 'id' => $penyerahan->id]), 'icon' => 'plus-square', 'htmlOptions' => ['class' => 'btn btn-success']],
+        ['label' => Yii::t('app', 'Import Item'), 'url' => Url::to(['import', 'id' => $penyerahan->id]), 'icon' => 'plus-square', 'htmlOptions' => ['class' => 'btn btn-dark']],
     ];
 }
 $this->params['menu']['option'] = [
 	//['label' => Yii::t('app', 'Search'), 'url' => 'javascript:void(0);'],
 	['label' => Yii::t('app', 'Grid Option'), 'url' => 'javascript:void(0);'],
+	['label' => Yii::t('app', 'Import Histories'), 'url' => Url::to(['import/manage', 'type' => 'item'])],
 ];
 ?>
 
