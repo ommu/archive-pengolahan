@@ -10,7 +10,17 @@
  *
  */
 
+use ommu\archivePengolahan\Events;
+use ommu\archivePengolahan\models\ArchivePengolahanPenyerahan;
+
 return [
 	'id' => 'archive-pengolahan',
 	'class' => ommu\archivePengolahan\Module::className(),
+	'events' => [
+		[
+			'class'    => ArchivePengolahanPenyerahan::className(),
+			'event'    => ArchivePengolahanPenyerahan::EVENT_BEFORE_SAVE_PENYERAHAN,
+			'callback' => [Events::className(), 'onBeforeSaveArchives']
+		],
+	],
 ];
