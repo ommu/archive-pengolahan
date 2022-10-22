@@ -63,7 +63,7 @@ class ArchivePengolahanImport extends \app\components\ActiveRecord
 		return [
 			[['type', 'original_filename', 'custom_filename'], 'required'],
 			[['all', 'error', 'rollback', 'creation_id'], 'integer'],
-			[['type', 'original_filename', 'custom_filename', 'log'], 'string'],
+			[['type', 'original_filename', 'custom_filename'], 'string'],
 			//[['log'], 'json'],
 			[['all', 'error', 'log'], 'safe'],
 		];
@@ -235,7 +235,7 @@ class ArchivePengolahanImport extends \app\components\ActiveRecord
 	public static function getType($value=null)
 	{
 		$items = array(
-			'pengolahan' => Yii::t('app', 'Pengolahan'),
+			'penyerahan' => Yii::t('app', 'Penyerahan'),
 			'item' => Yii::t('app', 'Item'),
 		);
 

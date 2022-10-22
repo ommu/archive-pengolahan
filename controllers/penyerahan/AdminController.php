@@ -13,8 +13,9 @@
  *  Update
  *  View
  *  Delete
- *  Status
  *  Publication
+ *  Status
+ *	Import
  *
  *  findModel
  *
@@ -36,9 +37,16 @@ use ommu\archivePengolahan\models\ArchivePengolahanPenyerahan;
 use ommu\archivePengolahan\models\search\ArchivePengolahanPenyerahan as ArchivePengolahanPenyerahanSearch;
 use yii\helpers\ArrayHelper;
 use yii\web\UploadedFile;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use thamtech\uuid\helpers\UuidHelper;
+use ommu\archivePengolahan\models\ArchivePengolahanPenyerahanType;
+use ommu\archivePengolahan\models\ArchivePengolahanImport;
+use yii\helpers\Inflector;
 
 class AdminController extends Controller
 {
+	use \ommu\traits\FileTrait;
+
 	/**
 	 * {@inheritdoc}
 	 */
@@ -325,6 +333,145 @@ class AdminController extends Controller
 		$this->view->keywords = '';
 		return $this->oRender('admin_status', [
 			'model' => $model,
+		]);
+	}
+
+	/**
+	 * Import a new ArchivePengolahanPenyerahanItem model.
+	 * If creation is successful, the browser will be redirected to the 'view' page.
+	 * @return mixed
+	 */
+	public function actionImport()
+	{
+        $penyerahanAsset = \ommu\archivePengolahan\components\assets\ImportTemplateAsset::register($this->getView());
+        $template = join('/', [$penyerahanAsset->baseUrl, 'penyerahanImport_template.xlsx']);
+
+		$types = ArchivePengolahanPenyerahanType::find()
+			->select(['id', 'type_name'])
+			->all();
+		$types = ArrayHelper::map($types, 'id', 'type_name');
+        if ($types) {
+            foreach ($types as $key => $val) {
+                $types[$key] = Inflector::camelize(strtolower($val));
+            }
+        }
+		$types = array_flip($types);
+
+
+        if (Yii::$app->request->isPost) {
+			$penyerahanPath = ArchivePengolahanPenyerahan::getUploadPath();
+			$penyerahanImportPath = join('/', [$penyerahanPath, '_import']);
+			$verwijderenPath = join('/', [$penyerahanImportPath, 'verwijderen']);
+			$this->createUploadDirectory($penyerahanImportPath);
+
+			$errors = [];
+			$importFilename = UploadedFile::getInstanceByName('importFilename');
+            if ($importFilename instanceof UploadedFile && !$importFilename->getHasError()) {
+				$importFileType = ['xlsx', 'xls'];
+                if (in_array(strtolower($importFilename->getExtension()), $importFileType)) {
+					$fileName = join('_', ['penyerahan', time(), 'import', UuidHelper::uuid()]);
+					$fileNameExtension = $fileName.'.'.strtolower($importFilename->getExtension());
+
+                    $importId = 0;
+                    $import = new ArchivePengolahanImport;
+                    $import->type = 'penyerahan';
+                    $import->original_filename = $importFilename->name;
+                    $import->custom_filename = $fileNameExtension;
+                    if($import->save()) {
+                        $importId = $import->id;
+                    }
+
+                    if ($importFilename->saveAs(join('/', [$penyerahanImportPath, $fileNameExtension]))) {
+						$spreadsheet = IOFactory::load(join('/', [$penyerahanImportPath, $fileNameExtension]));
+						$sheetData = $spreadsheet->getActiveSheet()->toArray();
+
+						try {
+                            $i = 0;
+                            $j = 0;
+							foreach ($sheetData as $key => $value) {
+                                if ($key == 0) {
+                                    continue;
+                                }
+                                $i++;
+								$type               = trim($value[0]);
+								$kode_box           = trim($value[1]);
+								$pencipta_arsip     = trim($value[2]);
+								$tahun              = trim($value[3]);
+								$nomor_arsip        = trim($value[4]);
+								$jumlah_arsip       = trim($value[5]);
+								$nomor_box          = trim($value[6]);
+								$jumlah_box         = trim($value[7]);
+								$nomor_box_urutan   = trim($value[8]);
+								$lokasi             = trim($value[9]);
+								$color_code         = trim($value[11]);
+								$description        = trim($value[12]);
+								$jenisArsip         = trim($value[10]);
+
+                                $typeCode = Inflector::camelize(strtolower($type));
+                                $typeId = $types[$typeCode];
+
+								$model = new ArchivePengolahanPenyerahan;
+								$model->type_id = $typeId;
+								$model->kode_box = $kode_box;
+								$model->pencipta_arsip = $pencipta_arsip;
+								$model->tahun = $tahun;
+								$model->nomor_arsip = $nomor_arsip;
+								$model->jumlah_arsip = $jumlah_arsip;
+								$model->nomor_box = $nomor_box;
+								$model->jumlah_box = $jumlah_box;
+								$model->nomor_box_urutan = $nomor_box_urutan;
+								$model->lokasi = $lokasi;
+								$model->color_code = $color_code;
+								$model->description = $description;
+								$model->jenisArsip = $jenisArsip;
+                                if ($importId) {
+								    $model->import_id = $importId;
+                                }
+                                if (!$model->save()) {
+                                    $j++;
+                                    $errors['row#'.$key] = $model->getErrors();
+                                }
+							}
+							Yii::$app->session->setFlash('success', Yii::t('app', 'Archive penyerahan success imported.'));
+						} catch (\Exception $e) {
+							throw $e;
+						} catch (\Throwable $e) {
+							throw $e;
+						}
+					}
+
+                    if ($importId) {
+                        $import = ArchivePengolahanImport::findOne($importId);
+                        $import->all = $i;
+                        $import->error = $j;
+                        $import->log = $errors;
+                        $import->save();
+                    }
+	
+				} else {
+					Yii::$app->session->setFlash('error', Yii::t('app', 'The file {name} cannot be uploaded. Only files with these extensions are allowed: {extensions}', [
+						'name' => $importFilename->name,
+						'extensions' => $importFileType,
+					]));
+				}
+			} else {
+				Yii::$app->session->setFlash('error', Yii::t('app', 'Import file cannot be blank.'));
+            }
+
+            if (!Yii::$app->request->isAjax) {
+				return $this->redirect(['import']);
+            }
+			return $this->redirect(Yii::$app->request->referrer ?: ['import']);
+		}
+
+		$this->view->title = Yii::t('app', 'Import Penyerahan');
+		$this->view->description = '';
+        if (Yii::$app->request->isAjax) {
+			$this->view->description = Yii::t('app', 'Are you sure you want to import penyerahan data?');
+        }
+		$this->view->keywords = '';
+		return $this->oRender('admin_import', [
+			'template' => $template,
 		]);
 	}
 

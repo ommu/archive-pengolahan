@@ -23,10 +23,12 @@ $this->params['breadcrumbs'][] = $this->title;
 
 $this->params['menu']['content'] = [
 	['label' => Yii::t('app', 'Add Penyerahan'), 'url' => Url::to(['create']), 'icon' => 'plus-square', 'htmlOptions' => ['class' => 'btn btn-success']],
+    ['label' => Yii::t('app', 'Import Penyerahan'), 'url' => Url::to(['import']), 'icon' => 'plus-square', 'htmlOptions' => ['class' => 'btn btn-dark']],
 ];
 $this->params['menu']['option'] = [
 	//['label' => Yii::t('app', 'Search'), 'url' => 'javascript:void(0);'],
 	['label' => Yii::t('app', 'Grid Option'), 'url' => 'javascript:void(0);'],
+	['label' => Yii::t('app', 'Import Histories'), 'url' => Url::to(['import/manage', 'type' => 'penyerahan'])],
 ];
 ?>
 

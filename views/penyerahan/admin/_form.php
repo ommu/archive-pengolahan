@@ -56,23 +56,23 @@ echo $form->field($model, 'type_id')
 	->label($model->getAttributeLabel('tahun')); ?>
 
 <?php echo $form->field($model, 'nomor_arsip')
-	->textInput(['maxlength' => true])
+	->textarea(['rows' => 2, 'cols' => 50])
 	->label($model->getAttributeLabel('nomor_arsip')); ?>
 
 <?php echo $form->field($model, 'jumlah_arsip')
-	->textInput(['maxlength' => true])
+	->textarea(['rows' => 2, 'cols' => 50])
 	->label($model->getAttributeLabel('jumlah_arsip')); ?>
 
 <?php echo $form->field($model, 'nomor_box')
-	->textInput(['maxlength' => true])
+	->textarea(['rows' => 2, 'cols' => 50])
 	->label($model->getAttributeLabel('nomor_box')); ?>
 
 <?php echo $form->field($model, 'jumlah_box')
-	->textInput(['maxlength' => true])
+	->textarea(['rows' => 2, 'cols' => 50])
 	->label($model->getAttributeLabel('jumlah_box')); ?>
 
 <?php echo $form->field($model, 'nomor_box_urutan')
-	->textInput(['maxlength' => true])
+	->textarea(['rows' => 2, 'cols' => 50])
 	->label($model->getAttributeLabel('nomor_box_urutan')); ?>
 
 <?php echo $form->field($model, 'lokasi')

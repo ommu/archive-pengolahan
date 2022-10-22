@@ -92,11 +92,10 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 			[['type_id', 'kode_box', 'pencipta_arsip'], 'required'],
 			[['pengolahan_status', 'pengolahan_tahun'], 'required', 'on' => self::SCENARIO_PENGOLAHAN_STATUS],
 			[['publish', 'type_id', 'pengolahan_status', 'creation_id', 'modified_id'], 'integer'],
-			[['pencipta_arsip', 'lokasi', 'description'], 'string'],
+			[['pencipta_arsip', 'nomor_arsip', 'jumlah_arsip', 'nomor_box', 'jumlah_box', 'nomor_box_urutan', 'lokasi', 'description'], 'string'],
 			[['tahun', 'nomor_arsip', 'jumlah_arsip', 'nomor_box', 'jumlah_box', 'nomor_box_urutan', 'lokasi', 'color_code', 'description', 'publication_file', 'pengolahan_status', 'pengolahan_tahun', 'jenisArsip'], 'safe'],
 			[['kode_box'], 'string', 'max' => 64],
-			[['tahun', 'pengolahan_tahun'], 'string', 'max' => 16],
-			[['nomor_arsip', 'jumlah_arsip', 'nomor_box', 'jumlah_box', 'nomor_box_urutan', 'color_code'], 'string', 'max' => 32],
+			[['tahun', 'pengolahan_tahun', 'color_code'], 'string', 'max' => 32],
 			[['type_id'], 'exist', 'skipOnError' => true, 'targetClass' => ArchivePengolahanPenyerahanType::className(), 'targetAttribute' => ['type_id' => 'id']],
 		];
 	}
