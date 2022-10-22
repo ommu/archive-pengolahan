@@ -33,7 +33,10 @@ namespace ommu\archivePengolahan\models;
 
 use Yii;
 use yii\helpers\Html;
+use yii\helpers\Url;
 use app\models\Users;
+use yii\helpers\Json;
+use yii\helpers\ArrayHelper;
 
 class ArchivePengolahanImport extends \app\components\ActiveRecord
 {
@@ -58,9 +61,11 @@ class ArchivePengolahanImport extends \app\components\ActiveRecord
 	public function rules()
 	{
 		return [
-			[['type', 'original_filename', 'custom_filename', 'all', 'error', 'log'], 'required'],
+			[['type', 'original_filename', 'custom_filename'], 'required'],
 			[['all', 'error', 'rollback', 'creation_id'], 'integer'],
 			[['type', 'original_filename', 'custom_filename', 'log'], 'string'],
+			//[['log'], 'json'],
+			[['all', 'error', 'log'], 'safe'],
 		];
 	}
 
@@ -88,53 +93,20 @@ class ArchivePengolahanImport extends \app\components\ActiveRecord
 	/**
 	 * @return \yii\db\ActiveQuery
 	 */
-	public function getPenyerahans($count=false, $publish=1)
+	public function getItems()
 	{
-        if ($count == false) {
+        if ($this->type == 'penyerahan') {
             return $this->hasMany(ArchivePengolahanPenyerahan::className(), ['import_id' => 'id'])
 				->alias('penyerahans')
-				->andOnCondition([sprintf('%s.publish', 'penyerahans') => $publish]);
-        }
-
-		$model = ArchivePengolahanPenyerahan::find()
-            ->alias('t')
-            ->where(['t.import_id' => $this->id]);
-        if ($publish == 0) {
-            $model->unpublish();
-        } else if ($publish == 1) {
-            $model->published();
-        } else if ($publish == 2) {
-            $model->deleted();
-        }
-		$penyerahans = $model->count();
-
-		return $penyerahans ? $penyerahans : 0;
-	}
-
-	/**
-	 * @return \yii\db\ActiveQuery
-	 */
-	public function getItems($count=false, $publish=1)
-	{
-        if ($count == false) {
+                ->select(['id'])
+				->andOnCondition(['IN', sprintf('%s.publish', 'penyerahans'), [0,1]]);
+ 
+        } else if ($this->type == 'item') {
             return $this->hasMany(ArchivePengolahanPenyerahanItem::className(), ['import_id' => 'id'])
 				->alias('items')
-				->andOnCondition([sprintf('%s.publish', 'items') => $publish]);
+                ->select(['id'])
+				->andOnCondition(['IN', sprintf('%s.publish', 'items'), [0,1]]);
         }
-
-		$model = ArchivePengolahanPenyerahanItem::find()
-            ->alias('t')
-            ->where(['t.import_id' => $this->id]);
-        if ($publish == 0) {
-            $model->unpublish();
-        } else if ($publish == 1) {
-            $model->published();
-        } else if ($publish == 2) {
-            $model->deleted();
-        }
-		$items = $model->count();
-
-		return $items ? $items : 0;
 	}
 
 	/**
@@ -187,6 +159,7 @@ class ArchivePengolahanImport extends \app\components\ActiveRecord
 			'value' => function($model, $key, $index, $column) {
 				return $model->parseFilename();
 			},
+			'format' => 'raw',
 		];
 		$this->templateColumns['all'] = [
 			'attribute' => 'all',
@@ -205,7 +178,7 @@ class ArchivePengolahanImport extends \app\components\ActiveRecord
 		$this->templateColumns['log'] = [
 			'attribute' => 'log',
 			'value' => function($model, $key, $index, $column) {
-				return $model->log;
+				return Json::encode($model->log);
 			},
 		];
 		$this->templateColumns['creation_date'] = [
@@ -226,10 +199,12 @@ class ArchivePengolahanImport extends \app\components\ActiveRecord
 		$this->templateColumns['rollback'] = [
 			'attribute' => 'rollback',
 			'value' => function($model, $key, $index, $column) {
-				return $this->filterYesNo($model->rollback);
+				$url = Url::to(['rollback', 'id' => $model->primaryKey]);
+				return $this->quickAction($url, $model->rollback, 'Rollback,Rollback', true);
 			},
 			'filter' => $this->filterYesNo(),
 			'contentOptions' => ['class' => 'text-center'],
+			'format' => 'raw',
 		];
 	}
 
@@ -274,9 +249,13 @@ class ArchivePengolahanImport extends \app\components\ActiveRecord
 	/**
 	 * function parseFilename
 	 */
-	public static function parseFilename()
+	public function parseFilename()
 	{
-		return $this->original_filename. '' .$this->custom_filename;
+        $uploadPath = join('/', [ArchivePengolahanPenyerahan::getUploadPath(false), '_import']);
+        $items[] = Yii::t('app', 'Original: {filename}', ['filename' => $this->original_filename]);
+        $items[] = Yii::t('app', 'Custom: {filename}', ['filename' => Html::a($this->custom_filename, Url::to(join('/', ['@webpublic', $uploadPath, $this->custom_filename])), ['title' => $this->custom_filename, 'data-pjax' => 0, 'target' => '_blank'])]);
+
+		return Html::ul($items, ['encode' => false, 'class' => 'list-boxed']);
 	}
 
 	/**
@@ -286,8 +265,55 @@ class ArchivePengolahanImport extends \app\components\ActiveRecord
 	{
 		parent::afterFind();
 
+        if ($this->log == '') {
+            $this->log = [];
+        } else {
+            $this->log = Json::decode($this->log);
+        }
+
 		// $this->creationDisplayname = isset($this->creation) ? $this->creation->displayname : '-';
 		// $this->penyerahan = $this->getPenyerahans(true) ? 1 : 0;
 		// $this->item = $this->getItems(true) ? 1 : 0;
+	}
+
+	/**
+	 * before validate attributes
+	 */
+	public function beforeValidate()
+	{
+        if (parent::beforeValidate()) {
+            if ($this->isNewRecord) {
+                if ($this->creation_id == null) {
+                    $this->creation_id = !Yii::$app->user->isGuest ? Yii::$app->user->id : null;
+                }
+            }
+        }
+        return true;
+	}
+
+	/**
+	 * before save attributes
+	 */
+	public function beforeSave($insert)
+	{
+        if (parent::beforeSave($insert)) {
+			$this->log = Json::encode($this->log);
+        }
+        return true;
+	}
+
+	/**
+	 * After save attributes
+	 */
+	public function afterSave($insert, $changedAttributes)
+	{
+        parent::afterSave($insert, $changedAttributes);
+
+        if (!$insert) {
+            if (array_key_exists('rollback', $changedAttributes) && $changedAttributes['rollback'] != $this->rollback && $this->rollback == 1) {
+                $items = ArrayHelper::map($this->items, 'id', 'id');
+                ArchivePengolahanPenyerahanItem::updateAll(['publish' => 2], ['IN', 'id', $items]);
+            }
+		}
 	}
 }

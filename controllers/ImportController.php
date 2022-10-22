@@ -11,6 +11,7 @@
  *  Manage
  *  View
  *  Delete
+ *  Rollback
  *
  *  findModel
  *
@@ -46,6 +47,7 @@ class ImportController extends Controller
                 'class' => VerbFilter::className(),
                 'actions' => [
                     'delete' => ['POST'],
+                    'rollback' => ['POST'],
                 ],
             ],
         ];
@@ -99,7 +101,7 @@ class ImportController extends Controller
 	{
         $model = $this->findModel($id);
 
-		$this->view->title = Yii::t('app', 'Detail Pengolahan Import: {original-filename}', ['original-filename' => $model->original_filename]);
+		$this->view->title = Yii::t('app', 'Detail Import: {original-filename}', ['original-filename' => $model->original_filename]);
 		$this->view->description = '';
 		$this->view->keywords = '';
 		return $this->oRender('admin_view', [
@@ -119,8 +121,25 @@ class ImportController extends Controller
 		$model = $this->findModel($id);
 		$model->delete();
 
-		Yii::$app->session->setFlash('success', Yii::t('app', 'Archive pengolahan import success deleted.'));
+		Yii::$app->session->setFlash('success', Yii::t('app', 'Archive import success deleted.'));
 		return $this->redirect(Yii::$app->request->referrer ?: ['manage']);
+	}
+
+	/**
+	 * actionRollback an existing ArchivePengolahanPenyerahanType model.
+	 * If publish is successful, the browser will be redirected to the 'index' page.
+	 * @param integer $id
+	 * @return mixed
+	 */
+	public function actionRollback($id)
+	{
+		$model = $this->findModel($id);
+		$model->rollback = 1;
+
+        if ($model->save()) {
+            Yii::$app->session->setFlash('success', Yii::t('app', 'Archive import success rollback.'));
+            return $this->redirect(Yii::$app->request->referrer ?: ['manage', 'type' => $model->type]);
+        }
 	}
 
 	/**
