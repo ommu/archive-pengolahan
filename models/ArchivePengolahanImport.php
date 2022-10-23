@@ -312,7 +312,12 @@ class ArchivePengolahanImport extends \app\components\ActiveRecord
         if (!$insert) {
             if (array_key_exists('rollback', $changedAttributes) && $changedAttributes['rollback'] != $this->rollback && $this->rollback == 1) {
                 $items = ArrayHelper::map($this->items, 'id', 'id');
-                ArchivePengolahanPenyerahanItem::updateAll(['publish' => 2], ['IN', 'id', $items]);
+
+                if ($this->type == 'penyerahan') {
+                    ArchivePengolahanPenyerahan::updateAll(['publish' => 2], ['IN', 'id', $items]);
+                } else if ($this->type == 'item') {
+                    ArchivePengolahanPenyerahanItem::updateAll(['publish' => 2], ['IN', 'id', $items]);
+                }
             }
 		}
 	}
