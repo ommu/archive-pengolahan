@@ -13,6 +13,8 @@
  *  Update
  *  View
  *  Delete
+ *  RunAction
+ *  Publish
  *	Import
  *
  *  findModel
@@ -75,6 +77,7 @@ class ItemController extends Controller
                 'class' => VerbFilter::className(),
                 'actions' => [
                     'delete' => ['POST'],
+					'publish' => ['POST'],
                 ],
             ],
         ];
@@ -236,6 +239,24 @@ class ItemController extends Controller
         if ($model->save(false, ['publish','modified_id'])) {
             Yii::$app->session->setFlash('success', Yii::t('app', 'Archive penyerahan item success deleted.'));
             return $this->redirect(Yii::$app->request->referrer ?: ['manage', 'penyerahan' => $model->penyerahan_id]);
+        }
+	}
+
+	/**
+	 * actionPublish an existing ArchivePengolahanPenyerahanType model.
+	 * If publish is successful, the browser will be redirected to the 'index' page.
+	 * @param integer $id
+	 * @return mixed
+	 */
+	public function actionPublish($id)
+	{
+		$model = $this->findModel($id);
+		$replace = $model->publish == 1 ? 0 : 1;
+		$model->publish = $replace;
+
+        if ($model->save(false, ['publish','modified_id'])) {
+            Yii::$app->session->setFlash('success', Yii::t('app', 'Archive penyerahan item success updated.'));
+            return $this->redirect(Yii::$app->request->referrer ?: ['manage']);
         }
 	}
 
