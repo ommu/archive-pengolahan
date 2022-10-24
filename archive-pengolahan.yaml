@@ -47,3 +47,40 @@ penyerahan_submenu:
         data-confirm: Are you sure you want to delete this item?
         data-method: post
       select: action
+
+luring_submenu:
+  0:
+    view:
+      label: Detail
+      url:
+        0: 'luring/admin/view'
+        id: $_GET*id
+      select: action
+  1:
+    lurings:
+      label: Document(s)
+      url:
+        0: 'luring/document/manage'
+        archive: $_GET*id
+      select: controller
+    downloads:
+      label: Downlaod(s)
+      url:
+        0: 'luring/download/manage'
+        archive: $_GET*id
+      select: controller
+
+location_submenu:
+  0:
+    view:
+      label: Detail
+      url:
+        0: 'location/view'
+        id: $_GET*id
+      select: action
+    location:
+      label: Storage Location
+      url:
+        0: 'location/set'
+        id: $_GET*id
+      select: action
