@@ -97,6 +97,10 @@ setting_submenu:
       url:
         0: 'setting/jenis/index'
       select: controller
+    location:
+      label: Physical Storage
+      url: ['/archive-location/admin/index']
+      select: controller
   1:
     setting:
       label: Settings
