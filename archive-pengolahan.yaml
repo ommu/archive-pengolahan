@@ -64,7 +64,7 @@ luring_submenu:
         archive: $_GET*id
       select: controller
     downloads:
-      label: Downlaod(s)
+      label: Download(s)
       url:
         0: 'luring/download/manage'
         archive: $_GET*id
