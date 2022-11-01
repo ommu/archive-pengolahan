@@ -84,3 +84,22 @@ location_submenu:
         0: 'location/set'
         id: $_GET*id
       select: action
+
+setting_submenu:
+  0:
+    penyerahanType:
+      label: Tipe Penyerahan
+      url:
+        0: 'setting/type/index'
+      select: controller
+    jenisArsip:
+      label: Jenis Arsip
+      url:
+        0: 'setting/jenis/index'
+      select: controller
+  1:
+    setting:
+      label: Settings
+      url:
+        0: 'setting/admin/update'
+      select: controller

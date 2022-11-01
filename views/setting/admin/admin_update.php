@@ -14,7 +14,11 @@
 use yii\helpers\Html;
 use app\components\widgets\ActiveForm;
 
-$this->params['breadcrumbs'][] = $this->title;
+$context = $this->context;
+if ($context->breadcrumbApp) {
+	$this->params['breadcrumbs'][] = ['label' => $context->breadcrumbAppParam['name'], 'url' => [$context->breadcrumbAppParam['url']]];
+}
+$this->params['breadcrumbs'][] = Yii::t('app', 'Settings');
 ?>
 
 <div class="archive-setting-update">

@@ -34,9 +34,24 @@ use mdm\admin\components\AccessControl;
 use yii\filters\VerbFilter;
 use ommu\archivePengolahan\models\ArchivePengolahanPenyerahanType;
 use ommu\archivePengolahan\models\search\ArchivePengolahanPenyerahanType as ArchivePengolahanPenyerahanTypeSearch;
+use ommu\archivePengolahan\models\ArchivePengolahanSetting;
 
 class TypeController extends Controller
 {
+	/**
+	 * {@inheritdoc}
+	 */
+	public function init()
+	{
+        parent::init();
+
+        $this->subMenu = $this->module->params['setting_submenu'];
+
+        $setting = new ArchivePengolahanSetting(['app' => 'archivePengolahanModule']);
+		$this->breadcrumbApp = $setting->breadcrumb;
+		$this->breadcrumbAppParam = $setting->getBreadcrumbAppParam();
+	}
+
 	/**
 	 * {@inheritdoc}
 	 */

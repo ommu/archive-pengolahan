@@ -30,9 +30,24 @@ use yii\filters\VerbFilter;
 use ommu\archivePengolahan\models\ArchivePengolahanPenyerahanJenis;
 use ommu\archivePengolahan\models\search\ArchivePengolahanPenyerahanJenis as ArchivePengolahanPenyerahanJenisSearch;
 use yii\helpers\ArrayHelper;
+use ommu\archivePengolahan\models\ArchivePengolahanSetting;
 
 class JenisController extends Controller
 {
+	/**
+	 * {@inheritdoc}
+	 */
+	public function init()
+	{
+        parent::init();
+
+        $this->subMenu = $this->module->params['setting_submenu'];
+
+        $setting = new ArchivePengolahanSetting(['app' => 'archivePengolahanModule']);
+		$this->breadcrumbApp = $setting->breadcrumb;
+		$this->breadcrumbAppParam = $setting->getBreadcrumbAppParam();
+	}
+
 	/**
 	 * {@inheritdoc}
 	 */

@@ -19,7 +19,12 @@ use yii\widgets\DetailView;
 use yii\helpers\Json;
 
 if (!$small) {
-    $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Penyerahan Types'), 'url' => ['index']];
+    $context = $this->context;
+    if ($context->breadcrumbApp) {
+        $this->params['breadcrumbs'][] = ['label' => $context->breadcrumbAppParam['name'], 'url' => [$context->breadcrumbAppParam['url']]];
+    }
+    $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Setting'), 'url' => ['setting/admin/index']];
+    $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Penyerahan Type'), 'url' => ['index']];
     $this->params['breadcrumbs'][] = $model->type_name;
 
     $this->params['menu']['content'] = [

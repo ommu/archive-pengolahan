@@ -29,6 +29,20 @@ class AdminController extends Controller
 	/**
 	 * {@inheritdoc}
 	 */
+	public function init()
+	{
+        parent::init();
+
+        $this->subMenu = $this->module->params['setting_submenu'];
+
+        $setting = new ArchivePengolahanSetting(['app' => 'archivePengolahanModule']);
+		$this->breadcrumbApp = $setting->breadcrumb;
+		$this->breadcrumbAppParam = $setting->getBreadcrumbAppParam();
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
 	public function behaviors()
 	{
 		return [

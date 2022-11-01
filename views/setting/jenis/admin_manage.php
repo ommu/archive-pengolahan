@@ -19,6 +19,11 @@ use yii\helpers\Url;
 use app\components\grid\GridView;
 use yii\widgets\Pjax;
 
+$context = $this->context;
+if ($context->breadcrumbApp) {
+	$this->params['breadcrumbs'][] = ['label' => $context->breadcrumbAppParam['name'], 'url' => [$context->breadcrumbAppParam['url']]];
+}
+$this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Setting'), 'url' => ['setting/admin/index']];
 $this->params['breadcrumbs'][] = $this->title;
 
 $this->params['menu']['option'] = [
