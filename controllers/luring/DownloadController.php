@@ -25,6 +25,7 @@ namespace ommu\archivePengolahan\controllers\luring;
 
 use Yii;
 use ommu\archive\controllers\luring\DownloadController as ArchiveDownloadController;
+use ommu\archivePengolahan\models\ArchivePengolahanSetting;
 
 class DownloadController extends ArchiveDownloadController
 {
@@ -39,6 +40,8 @@ class DownloadController extends ArchiveDownloadController
             }
         }
 
+        $setting = new ArchivePengolahanSetting(['app' => 'archivePengolahanModule']);
+
         parent::init();
 	}
 
@@ -46,6 +49,14 @@ class DownloadController extends ArchiveDownloadController
 	 * {@inheritdoc}
 	 */
 	public function ignoreLevelField()
+	{
+		return true;
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function isPengolahan()
 	{
 		return true;
 	}

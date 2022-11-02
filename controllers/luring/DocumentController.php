@@ -29,6 +29,7 @@ namespace ommu\archivePengolahan\controllers\luring;
 
 use Yii;
 use ommu\archive\controllers\luring\AdminController;
+use ommu\archivePengolahan\models\ArchivePengolahanSetting;
 
 class DocumentController extends AdminController
 {
@@ -43,6 +44,8 @@ class DocumentController extends AdminController
             }
         }
 
+        $setting = new ArchivePengolahanSetting(['app' => 'archivePengolahanModule']);
+
         parent::init();
 	}
 
@@ -50,6 +53,14 @@ class DocumentController extends AdminController
 	 * {@inheritdoc}
 	 */
 	public function ignoreLevelField()
+	{
+		return true;
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function isPengolahan()
 	{
 		return true;
 	}

@@ -20,7 +20,11 @@ use yii\widgets\DetailView;
 !$small ? \ommu\archive\assets\AciTreeAsset::register($this) : '';
 
 if (!$small) {
-    $this->params['breadcrumbs'][] = ['label' => $isFond ? Yii::t('app', 'Senarai Luring') : Yii::t('app', 'Location'), 'url' => ['index']];
+    $context = $this->context;
+    if ($context->breadcrumbApp) {
+        $this->params['breadcrumbs'][] = ['label' => $context->breadcrumbAppParam['name'], 'url' => [$context->breadcrumbAppParam['url']]];
+    }
+    $this->params['breadcrumbs'][] = ['label' => $isFond ? Yii::t('app', 'Senarai') : Yii::t('app', 'Location'), 'url' => ['index']];
     $this->params['breadcrumbs'][] = $isFond ? $model->code : Yii::t('app', '#{level-name} {code}', ['level-name' => strtoupper($model->levelTitle->message), 'code' => $model->code]);
 } ?>
 

@@ -29,6 +29,7 @@ use mdm\admin\components\AccessControl;
 use yii\filters\VerbFilter;
 use ommu\archivePengolahan\models\Archives;
 use ommu\archivePengolahan\models\search\Archives as ArchivesSearch;
+use ommu\archivePengolahan\models\ArchivePengolahanSetting;
 
 class AdminController extends Controller
 {
@@ -46,6 +47,10 @@ class AdminController extends Controller
                 $this->subMenu = $this->module->params['location_submenu'];
             }
         }
+
+        $setting = new ArchivePengolahanSetting(['app' => 'archivePengolahanModule']);
+		$this->breadcrumbApp = $setting->breadcrumb;
+		$this->breadcrumbAppParam = $setting->getBreadcrumbAppParam();
 	}
 
 	/**
@@ -104,6 +109,7 @@ class AdminController extends Controller
 			'searchModel' => $searchModel,
 			'dataProvider' => $dataProvider,
 			'columns' => $columns,
+			'isFond' => $this->isFond(),
 		]);
 	}
 
