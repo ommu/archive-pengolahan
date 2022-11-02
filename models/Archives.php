@@ -172,7 +172,7 @@ class Archives extends ArchivesModel
 		$this->templateColumns['location'] = [
 			'attribute' => 'location',
 			'value' => function($model, $key, $index, $column) {
-                $location = $this->getLocations(false) != null ? 1 : 0;
+                $location = $model->getLocations(false) != null ? 1 : 0;
 				return $this->filterYesNo($location);
 			},
 			'filter' => $this->filterYesNo(),

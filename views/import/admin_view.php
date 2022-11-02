@@ -19,7 +19,11 @@ use yii\widgets\DetailView;
 use ommu\archivePengolahan\models\ArchivePengolahanPenyerahan;
 
 if (!$small) {
-    $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Imports'), 'url' => ['index']];
+    $context = $this->context;
+    if ($context->breadcrumbApp) {
+        $this->params['breadcrumbs'][] = ['label' => $context->breadcrumbAppParam['name'], 'url' => [$context->breadcrumbAppParam['url']]];
+    }
+    $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Import'), 'url' => ['index']];
     $this->params['breadcrumbs'][] = $model->original_filename;
 
     $this->params['menu']['content'] = [

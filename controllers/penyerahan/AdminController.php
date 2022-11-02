@@ -42,6 +42,7 @@ use thamtech\uuid\helpers\UuidHelper;
 use ommu\archivePengolahan\models\ArchivePengolahanPenyerahanType;
 use ommu\archivePengolahan\models\ArchivePengolahanImport;
 use yii\helpers\Inflector;
+use ommu\archivePengolahan\models\ArchivePengolahanSetting;
 
 class AdminController extends Controller
 {
@@ -58,12 +59,9 @@ class AdminController extends Controller
             $this->subMenu = $this->module->params['penyerahan_submenu'];
         }
 
-		// $setting = ArchiveSetting::find()
-		// 	->select(['breadcrumb_param'])
-		// 	->where(['id' => 1])
-		// 	->one();
-		// $this->breadcrumbApp = $setting->breadcrumb;
-		// $this->breadcrumbAppParam = $setting->getBreadcrumbAppParam();
+        $setting = new ArchivePengolahanSetting(['app' => 'archivePengolahanModule']);
+		$this->breadcrumbApp = $setting->breadcrumb;
+		$this->breadcrumbAppParam = $setting->getBreadcrumbAppParam();
 	}
 
 	/**

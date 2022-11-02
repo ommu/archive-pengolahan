@@ -40,6 +40,7 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use yii\helpers\Inflector;
 use thamtech\uuid\helpers\UuidHelper;
 use ommu\archivePengolahan\models\ArchivePengolahanImport;
+use ommu\archivePengolahan\models\ArchivePengolahanSetting;
 
 class ItemController extends Controller
 {
@@ -56,12 +57,9 @@ class ItemController extends Controller
             $this->subMenu = $this->module->params['penyerahan_submenu'];
         }
 
-		// $setting = ArchiveSetting::find()
-		// 	->select(['breadcrumb_param'])
-		// 	->where(['id' => 1])
-		// 	->one();
-		// $this->breadcrumbApp = $setting->breadcrumb;
-		// $this->breadcrumbAppParam = $setting->getBreadcrumbAppParam();
+        $setting = new ArchivePengolahanSetting(['app' => 'archivePengolahanModule']);
+		$this->breadcrumbApp = $setting->breadcrumb;
+		$this->breadcrumbAppParam = $setting->getBreadcrumbAppParam();
 	}
 
 	/**
@@ -198,7 +196,7 @@ class ItemController extends Controller
         }
 
         $this->subMenuParam = $model->penyerahan_id;
-		$this->view->title = Yii::t('app', 'Update Penyerahan Item: {penyerahan-id}', ['penyerahan-id' => $model->penyerahan->type->type_name]);
+		$this->view->title = Yii::t('app', 'Update Penyerahan Item: {penyerahan-tipeId} {penyerahan-kodeBox}', ['penyerahan-tipeId' => $model->type->type_name, 'penyerahan-kodeBox' => $model->penyerahan->kode_box]);
 		$this->view->description = '';
 		$this->view->keywords = '';
 		return $this->render('admin_update', [
@@ -216,7 +214,7 @@ class ItemController extends Controller
         $model = $this->findModel($id);
 
         $this->subMenuParam = $model->penyerahan_id;
-		$this->view->title = Yii::t('app', 'Detail Penyerahan Item: {penyerahan-id}', ['penyerahan-id' => $model->penyerahan->type->type_name]);
+		$this->view->title = Yii::t('app', 'Detail Penyerahan Item: {penyerahan-tipeId} {penyerahan-kodeBox}', ['penyerahan-tipeId' => $model->type->type_name, 'penyerahan-kodeBox' => $model->penyerahan->kode_box]);
 		$this->view->description = '';
 		$this->view->keywords = '';
 		return $this->oRender('admin_view', [
@@ -368,7 +366,7 @@ class ItemController extends Controller
 			return $this->redirect(Yii::$app->request->referrer ?: ['import', 'id' => $id]);
 		}
 
-		$this->view->title = Yii::t('app', 'Import Penyerahan Item: {penyerahan-id}', ['penyerahan-id' => $model->penyerahan->type->type_name]);
+		$this->view->title = Yii::t('app', 'Import Penyerahan Item: {penyerahan-tipeId} {penyerahan-kodeBox}', ['penyerahan-tipeId' => $model->type->type_name, 'penyerahan-kodeBox' => $model->penyerahan->kode_box]);
 		$this->view->description = '';
         if (Yii::$app->request->isAjax) {
 			$this->view->description = Yii::t('app', 'Are you sure you want to import penyerahan item data?');
