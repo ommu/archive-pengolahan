@@ -47,6 +47,8 @@ class ArchivePengolahanPenyerahanItem extends \app\components\ActiveRecord
 
     public $gridForbiddenColumn = ['description', 'creation_date', 'creationDisplayname', 'modified_date', 'modifiedDisplayname', 'updated_date'];
 
+    public $stayInHere;
+
 	public $penyerahanTypeId;
 	public $penyerahanPenciptaArsip;
 	public $creationDisplayname;
@@ -67,8 +69,9 @@ class ArchivePengolahanPenyerahanItem extends \app\components\ActiveRecord
 	{
 		return [
 			[['penyerahan_id', 'archive_number', 'archive_description', 'year', 'volume', 'code', 'description'], 'required'],
-			[['publish', 'penyerahan_id', 'creation_id', 'modified_id'], 'integer'],
+			[['publish', 'penyerahan_id', 'creation_id', 'modified_id', 'stayInHere'], 'integer'],
 			[['archive_description'], 'string'],
+			[['stayInHere'], 'safe'],
 			[['archive_number', 'volume', 'code'], 'string', 'max' => 16],
 			[['year'], 'string', 'max' => 8],
 			[['description'], 'string', 'max' => 64],
@@ -97,6 +100,7 @@ class ArchivePengolahanPenyerahanItem extends \app\components\ActiveRecord
 			'modified_date' => Yii::t('app', 'Modified Date'),
 			'modified_id' => Yii::t('app', 'Modified'),
 			'updated_date' => Yii::t('app', 'Updated Date'),
+			'stayInHere' => Yii::t('app', 'stayInHere'),
 			'penyerahanTypeId' => Yii::t('app', 'Penyerahan Type'),
 			'penyerahanPenciptaArsip' => Yii::t('app', 'Kode Box / Pencipta Arsip'),
 			'creationDisplayname' => Yii::t('app', 'Creation'),

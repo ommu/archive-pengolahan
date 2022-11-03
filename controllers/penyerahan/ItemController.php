@@ -148,6 +148,9 @@ class ItemController extends Controller
 
             if ($model->save()) {
                 Yii::$app->session->setFlash('success', Yii::t('app', 'Archive penyerahan item success created.'));
+                if ($model->stayInHere) {
+                    return $this->redirect(['create', 'id' => $model->penyerahan_id, 'stayInHere' => $model->stayInHere]);
+                }
                 return $this->redirect(['manage', 'penyerahan' => $model->penyerahan_id]);
                 //return $this->redirect(['view', 'id' => $model->id]);
 
@@ -186,7 +189,10 @@ class ItemController extends Controller
 
             if ($model->save()) {
                 Yii::$app->session->setFlash('success', Yii::t('app', 'Archive penyerahan item success updated.'));
-                return $this->redirect(['manage']);
+                if ($model->stayInHere) {
+                    return $this->redirect(['update', 'id' => $model->id, 'stayInHere' => $model->stayInHere]);
+                }
+                return $this->redirect(['manage', 'penyerahan' => $model->penyerahan_id]);
 
             } else {
                 if (Yii::$app->request->isAjax) {
@@ -254,7 +260,7 @@ class ItemController extends Controller
 
         if ($model->save(false, ['publish','modified_id'])) {
             Yii::$app->session->setFlash('success', Yii::t('app', 'Archive penyerahan item success updated.'));
-            return $this->redirect(Yii::$app->request->referrer ?: ['manage']);
+            return $this->redirect(Yii::$app->request->referrer ?: ['manage', 'penyerahan' => $model->penyerahan_id]);
         }
 	}
 
