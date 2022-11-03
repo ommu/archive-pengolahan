@@ -64,6 +64,7 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
     public $gridForbiddenColumn = ['jumlah_arsip', 'jumlah_box', 'nomor_box_urutan', 'lokasi', 'color_code', 'description', 'pengolahan_tahun', 'creation_date', 'modified_date', 'updated_date', 
         'jenisArsip', 'typeName', 'creationDisplayname', 'modifiedDisplayname'];
 
+    public $stayInHere;
 	public $jenisArsip;
 	public $old_publication_file;
 
@@ -95,9 +96,9 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 		return [
 			[['type_id', 'kode_box', 'pencipta_arsip'], 'required'],
 			[['pengolahan_status', 'pengolahan_tahun'], 'required', 'on' => self::SCENARIO_PENGOLAHAN_STATUS],
-			[['publish', 'type_id', 'pengolahan_status', 'creation_id', 'modified_id'], 'integer'],
+			[['publish', 'type_id', 'pengolahan_status', 'creation_id', 'modified_id', 'stayInHere'], 'integer'],
 			[['pencipta_arsip', 'nomor_arsip', 'jumlah_arsip', 'nomor_box', 'jumlah_box', 'nomor_box_urutan', 'lokasi', 'description'], 'string'],
-			[['tahun', 'nomor_arsip', 'jumlah_arsip', 'nomor_box', 'jumlah_box', 'nomor_box_urutan', 'lokasi', 'color_code', 'description', 'publication_file', 'pengolahan_status', 'pengolahan_tahun', 'jenisArsip'], 'safe'],
+			[['tahun', 'nomor_arsip', 'jumlah_arsip', 'nomor_box', 'jumlah_box', 'nomor_box_urutan', 'lokasi', 'color_code', 'description', 'publication_file', 'pengolahan_status', 'pengolahan_tahun', 'stayInHere', 'jenisArsip'], 'safe'],
 			[['kode_box'], 'string', 'max' => 64],
 			[['tahun', 'pengolahan_tahun', 'color_code'], 'string', 'max' => 32],
 			[['type_id'], 'exist', 'skipOnError' => true, 'targetClass' => ArchivePengolahanPenyerahanType::className(), 'targetAttribute' => ['type_id' => 'id']],
@@ -133,6 +134,7 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 			'modified_date' => Yii::t('app', 'Modified Date'),
 			'modified_id' => Yii::t('app', 'Modified'),
 			'updated_date' => Yii::t('app', 'Updated Date'),
+			'stayInHere' => Yii::t('app', 'stayInHere'),
 			'jenisArsip' => Yii::t('app', 'Jenis Arsip'),
 			'old_publication_file' => Yii::t('app', 'Old Publication File'),
 			'typeName' => Yii::t('app', 'Type'),
@@ -150,8 +152,8 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 	public function scenarios()
 	{
 		$scenarios = parent::scenarios();
-		$scenarios[self::SCENARIO_PENGOLAHAN_STATUS] = ['publish', 'type_id', 'kode_box', 'pencipta_arsip', 'tahun', 'nomor_arsip', 'jumlah_arsip', 'nomor_box', 'jumlah_box', 'nomor_box_urutan', 'lokasi', 'color_code', 'description', 'pengolahan_status', 'pengolahan_tahun'];
-		$scenarios[self::SCENARIO_PUBLICATION] = ['publish', 'type_id', 'kode_box', 'pencipta_arsip', 'tahun', 'nomor_arsip', 'jumlah_arsip', 'nomor_box', 'jumlah_box', 'nomor_box_urutan', 'lokasi', 'color_code', 'description', 'publication_file', 'pengolahan_status', 'pengolahan_tahun'];
+		$scenarios[self::SCENARIO_PENGOLAHAN_STATUS] = ['publish', 'type_id', 'kode_box', 'pencipta_arsip', 'tahun', 'nomor_arsip', 'jumlah_arsip', 'nomor_box', 'jumlah_box', 'nomor_box_urutan', 'lokasi', 'color_code', 'description', 'pengolahan_status', 'pengolahan_tahun', 'stayInHere'];
+		$scenarios[self::SCENARIO_PUBLICATION] = ['publish', 'type_id', 'kode_box', 'pencipta_arsip', 'tahun', 'nomor_arsip', 'jumlah_arsip', 'nomor_box', 'jumlah_box', 'nomor_box_urutan', 'lokasi', 'color_code', 'description', 'publication_file', 'pengolahan_status', 'pengolahan_tahun', 'stayInHere'];
 		return $scenarios;
 	}
 

@@ -150,8 +150,10 @@ class AdminController extends Controller
 
             if ($model->save()) {
                 Yii::$app->session->setFlash('success', Yii::t('app', 'Archive penyerahan success created.'));
+                if ($model->stayInHere) {
+                    return $this->redirect(['create', 'stayInHere' => $model->stayInHere]);
+                }
                 return $this->redirect(['manage']);
-                //return $this->redirect(['view', 'id' => $model->id]);
 
             } else {
                 if (Yii::$app->request->isAjax) {
@@ -192,6 +194,9 @@ class AdminController extends Controller
 
             if ($model->save()) {
                 Yii::$app->session->setFlash('success', Yii::t('app', 'Archive penyerahan success updated.'));
+                if ($model->stayInHere) {
+                    return $this->redirect(['update', 'id' => $model->id, 'stayInHere' => $model->stayInHere]);
+                }
                 return $this->redirect(['manage']);
 
             } else {
@@ -275,6 +280,9 @@ class AdminController extends Controller
 
             if ($model->save()) {
                 Yii::$app->session->setFlash('success', Yii::t('app', 'Archive penyerahan success add publication item.'));
+                if ($model->stayInHere) {
+                    return $this->redirect(['publication', 'id' => $model->id, 'stayInHere' => $model->stayInHere]);
+                }
                 return $this->redirect(['manage']);
 
             } else {
@@ -317,6 +325,9 @@ class AdminController extends Controller
 
             if ($model->save()) {
                 Yii::$app->session->setFlash('success', Yii::t('app', 'Archive penyerahan success updated status pengolahan.'));
+                if ($model->stayInHere) {
+                    return $this->redirect(['status', 'id' => $model->id, 'stayInHere' => $model->stayInHere]);
+                }
                 return $this->redirect(['manage']);
 
             } else {

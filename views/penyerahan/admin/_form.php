@@ -107,6 +107,15 @@ echo $form->field($model, 'jenisArsip', ['options' => ['class' => 'form-group ro
 
 <hr/>
 
+<?php if (($stayInHere = Yii::$app->request->get('stayInHere')) != null) {
+    $model->stayInHere = $stayInHere;
+}
+echo $form->field($model, 'stayInHere')
+	->checkbox()
+	->label(Yii::t('app', 'Stay on this page after I click {message}.', ['message' => $model->isNewRecord ? Yii::t('app', 'Create') : Yii::t('app', 'Update')])); ?>
+
+<hr/>
+
 <?php $submitButtonOption = [];
 if (!$model->isNewRecord && Yii::$app->request->isAjax) {
     $submitButtonOption = ArrayHelper::merge($submitButtonOption, [
