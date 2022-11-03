@@ -24,6 +24,7 @@
  *
  * The followings are the available model relations:
  * @property ArchivePengolahanPenyerahan[] $penyerahans
+ * @property ArchivePengolahanPenyerahanTypeGrid $grid
  * @property Users $creation
  * @property Users $modified
  *
@@ -45,6 +46,7 @@ class ArchivePengolahanPenyerahanType extends \app\components\ActiveRecord
 
 	public $creationDisplayname;
 	public $modifiedDisplayname;
+	public $oPenyerahan;
 
 	/**
 	 * @return string the associated database table name
@@ -87,6 +89,7 @@ class ArchivePengolahanPenyerahanType extends \app\components\ActiveRecord
 			'updated_date' => Yii::t('app', 'Updated Date'),
 			'creationDisplayname' => Yii::t('app', 'Creation'),
 			'modifiedDisplayname' => Yii::t('app', 'Modified'),
+			'oPenyerahan' => Yii::t('app', 'Penyerahan'),
 		];
 	}
 
@@ -114,6 +117,14 @@ class ArchivePengolahanPenyerahanType extends \app\components\ActiveRecord
 		$penyerahans = $model->count();
 
 		return $penyerahans ? $penyerahans : 0;
+	}
+
+	/**
+	 * @return \yii\db\ActiveQuery
+	 */
+	public function getGrid()
+	{
+		return $this->hasOne(ArchivePengolahanPenyerahanTypeGrid::className(), ['id' => 'id']);
 	}
 
 	/**
@@ -211,6 +222,17 @@ class ArchivePengolahanPenyerahanType extends \app\components\ActiveRecord
 				return Yii::$app->formatter->asDatetime($model->updated_date, 'medium');
 			},
 			'filter' => $this->filterDatepicker($this, 'updated_date'),
+		];
+		$this->templateColumns['oPenyerahan'] = [
+			'attribute' => 'oPenyerahan',
+			'value' => function($model, $key, $index, $column) {
+				// $penyerahans = $model->getPenyerahans(true);
+				$penyerahans = $model->grid->penyerahan;
+				return Html::a($penyerahans, ['penyerahan/admin/manage', 'type' => $model->primaryKey], ['title' => Yii::t('app', '{count} penyerahan', ['count' => $penyerahans]), 'data-pjax' => 0]);
+			},
+			'filter' => $this->filterYesNo(),
+			'contentOptions' => ['class' => 'text-center'],
+			'format' => 'raw',
 		];
 		$this->templateColumns['publish'] = [
 			'attribute' => 'publish',
@@ -316,6 +338,7 @@ class ArchivePengolahanPenyerahanType extends \app\components\ActiveRecord
 		// $this->creationDisplayname = isset($this->creation) ? $this->creation->displayname : '-';
 		// $this->modifiedDisplayname = isset($this->modified) ? $this->modified->displayname : '-';
 		// $this->penyerahan = $this->getPenyerahans(true) ? 1 : 0;
+		// $this->oPenyerahan = isset($this->grid) ? $this->grid->penyerahan : 0;
 	}
 
 	/**

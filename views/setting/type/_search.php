@@ -32,6 +32,8 @@ use yii\widgets\ActiveForm;
 
 		<?php echo $form->field($model, 'type_desc');?>
 
+		<?php echo $form->field($model, 'feature');?>
+
 		<?php echo $form->field($model, 'creation_date')
 			->input('date');?>
 

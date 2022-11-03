@@ -93,6 +93,15 @@ $attributes = [
 		'visible' => !$small,
 	],
 	[
+		'attribute' => 'oPenyerahan',
+		'value' => function ($model) {
+			$penyerahans = $model->grid->penyerahan;
+			return Html::a($penyerahans, ['penyerahan/manage', 'type' => $model->primaryKey, 'publish' => 1], ['title' => Yii::t('app', '{count} penyerahans', ['count' => $penyerahans])]);
+		},
+		'format' => 'html',
+		'visible' => !$small,
+	],
+	[
 		'attribute' => '',
 		'value' => Html::a(Yii::t('app', 'Update'), ['update', 'id' => $model->primaryKey], ['title' => Yii::t('app', 'Update'), 'class' => 'btn btn-primary btn-sm modal-btn']),
 		'format' => 'html',
