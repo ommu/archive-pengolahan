@@ -74,6 +74,7 @@ class ArchivePengolahanPenyerahanJenis extends ArchivePengolahanPenyerahanJenisM
         }
 		$query->joinWith([
 			// 'tag tag', 
+			'penyerahan penyerahan', 
 			// 'penyerahan.type penyerahan', 
 			// 'creation creation'
 		]);
@@ -82,13 +83,13 @@ class ArchivePengolahanPenyerahanJenis extends ArchivePengolahanPenyerahanJenisM
         ) {
             $query->joinWith(['tag tag']);
         }
-        if ((isset($params['sort']) && in_array($params['sort'], ['penyerahanArsip', '-penyerahanArsip'])) || (
-            (isset($params['penyerahanArsip']) && $params['penyerahanArsip'] != '') ||
-            (isset($params['penyerahanTypeId']) && $params['penyerahanTypeId'] != '') ||
-            (isset($params['type']) && $params['type'] != '')
-        )) {
-            $query->joinWith(['penyerahan penyerahan']);
-        }
+        // if ((isset($params['sort']) && in_array($params['sort'], ['penyerahanArsip', '-penyerahanArsip'])) || (
+        //     (isset($params['penyerahanArsip']) && $params['penyerahanArsip'] != '') ||
+        //     (isset($params['penyerahanTypeId']) && $params['penyerahanTypeId'] != '') ||
+        //     (isset($params['type']) && $params['type'] != '')
+        // )) {
+        //     $query->joinWith(['penyerahan penyerahan']);
+        // }
         if ((isset($params['sort']) && in_array($params['sort'], ['creationDisplayname', '-creationDisplayname'])) || 
             (isset($params['creationDisplayname']) && $params['creationDisplayname'] != '')
         ) {
@@ -165,7 +166,8 @@ class ArchivePengolahanPenyerahanJenis extends ArchivePengolahanPenyerahanJenisM
                 ['like', 'penyerahan.kode_box', $this->penyerahanArsip],
                 ['like', 'penyerahan.pencipta_arsip', $this->penyerahanArsip]
             ])
-			->andFilterWhere(['like', 'creation.displayname', $this->creationDisplayname]);
+			->andFilterWhere(['like', 'creation.displayname', $this->creationDisplayname])
+            ->andFilterWhere(['<>', 'penyerahan.publish', '2']);
 
 		return $dataProvider;
 	}

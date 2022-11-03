@@ -78,7 +78,7 @@ class ArchivePengolahanPenyerahanJenis extends \app\components\ActiveRecord
 			'penyerahanArsip' => Yii::t('app', 'Penyerahan'),
 			'creationDisplayname' => Yii::t('app', 'Creation'),
 			'penyerahanTypeId' => Yii::t('app', 'Tipe Penyerahan'),
-			'penyerahans' => Yii::t('app', 'Jumlah Penyerahan'),
+			'penyerahans' => Yii::t('app', 'Penyerahan'),
 		];
 	}
 
