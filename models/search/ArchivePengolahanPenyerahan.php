@@ -28,7 +28,7 @@ class ArchivePengolahanPenyerahan extends ArchivePengolahanPenyerahanModel
 	{
 		return [
 			[['id', 'publish', 'type_id', 'pengolahan_status', 'creation_id', 'modified_id', 
-                'jenisId', 'oPublication'], 'integer'],
+                'jenisId', 'oPublication', 'oCard', 'oItem'], 'integer'],
 			[['kode_box', 'pencipta_arsip', 'tahun', 'nomor_arsip', 'jumlah_arsip', 'nomor_box', 'jumlah_box', 'nomor_box_urutan', 'lokasi', 'color_code', 'description', 'publication_file', 'pengolahan_tahun', 'creation_date', 'modified_date', 'updated_date', 
                 'jenisArsip', 'typeName', 'creationDisplayname', 'modifiedDisplayname'], 'safe'],
 		];
@@ -69,10 +69,17 @@ class ArchivePengolahanPenyerahan extends ArchivePengolahanPenyerahanModel
                 ->select($column);
         }
 		$query->joinWith([
+            // 'grid grid', 
 			// 'type type', 
 			// 'creation creation', 
 			// 'modified modified'
 		]);
+        if ((isset($params['sort']) && in_array($params['sort'], ['oCard', '-oCard', 'oItem', '-oItem'])) || (
+            (isset($params['oCard']) && $params['oCard'] != '') ||
+            (isset($params['oItem']) && $params['oItem'] != '')
+        )) {
+            $query->joinWith(['grid grid']);
+        }
         if ((isset($params['sort']) && in_array($params['sort'], ['type_id', '-type_id'])) || 
             (isset($params['typeName']) && $params['typeName'] != '')
         ) {
@@ -126,6 +133,14 @@ class ArchivePengolahanPenyerahan extends ArchivePengolahanPenyerahanModel
 			'asc' => ['t.publication_file' => SORT_ASC],
 			'desc' => ['t.publication_file' => SORT_DESC],
 		];
+        $attributes['oCard'] = [
+            'asc' => ['grid.card' => SORT_ASC],
+            'desc' => ['grid.card' => SORT_DESC],
+        ];
+        $attributes['oItem'] = [
+            'asc' => ['grid.item' => SORT_ASC],
+            'desc' => ['grid.item' => SORT_DESC],
+        ];
 		$dataProvider->setSort([
 			'attributes' => $attributes,
 			'defaultOrder' => ['id' => SORT_DESC],
@@ -172,6 +187,21 @@ class ArchivePengolahanPenyerahan extends ArchivePengolahanPenyerahanModel
 
         if (isset($params['trash']) && $params['trash'] == 1) {
             $query->andFilterWhere(['NOT IN', 't.publish', [0,1]]);
+        }
+
+        if (isset($params['oCard']) && $params['oCard'] != '') {
+            if ($this->oCard == 1) {
+                $query->andWhere(['<>', 'grid.card', 0]);
+            } else if ($this->oCard == 0) {
+                $query->andWhere(['=', 'grid.card', 0]);
+            }
+        }
+        if (isset($params['oItem']) && $params['oItem'] != '') {
+            if ($this->oItem == 1) {
+                $query->andWhere(['<>', 'grid.item', 0]);
+            } else if ($this->oItem == 0) {
+                $query->andWhere(['=', 'grid.item', 0]);
+            }
         }
 
 		$query->andFilterWhere(['like', 't.kode_box', $this->kode_box])

@@ -34,7 +34,7 @@ penyerahan_submenu:
     card:
       label: Description Card
       url:
-        0: 'card/manage'
+        0: 'penyerahan/card/manage'
         penyerahan: $_GET*id
       select: controller
   2:

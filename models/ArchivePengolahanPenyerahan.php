@@ -28,6 +28,7 @@
  * @property string $publication_file
  * @property integer $pengolahan_status
  * @property string $pengolahan_tahun
+ * @property integer $import_id
  * @property string $creation_date
  * @property integer $creation_id
  * @property string $modified_date
@@ -36,6 +37,8 @@
  *
  * The followings are the available model relations:
  * @property ArchivePengolahanPenyerahanType $type
+ * @property ArchivePengolahanPenyerahanCard[] $cards
+ * @property ArchivePengolahanPenyerahanGrid $grid
  * @property ArchivePengolahanPenyerahanItem[] $items
  * @property ArchivePengolahanPenyerahanJenis[] $jenis
  * @property Users $creation
@@ -69,6 +72,7 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 	public $modifiedDisplayname;
 	public $jenisId;
 	public $oPublication;
+	public $oCard;
     public $oItem;
 
 	const SCENARIO_PENGOLAHAN_STATUS = 'pengolahanStatusForm';
@@ -123,6 +127,7 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 			'color_code' => Yii::t('app', 'Color Code'),
 			'description' => Yii::t('app', 'Description'),
 			'publication_file' => Yii::t('app', 'Publication File'),
+			'import_id' => Yii::t('app', 'Import'),
 			'creation_date' => Yii::t('app', 'Creation Date'),
 			'creation_id' => Yii::t('app', 'Creation'),
 			'modified_date' => Yii::t('app', 'Modified Date'),
@@ -134,7 +139,8 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 			'creationDisplayname' => Yii::t('app', 'Creation'),
 			'modifiedDisplayname' => Yii::t('app', 'Modified'),
 			'oPublication' => Yii::t('app', 'Publication File'),
-            'oItem' => Yii::t('app', 'Items'),
+			'oCard' => Yii::t('app', 'Cards'),
+			'oItem' => Yii::t('app', 'Items'),
 		];
 	}
 
@@ -156,6 +162,40 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 	{
 		return $this->hasOne(ArchivePengolahanPenyerahanType::className(), ['id' => 'type_id'])
             ->select(['id', 'type_name', 'feature']);
+	}
+
+	/**
+	 * @return \yii\db\ActiveQuery
+	 */
+	public function getCards($count=false, $publish=1)
+	{
+        if ($count == false) {
+            return $this->hasMany(ArchivePengolahanPenyerahanCard::className(), ['penyerahan_id' => 'id'])
+				->alias('cards')
+				->andOnCondition([sprintf('%s.publish', 'cards') => $publish]);
+        }
+
+		$model = ArchivePengolahanPenyerahanCard::find()
+            ->alias('t')
+            ->where(['t.penyerahan_id' => $this->id]);
+        if ($publish == 0) {
+            $model->unpublish();
+        } else if ($publish == 1) {
+            $model->published();
+        } else if ($publish == 2) {
+            $model->deleted();
+        }
+		$cards = $model->count();
+
+		return $cards ? $cards : 0;
+	}
+
+	/**
+	 * @return \yii\db\ActiveQuery
+	 */
+	public function getGrid()
+	{
+		return $this->hasOne(ArchivePengolahanPenyerahanGrid::className(), ['id' => 'id']);
 	}
 
     /**
@@ -369,17 +409,6 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 			},
 			'filter' => $this->filterDatepicker($this, 'updated_date'),
 		];
-        $this->templateColumns['oItem'] = [
-            'attribute' => 'oItem',
-            'value' => function($model, $key, $index, $column) {
-                $items = $model->getItems(true);
-                // $items = $model->grid->item;
-                return Html::a($items, ['penyerahan/item/manage', 'penyerahan' => $model->primaryKey], ['title' => Yii::t('app', '{count} items', ['count' => $items]), 'data-pjax' => 0]);
-            },
-            'filter' => false,
-            'contentOptions' => ['class' => 'text-center'],
-            'format' => 'raw',
-        ];
 		$this->templateColumns['oPublication'] = [
 			'attribute' => 'oPublication',
 			'value' => function($model, $key, $index, $column) {
@@ -401,6 +430,28 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 			'filter' => $this->filterYesNo(),
 			'contentOptions' => ['class' => 'text-center'],
 			'format' => 'html',
+		];
+		$this->templateColumns['oItem'] = [
+			'attribute' => 'oItem',
+			'value' => function($model, $key, $index, $column) {
+				// $items = $model->getItems(true);
+				$items = $model->grid->item;
+				return Html::a($items, ['penyerahan/item/manage', 'penyerahan' => $model->primaryKey], ['title' => Yii::t('app', '{count} items', ['count' => $items]), 'data-pjax' => 0]);
+			},
+			'filter' => $this->filterYesNo(),
+			'contentOptions' => ['class' => 'text-center'],
+			'format' => 'raw',
+		];
+		$this->templateColumns['oCard'] = [
+			'attribute' => 'oCard',
+			'value' => function($model, $key, $index, $column) {
+				// $cards = $model->getCards(true);
+				$cards = $model->grid->card;
+				return Html::a($cards, ['penyerahan/card/manage', 'penyerahan' => $model->primaryKey], ['title' => Yii::t('app', '{count} cards', ['count' => $cards]), 'data-pjax' => 0]);
+			},
+			'filter' => $this->filterYesNo(),
+			'contentOptions' => ['class' => 'text-center'],
+			'format' => 'raw',
 		];
 	}
 
@@ -469,9 +520,12 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 		// $this->typeName = isset($this->type) ? $this->type->type_name : '-';
 		// $this->creationDisplayname = isset($this->creation) ? $this->creation->displayname : '-';
 		// $this->modifiedDisplayname = isset($this->modified) ? $this->modified->displayname : '-';
+		// $this->card = $this->getCards(true) ? 1 : 0;
         // $this->item = $this->getItems(true) ? 1 : 0;
 		// $this->jenisArsip = $this->getJenis(true) ? 1 : 0;
         $this->pengolahan_status = $this->pengolahan_status != '' && $this->pengolahan_status == 1 ? $this->pengolahan_status : 0;
+		// $this->oCard = isset($this->grid) ? $this->grid->card : 0;
+		// $this->oItem = isset($this->grid) ? $this->grid->item : 0;
 	}
 
 	/**

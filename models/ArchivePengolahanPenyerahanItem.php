@@ -20,6 +20,7 @@
  * @property string $volume
  * @property string $code
  * @property string $description
+ * @property integer $import_id
  * @property string $creation_date
  * @property integer $creation_id
  * @property string $modified_date
@@ -90,6 +91,7 @@ class ArchivePengolahanPenyerahanItem extends \app\components\ActiveRecord
 			'volume' => Yii::t('app', 'Volume'),
 			'code' => Yii::t('app', 'Code'),
 			'description' => Yii::t('app', 'Description'),
+			'import_id' => Yii::t('app', 'Import'),
 			'creation_date' => Yii::t('app', 'Creation Date'),
 			'creation_id' => Yii::t('app', 'Creation'),
 			'modified_date' => Yii::t('app', 'Modified Date'),
