@@ -44,6 +44,8 @@ class ArchivePengolahanPenyerahanType extends \app\components\ActiveRecord
 
     public $gridForbiddenColumn = ['creationDisplayname', 'modified_date', 'modifiedDisplayname', 'updated_date'];
 
+	public $stayInHere;
+
 	public $creationDisplayname;
 	public $modifiedDisplayname;
 	public $oPenyerahan;
@@ -63,9 +65,9 @@ class ArchivePengolahanPenyerahanType extends \app\components\ActiveRecord
 	{
 		return [
 			[['type_name', 'type_desc'], 'required'],
-			[['publish', 'creation_id', 'modified_id'], 'integer'],
+			[['publish', 'creation_id', 'modified_id', 'stayInHere'], 'integer'],
 			//[['feature'], 'json'],
-			[['feature'], 'safe'],
+			[['feature', 'stayInHere'], 'safe'],
 			[['type_name'], 'string', 'max' => 64],
 			[['type_desc'], 'string', 'max' => 256],
 		];
@@ -87,6 +89,7 @@ class ArchivePengolahanPenyerahanType extends \app\components\ActiveRecord
 			'modified_date' => Yii::t('app', 'Modified Date'),
 			'modified_id' => Yii::t('app', 'Modified'),
 			'updated_date' => Yii::t('app', 'Updated Date'),
+			'stayInHere' => Yii::t('app', 'stayInHere'),
 			'creationDisplayname' => Yii::t('app', 'Creation'),
 			'modifiedDisplayname' => Yii::t('app', 'Modified'),
 			'oPenyerahan' => Yii::t('app', 'Penyerahan'),

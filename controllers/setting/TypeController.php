@@ -127,8 +127,10 @@ class TypeController extends Controller
 
             if ($model->save()) {
                 Yii::$app->session->setFlash('success', Yii::t('app', 'Archive penyerahan type success created.'));
+                if ($model->stayInHere) {
+                    return $this->redirect(['create', 'stayInHere' => $model->stayInHere]);
+                }
                 return $this->redirect(['manage']);
-                //return $this->redirect(['view', 'id' => $model->id]);
 
             } else {
                 if (Yii::$app->request->isAjax) {
@@ -163,6 +165,9 @@ class TypeController extends Controller
 
             if ($model->save()) {
                 Yii::$app->session->setFlash('success', Yii::t('app', 'Archive penyerahan type success updated.'));
+                if ($model->stayInHere) {
+                    return $this->redirect(['update', 'id' => $model->id, 'stayInHere' => $model->stayInHere]);
+                }
                 return $this->redirect(['manage']);
 
             } else {
