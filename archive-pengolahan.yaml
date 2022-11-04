@@ -101,6 +101,11 @@ setting_submenu:
       label: Physical Storage
       url: ['/archive-location/admin/index']
       select: controller
+    userGroup:
+      label: User Group
+      url:
+        0: 'user/group/index'
+      select: controller
   1:
     setting:
       label: Settings
