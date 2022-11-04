@@ -68,6 +68,15 @@ $attributes = [
 		'visible' => !$small,
 	],
 	[
+		'attribute' => 'oPenyerahan',
+		'value' => function ($model) {
+			$penyerahans = $model->grid->penyerahan;
+			return Html::a($penyerahans, ['penyerahan/admin/manage', 'type' => $model->primaryKey], ['title' => Yii::t('app', '{count} penyerahans', ['count' => $penyerahans])]);
+		},
+		'format' => 'html',
+		'visible' => !$small,
+	],
+	[
 		'attribute' => 'creation_date',
 		'value' => Yii::$app->formatter->asDatetime($model->creation_date, 'medium'),
 		'visible' => !$small,
@@ -90,15 +99,6 @@ $attributes = [
 	[
 		'attribute' => 'updated_date',
 		'value' => Yii::$app->formatter->asDatetime($model->updated_date, 'medium'),
-		'visible' => !$small,
-	],
-	[
-		'attribute' => 'oPenyerahan',
-		'value' => function ($model) {
-			$penyerahans = $model->grid->penyerahan;
-			return Html::a($penyerahans, ['penyerahan/manage', 'type' => $model->primaryKey, 'publish' => 1], ['title' => Yii::t('app', '{count} penyerahans', ['count' => $penyerahans])]);
-		},
-		'format' => 'html',
 		'visible' => !$small,
 	],
 	[
