@@ -107,9 +107,17 @@ $attributes = [
 	[
 		'attribute' => 'oItem',
 		'value' => function ($model) {
-            $items = $model->getItems(true);
-            // $items = $model->grid->item;
-            return Html::a($items, ['penyerahan/item/manage', 'penyerahan' => $model->primaryKey, 'publish' => 1], ['title' => Yii::t('app', '{count} items', ['count' => $items]), 'data-pjax' => 0]);
+            $items = $model->grid->item;
+            return Html::a($items, ['penyerahan/item/manage', 'penyerahan' => $model->primaryKey], ['title' => Yii::t('app', '{count} items', ['count' => $items]), 'data-pjax' => 0]);
+		},
+		'format' => 'raw',
+		'visible' => !$small,
+	],
+	[
+		'attribute' => 'oCard',
+		'value' => function ($model) {
+            $cards = $model->grid->card;
+            return Html::a($cards, ['penyerahan/card/manage', 'penyerahan' => $model->primaryKey], ['title' => Yii::t('app', '{count} cards', ['count' => $cards]), 'data-pjax' => 0]);
 		},
 		'format' => 'raw',
 		'visible' => !$small,
