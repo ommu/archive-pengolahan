@@ -1,20 +1,22 @@
 <?php
 /**
- * ArchivePengolahanUserGroup
+ * ArchivePengolahanUsers
  * 
  * @author Putra Sudaryanto <putra@ommu.id>
  * @contact (+62)856-299-4114
  * @copyright Copyright (c) 2022 OMMU (www.ommu.id)
- * @created date 4 November 2022, 08:45 WIB
+ * @created date 4 November 2022, 10:05 WIB
  * @link https://bitbucket.org/ommu/archive-pengolahan
  *
- * This is the model class for table "ommu_archive_pengolahan_user_group".
+ * This is the model class for table "ommu_archive_pengolahan_users".
  *
- * The followings are the available columns in table "ommu_archive_pengolahan_user_group":
+ * The followings are the available columns in table "ommu_archive_pengolahan_users":
  * @property integer $id
  * @property integer $publish
- * @property string $name
- * @property string $permission
+ * @property integer $user_id
+ * @property string $user_code
+ * @property string $groups
+ * @property integer $archives
  * @property string $creation_date
  * @property integer $creation_id
  * @property string $modified_date
@@ -22,6 +24,7 @@
  * @property string $updated_date
  *
  * The followings are the available model relations:
+ * @property Users $user
  * @property Users $creation
  * @property Users $modified
  *
@@ -31,11 +34,12 @@ namespace ommu\archivePengolahan\models;
 
 use Yii;
 use yii\helpers\Url;
+use yii\helpers\Json;
 use app\models\Users;
 use yii\base\InvalidConfigException;
 use yii\rbac\DbManager;
 
-class ArchivePengolahanUserGroup extends \app\components\ActiveRecord
+class ArchivePengolahanUsers extends \app\components\ActiveRecord
 {
 	use \ommu\traits\UtilityTrait;
 
@@ -43,6 +47,7 @@ class ArchivePengolahanUserGroup extends \app\components\ActiveRecord
 
 	public $stayInHere;
 
+	public $userDisplayname;
 	public $creationDisplayname;
 	public $modifiedDisplayname;
 
@@ -51,7 +56,7 @@ class ArchivePengolahanUserGroup extends \app\components\ActiveRecord
 	 */
 	public static function tableName()
 	{
-		return 'ommu_archive_pengolahan_user_group';
+		return 'ommu_archive_pengolahan_users';
 	}
 
 	/**
@@ -60,10 +65,11 @@ class ArchivePengolahanUserGroup extends \app\components\ActiveRecord
 	public function rules()
 	{
 		return [
-			[['name', 'permission'], 'required'],
-			[['publish', 'creation_id', 'modified_id', 'stayInHere'], 'integer'],
-			[['name', 'permission'], 'string', 'max' => 64],
-			[['stayInHere'], 'safe'],
+			[['user_id', 'user_code'], 'required'],
+			[['publish', 'user_id', 'archives', 'creation_id', 'modified_id', 'stayInHere'], 'integer'],
+			//[['groups'], 'json'],
+			[['groups', 'stayInHere'], 'safe'],
+			[['user_code'], 'string', 'max' => 8],
 		];
 	}
 
@@ -75,17 +81,29 @@ class ArchivePengolahanUserGroup extends \app\components\ActiveRecord
 		return [
 			'id' => Yii::t('app', 'ID'),
 			'publish' => Yii::t('app', 'Publish'),
-			'name' => Yii::t('app', 'Name'),
-			'permission' => Yii::t('app', 'Permission'),
+			'user_id' => Yii::t('app', 'User'),
+			'user_code' => Yii::t('app', 'User Code'),
+			'groups' => Yii::t('app', 'Groups'),
+			'archives' => Yii::t('app', 'Archives'),
 			'creation_date' => Yii::t('app', 'Creation Date'),
 			'creation_id' => Yii::t('app', 'Creation'),
 			'modified_date' => Yii::t('app', 'Modified Date'),
 			'modified_id' => Yii::t('app', 'Modified'),
 			'updated_date' => Yii::t('app', 'Updated Date'),
 			'stayInHere' => Yii::t('app', 'stayInHere'),
+			'userDisplayname' => Yii::t('app', 'User'),
 			'creationDisplayname' => Yii::t('app', 'Creation'),
 			'modifiedDisplayname' => Yii::t('app', 'Modified'),
 		];
+	}
+
+	/**
+	 * @return \yii\db\ActiveQuery
+	 */
+	public function getUser()
+	{
+		return $this->hasOne(Users::className(), ['user_id' => 'user_id'])
+            ->select(['user_id', 'email', 'displayname']);
 	}
 
 	/**
@@ -108,11 +126,11 @@ class ArchivePengolahanUserGroup extends \app\components\ActiveRecord
 
 	/**
 	 * {@inheritdoc}
-	 * @return \ommu\archivePengolahan\models\query\ArchivePengolahanUserGroup the active query used by this AR class.
+	 * @return \ommu\archivePengolahan\models\query\ArchivePengolahanUsers the active query used by this AR class.
 	 */
 	public static function find()
 	{
-		return new \ommu\archivePengolahan\models\query\ArchivePengolahanUserGroup(get_called_class());
+		return new \ommu\archivePengolahan\models\query\ArchivePengolahanUsers(get_called_class());
 	}
 
 	/**
@@ -135,16 +153,33 @@ class ArchivePengolahanUserGroup extends \app\components\ActiveRecord
 			'class' => 'app\components\grid\SerialColumn',
 			'contentOptions' => ['class' => 'text-center'],
 		];
-		$this->templateColumns['name'] = [
-			'attribute' => 'name',
+		$this->templateColumns['userDisplayname'] = [
+			'attribute' => 'userDisplayname',
 			'value' => function($model, $key, $index, $column) {
-				return $model->name;
+				return isset($model->user) ? $model->user->displayname : '-';
+				// return $model->userDisplayname;
+			},
+			'visible' => !Yii::$app->request->get('user') ? true : false,
+		];
+		$this->templateColumns['user_code'] = [
+			'attribute' => 'user_code',
+			'value' => function($model, $key, $index, $column) {
+				return $model->user_code;
 			},
 		];
-		$this->templateColumns['permission'] = [
-			'attribute' => 'permission',
+		$this->templateColumns['groups'] = [
+			'attribute' => 'groups',
 			'value' => function($model, $key, $index, $column) {
-				return $model->permission;
+                if (is_array($model->groups) && empty($model->groups)) {
+                    return '-';
+                }
+                return Json::encode($model->groups);
+			},
+		];
+		$this->templateColumns['archives'] = [
+			'attribute' => 'archives',
+			'value' => function($model, $key, $index, $column) {
+				return $model->archives;
 			},
 		];
 		$this->templateColumns['creation_date'] = [
@@ -184,17 +219,6 @@ class ArchivePengolahanUserGroup extends \app\components\ActiveRecord
 			},
 			'filter' => $this->filterDatepicker($this, 'updated_date'),
 		];
-		$this->templateColumns['publish'] = [
-			'attribute' => 'publish',
-			'value' => function($model, $key, $index, $column) {
-				$url = Url::to(['publish', 'id' => $model->primaryKey]);
-				return $this->quickAction($url, $model->publish);
-			},
-			'filter' => $this->filterYesNo(),
-			'contentOptions' => ['class' => 'text-center'],
-			'format' => 'raw',
-			'visible' => !Yii::$app->request->get('trash') ? true : false,
-		];
 	}
 
 	/**
@@ -218,39 +242,6 @@ class ArchivePengolahanUserGroup extends \app\components\ActiveRecord
         }
 	}
 
-	/**
-	 * function getGroup
-	 */
-	public static function getGroup($publish=null, $array=true) 
-	{
-		$model = self::find()->alias('t')
-			->select(['t.id', 't.name', 't.permission']);
-
-        if ($publish != null) {
-            $model->andWhere(['t.publish' => $publish]);
-        } else {
-            $model->andWhere(['in', 't.publish', [0,1]]);
-        }
-
-		$model = $model->orderBy('t.name ASC')->all();
-
-        if ($array == true) {
-            return \yii\helpers\ArrayHelper::map($model, 'id', 'name');
-        }
-
-		return $model;
-	}
-
-	/**
-	 * function getPermission
-	 */
-	public static function getPermission() 
-	{
-		$model = self::getGroup(null, false);
-
-        return \yii\helpers\ArrayHelper::map($model, 'permission', 'name');
-	}
-
     /**
      * @throws yii\base\InvalidConfigException
      * @return DbManager
@@ -266,12 +257,67 @@ class ArchivePengolahanUserGroup extends \app\components\ActiveRecord
     }
 
 	/**
+	 * function setPermission
+	 */
+	public static function setPermission($tableName, $itemName, $userId) 
+	{
+        $validate = Yii::$app->db->createCommand("select * from {$tableName} where item_name=:itemName and user_id=:userId")
+            ->bindValues([
+                ':itemName' => $itemName,
+                ':userId' => $userId
+            ])
+            ->queryOne();
+
+        if (!$validate) {
+            Yii::$app->db->createCommand()
+                ->insert($tableName, [
+                    'item_name' => $itemName, 
+                    'user_id' => $userId, 
+                    'created_at' => time()  
+                ])
+                ->execute();
+        }
+
+        return true;
+	}
+
+	/**
+	 * function deletePermission
+	 */
+	public static function deletePermission($tableName, $itemName, $userId) 
+	{
+        $validate = Yii::$app->db->createCommand("select * from {$tableName} where item_name=:itemName and user_id=:userId")
+            ->bindValues([
+                ':itemName' => $itemName,
+                ':userId' => $userId
+            ])
+            ->queryOne();
+
+        if (is_array($validate) && !empty($validate)) {
+            Yii::$app->db->createCommand()
+                ->delete($tableName, [
+                    'item_name' => $itemName, 
+                    'user_id' => $userId
+                ])
+                ->execute();
+        }
+
+        return true;
+	}
+
+	/**
 	 * after find attributes
 	 */
 	public function afterFind()
 	{
 		parent::afterFind();
 
+        if ($this->groups == '') {
+            $this->groups = [];
+        } else {
+            $this->groups = Json::decode($this->groups);
+        }
+		// $this->userDisplayname = isset($this->user) ? $this->user->displayname : '-';
 		// $this->creationDisplayname = isset($this->creation) ? $this->creation->displayname : '-';
 		// $this->modifiedDisplayname = isset($this->modified) ? $this->modified->displayname : '-';
 	}
@@ -283,6 +329,11 @@ class ArchivePengolahanUserGroup extends \app\components\ActiveRecord
 	{
         if (parent::beforeValidate()) {
             if ($this->isNewRecord) {
+                $user = self::find()->where(['publish' => 1, 'user_id' => $this->user_id])->one();
+                if ($user != null) {
+                    $this->addError('user_id', Yii::t('app', 'User is already registered'));
+                }
+    
                 if ($this->creation_id == null) {
                     $this->creation_id = !Yii::$app->user->isGuest ? Yii::$app->user->id : null;
                 }
@@ -296,24 +347,58 @@ class ArchivePengolahanUserGroup extends \app\components\ActiveRecord
 	}
 
 	/**
+	 * before save attributes
+	 */
+	public function beforeSave($insert)
+	{
+        if (parent::beforeSave($insert)) {
+			$this->groups = Json::encode($this->groups);
+        }
+        return true;
+	}
+
+	/**
 	 * After save attributes
 	 */
 	public function afterSave($insert, $changedAttributes)
 	{
         parent::afterSave($insert, $changedAttributes);
 
-        if ($insert) {
-            $authManager = $this->getAuthManager();
-            $tableName = Yii::$app->db->tablePrefix . $authManager->itemTable;
+        $authManager = $this->getAuthManager();
+        $tableName = Yii::$app->db->tablePrefix . $authManager->assignmentTable;
 
-            Yii::$app->db->createCommand()
-                ->insert($tableName, [
-                    'name' => $this->permission, 
-                    'type' => '2', 
-                    'data' => '', 
-                    'created_at' => time()
-                ])
-                ->execute();
-		}
+        $groups = Json::decode($this->groups);
+
+        if ($insert) {
+            if (!empty($groups)) {
+                foreach ($groups as $group) {
+                    self::setPermission($tableName, $group, $this->user_id);
+                }
+            }
+
+		} else {
+            if (array_key_exists('groups', $changedAttributes) && $changedAttributes['groups'] != $this->groups) {
+                $oldGroups = Json::decode($changedAttributes['groups']);
+                if (!is_array($oldGroups)) {
+                    $oldGroups = [];
+                }
+
+                if (!empty($groups)) {
+                    foreach ($groups as $group) {
+                        if (in_array($group, $oldGroups)) {
+                            unset($oldGroups[array_keys($oldGroups, $group)[0]]);
+                            continue;
+                        }
+                        self::setPermission($tableName, $group, $this->user_id);
+                    }
+                }
+
+                if (!empty($oldGroups)) {
+                    foreach ($oldGroups as $group) {
+                        self::deletePermission($tableName, $group, $this->user_id);
+                    }
+                }
+            }
+        }
     }
 }
