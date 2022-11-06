@@ -44,6 +44,8 @@ class AdminController extends Controller
 	{
         parent::init();
 
+        $this->subMenu = $this->module->params['setting_submenu'];
+
         $setting = new ArchivePengolahanSetting(['app' => 'archivePengolahanModule']);
 		$this->breadcrumbApp = $setting->breadcrumb;
 		$this->breadcrumbAppParam = $setting->getBreadcrumbAppParam();
