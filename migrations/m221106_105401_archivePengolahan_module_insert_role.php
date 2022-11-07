@@ -65,7 +65,7 @@ class m221106_105401_archivePengolahan_module_insert_role extends \yii\db\Migrat
 				['archivePengolahanModLevelAdmin', '/archive-pengolahan/setting/admin/*'],
 				['archivePengolahanModLevelAdmin', '/archive-pengolahan/setting/type/*'],
 				['archivePengolahanModLevelAdmin', '/archive-pengolahan/user/admin/*'],
-				['archivePengolahanModLevelAdmin', '/archive-pengolahan/group/admin/*'],
+				['archivePengolahanModLevelAdmin', '/archive-pengolahan/user/group/*'],
 				['archivePengolahanModLevelModerator', '/archive-pengolahan/setting/jenis/*'],
 				['archivePengolahanModLevelModerator', '/archive-pengolahan/import/*'],
 			]);
