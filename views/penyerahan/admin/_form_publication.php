@@ -52,11 +52,13 @@ echo $form->field($model, 'publication_file', ['template' => '{label}{beginWrapp
 <?php if (($stayInHere = Yii::$app->request->get('stayInHere')) != null) {
     $model->stayInHere = $stayInHere;
 }
-echo $form->field($model, 'stayInHere')
-	->checkbox()
-	->label(Yii::t('app', 'Stay on this page after I click {message}.', ['message' => Yii::t('app', 'Upload')])); ?>
+if (!Yii::$app->request->isAjax) {
+    echo $form->field($model, 'stayInHere')
+        ->checkbox()
+        ->label(Yii::t('app', 'Stay on this page after I click {message}.', ['message' => Yii::t('app', 'Upload')])); ?>
 
 <hr/>
+<?php }?>
 
 <?php $submitButtonOption = ['button' => Html::submitButton(Yii::t('app', 'Upload'), ['class' => 'btn btn-primary'])];
 if (!$model->isNewRecord && Yii::$app->request->isAjax) {

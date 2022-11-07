@@ -53,11 +53,13 @@ echo $form->field($model, 'pengolahan_status')
 <?php if (($stayInHere = Yii::$app->request->get('stayInHere')) != null) {
     $model->stayInHere = $stayInHere;
 }
-echo $form->field($model, 'stayInHere')
-	->checkbox()
-	->label(Yii::t('app', 'Stay on this page after I click {message}.', ['message' => Yii::t('app', 'Update Status')])); ?>
+if (!Yii::$app->request->isAjax) {
+    echo $form->field($model, 'stayInHere')
+        ->checkbox()
+        ->label(Yii::t('app', 'Stay on this page after I click {message}.', ['message' => Yii::t('app', 'Update Status')])); ?>
 
 <hr/>
+<?php }?>
 
 <?php $submitButtonOption = ['button' => Html::submitButton(Yii::t('app', 'Update Status'), ['class' => 'btn btn-primary'])];
 echo $form->field($model, 'submitButton')

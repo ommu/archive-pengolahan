@@ -49,10 +49,12 @@ $attributes = [
 	[
 		'attribute' => 'kode_box',
 		'value' => $model->kode_box ? $model->kode_box : '-',
+		'format' => 'html',
 	],
 	[
 		'attribute' => 'pencipta_arsip',
 		'value' => $model->pencipta_arsip ? $model->pencipta_arsip : '-',
+		'format' => 'html',
 	],
 	[
 		'attribute' => 'tahun',
@@ -61,31 +63,37 @@ $attributes = [
 	[
 		'attribute' => 'nomor_arsip',
 		'value' => $model->nomor_arsip ? $model->nomor_arsip : '-',
+		'format' => 'html',
 		'visible' => !$small,
 	],
 	[
 		'attribute' => 'jumlah_arsip',
 		'value' => $model->jumlah_arsip ? $model->jumlah_arsip : '-',
+		'format' => 'html',
 		'visible' => !$small,
 	],
 	[
 		'attribute' => 'nomor_box',
 		'value' => $model->nomor_box ? $model->nomor_box : '-',
+		'format' => 'html',
 		'visible' => !$small,
 	],
 	[
 		'attribute' => 'jumlah_box',
 		'value' => $model->jumlah_box ? $model->jumlah_box : '-',
+		'format' => 'html',
 		'visible' => !$small,
 	],
 	[
 		'attribute' => 'nomor_box_urutan',
 		'value' => $model->nomor_box_urutan ? $model->nomor_box_urutan : '-',
+		'format' => 'html',
 		'visible' => !$small,
 	],
 	[
 		'attribute' => 'lokasi',
 		'value' => $model->lokasi ? $model->lokasi : '-',
+		'format' => 'html',
 		'visible' => !$small,
 	],
 	[
@@ -102,6 +110,7 @@ $attributes = [
 	[
 		'attribute' => 'description',
 		'value' => $model->description ? $model->description : '-',
+		'format' => 'html',
 		'visible' => !$small,
 	],
 	[

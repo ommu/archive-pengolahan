@@ -97,7 +97,7 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 			[['type_id', 'kode_box', 'pencipta_arsip'], 'required'],
 			[['pengolahan_status', 'pengolahan_tahun'], 'required', 'on' => self::SCENARIO_PENGOLAHAN_STATUS],
 			[['publish', 'type_id', 'pengolahan_status', 'creation_id', 'modified_id', 'stayInHere'], 'integer'],
-			[['pencipta_arsip', 'nomor_arsip', 'jumlah_arsip', 'nomor_box', 'jumlah_box', 'nomor_box_urutan', 'lokasi', 'description'], 'string'],
+			[['kode_box', 'pencipta_arsip', 'nomor_arsip', 'jumlah_arsip', 'nomor_box', 'jumlah_box', 'nomor_box_urutan', 'lokasi', 'description'], 'string'],
 			[['tahun', 'nomor_arsip', 'jumlah_arsip', 'nomor_box', 'jumlah_box', 'nomor_box_urutan', 'lokasi', 'color_code', 'description', 'publication_file', 'pengolahan_status', 'pengolahan_tahun', 'stayInHere', 'jenisArsip'], 'safe'],
 			[['kode_box'], 'string', 'max' => 64],
 			[['tahun', 'pengolahan_tahun', 'color_code'], 'string', 'max' => 32],
@@ -298,14 +298,16 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 		$this->templateColumns['kode_box'] = [
 			'attribute' => 'kode_box',
 			'value' => function($model, $key, $index, $column) {
-				return $model->kode_box;
+				return nl2br($model->kode_box);
 			},
+			'format' => 'html',
 		];
 		$this->templateColumns['pencipta_arsip'] = [
 			'attribute' => 'pencipta_arsip',
 			'value' => function($model, $key, $index, $column) {
-				return $model->pencipta_arsip;
+				return nl2br($model->pencipta_arsip);
 			},
+			'format' => 'html',
 		];
 		$this->templateColumns['tahun'] = [
 			'attribute' => 'tahun',
@@ -316,38 +318,44 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 		$this->templateColumns['nomor_arsip'] = [
 			'attribute' => 'nomor_arsip',
 			'value' => function($model, $key, $index, $column) {
-				return $model->nomor_arsip;
+				return nl2br($model->nomor_arsip);
 			},
+			'format' => 'html',
 		];
 		$this->templateColumns['jumlah_arsip'] = [
 			'attribute' => 'jumlah_arsip',
 			'value' => function($model, $key, $index, $column) {
-				return $model->jumlah_arsip;
+				return nl2br($model->jumlah_arsip);
 			},
+			'format' => 'html',
 		];
 		$this->templateColumns['nomor_box'] = [
 			'attribute' => 'nomor_box',
 			'value' => function($model, $key, $index, $column) {
-				return $model->nomor_box;
+				return nl2br($model->nomor_box);
 			},
+			'format' => 'html',
 		];
 		$this->templateColumns['jumlah_box'] = [
 			'attribute' => 'jumlah_box',
 			'value' => function($model, $key, $index, $column) {
-				return $model->jumlah_box;
+				return nl2br($model->jumlah_box);
 			},
+			'format' => 'html',
 		];
 		$this->templateColumns['nomor_box_urutan'] = [
 			'attribute' => 'nomor_box_urutan',
 			'value' => function($model, $key, $index, $column) {
-				return $model->nomor_box_urutan;
+				return nl2br($model->nomor_box_urutan);
 			},
+			'format' => 'html',
 		];
 		$this->templateColumns['lokasi'] = [
 			'attribute' => 'lokasi',
 			'value' => function($model, $key, $index, $column) {
-				return $model->lokasi;
+				return nl2br($model->lokasi);
 			},
+			'format' => 'html',
 		];
 		$this->templateColumns['jenisArsip'] = [
 			'attribute' => 'jenisArsip',
@@ -365,8 +373,9 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 		$this->templateColumns['description'] = [
 			'attribute' => 'description',
 			'value' => function($model, $key, $index, $column) {
-				return $model->description;
+				return nl2br($model->description);
 			},
+			'format' => 'html',
 		];
 		$this->templateColumns['pengolahan_tahun'] = [
 			'attribute' => 'pengolahan_tahun',

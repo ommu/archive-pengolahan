@@ -44,7 +44,7 @@ echo $form->field($model, 'type_id')
 	->label($model->getAttributeLabel('type_id')); ?>
 
 <?php echo $form->field($model, 'kode_box')
-	->textInput(['maxlength' => true])
+	->textarea(['rows' => 2, 'cols' => 50])
 	->label($model->getAttributeLabel('kode_box')); ?>
 
 <?php echo $form->field($model, 'pencipta_arsip')
@@ -110,11 +110,13 @@ echo $form->field($model, 'jenisArsip', ['options' => ['class' => 'form-group ro
 <?php if (($stayInHere = Yii::$app->request->get('stayInHere')) != null) {
     $model->stayInHere = $stayInHere;
 }
-echo $form->field($model, 'stayInHere')
-	->checkbox()
-	->label(Yii::t('app', 'Stay on this page after I click {message}.', ['message' => $model->isNewRecord ? Yii::t('app', 'Create') : Yii::t('app', 'Update')])); ?>
+if (!Yii::$app->request->isAjax) {
+    echo $form->field($model, 'stayInHere')
+        ->checkbox()
+        ->label(Yii::t('app', 'Stay on this page after I click {message}.', ['message' => $model->isNewRecord ? Yii::t('app', 'Create') : Yii::t('app', 'Update')])); ?>
 
 <hr/>
+<?php }?>
 
 <?php $submitButtonOption = [];
 if (!$model->isNewRecord && Yii::$app->request->isAjax) {

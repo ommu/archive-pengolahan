@@ -222,6 +222,17 @@ class AdminController extends Controller
 	public function actionView($id)
 	{
         $model = $this->findModel($id);
+
+        $model->kode_box = nl2br($model->kode_box);
+        $model->pencipta_arsip = nl2br($model->pencipta_arsip);
+        $model->nomor_arsip = nl2br($model->nomor_arsip);
+        $model->jumlah_arsip = nl2br($model->jumlah_arsip);
+        $model->nomor_box = nl2br($model->nomor_box);
+        $model->jumlah_box = nl2br($model->jumlah_box);
+        $model->nomor_box_urutan = nl2br($model->nomor_box_urutan);
+        $model->lokasi = nl2br($model->lokasi);
+        $model->description = nl2br($model->description);
+
         if (empty($model->type->feature) || !in_array('item', $model->type->feature)) {
             unset($this->subMenu[1]['item']);
         }
