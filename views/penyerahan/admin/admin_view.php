@@ -52,6 +52,13 @@ $attributes = [
 		'format' => 'html',
 	],
 	[
+        'attribute' => 'creator',
+		'value' => function ($model) {
+            return implode(', ', $model->getCreators(true, 'title'));
+		},
+		'format' => 'html',
+	],
+	[
 		'attribute' => 'pencipta_arsip',
 		'value' => $model->pencipta_arsip ? $model->pencipta_arsip : '-',
 		'format' => 'html',

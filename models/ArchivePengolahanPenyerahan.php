@@ -62,9 +62,10 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 	use \ommu\traits\FileTrait;
 
     public $gridForbiddenColumn = ['jumlah_arsip', 'jumlah_box', 'nomor_box_urutan', 'lokasi', 'color_code', 'description', 'pengolahan_tahun', 'creation_date', 'modified_date', 'updated_date', 
-        'jenisArsip', 'typeName', 'creationDisplayname', 'modifiedDisplayname'];
+        'jenisArsip', 'typeName', 'creationDisplayname', 'modifiedDisplayname', 'creator'];
 
     public $stayInHere;
+	public $creator;
 	public $jenisArsip;
 	public $old_publication_file;
 
@@ -98,7 +99,7 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 			[['pengolahan_status', 'pengolahan_tahun'], 'required', 'on' => self::SCENARIO_PENGOLAHAN_STATUS],
 			[['publish', 'type_id', 'pengolahan_status', 'creation_id', 'modified_id', 'stayInHere'], 'integer'],
 			[['kode_box', 'pencipta_arsip', 'nomor_arsip', 'jumlah_arsip', 'nomor_box', 'jumlah_box', 'nomor_box_urutan', 'lokasi', 'description'], 'string'],
-			[['tahun', 'nomor_arsip', 'jumlah_arsip', 'nomor_box', 'jumlah_box', 'nomor_box_urutan', 'lokasi', 'color_code', 'description', 'publication_file', 'pengolahan_status', 'pengolahan_tahun', 'stayInHere', 'jenisArsip'], 'safe'],
+			[['tahun', 'nomor_arsip', 'jumlah_arsip', 'nomor_box', 'jumlah_box', 'nomor_box_urutan', 'lokasi', 'color_code', 'description', 'publication_file', 'pengolahan_status', 'pengolahan_tahun', 'stayInHere', 'jenisArsip', 'creator'], 'safe'],
 			[['kode_box'], 'string', 'max' => 64],
 			[['tahun', 'pengolahan_tahun', 'color_code'], 'string', 'max' => 32],
 			[['type_id'], 'exist', 'skipOnError' => true, 'targetClass' => ArchivePengolahanPenyerahanType::className(), 'targetAttribute' => ['type_id' => 'id']],
@@ -135,6 +136,7 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 			'modified_id' => Yii::t('app', 'Modified'),
 			'updated_date' => Yii::t('app', 'Updated Date'),
 			'stayInHere' => Yii::t('app', 'stayInHere'),
+			'creator' => Yii::t('app', 'Name of creator(s)'),
 			'jenisArsip' => Yii::t('app', 'Jenis Arsip'),
 			'old_publication_file' => Yii::t('app', 'Old Publication File'),
 			'typeName' => Yii::t('app', 'Type'),
@@ -258,6 +260,19 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 	}
 
 	/**
+	 * @return \yii\db\ActiveQuery
+	 */
+	public function getCreators($result=false, $val='id')
+	{
+        if ($result == true) {
+            return \yii\helpers\ArrayHelper::map($this->creators, 'creator_id', $val=='id' ? 'id' : 'creator.creator_name');
+        }
+
+		return $this->hasMany(ArchivePengolahanPenyerahanCreator::className(), ['penyerahan_id' => 'id'])
+            ->select(['id', 'penyerahan_id', 'creator_id']);
+	}
+
+	/**
 	 * {@inheritdoc}
 	 * @return \ommu\archivePengolahan\models\query\ArchivePengolahanPenyerahan the active query used by this AR class.
 	 */
@@ -299,6 +314,14 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 			'attribute' => 'kode_box',
 			'value' => function($model, $key, $index, $column) {
 				return nl2br($model->kode_box);
+			},
+			'format' => 'html',
+		];
+		$this->templateColumns['creator'] = [
+			'attribute' => 'creator',
+			'label' => Yii::t('app', 'Creator'),
+			'value' => function($model, $key, $index, $column) {
+				return implode(', ', $model->getCreators(true, 'title'));
 			},
 			'format' => 'html',
 		];
@@ -537,6 +560,7 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
         $this->pengolahan_status = $this->pengolahan_status != '' && $this->pengolahan_status == 1 ? $this->pengolahan_status : 0;
 		// $this->oCard = isset($this->grid) ? $this->grid->card : 0;
 		// $this->oItem = isset($this->grid) ? $this->grid->item : 0;
+		// $this->creator = implode(',', $this->getCreators(true, 'title'));
 	}
 
 	/**

@@ -505,6 +505,7 @@ class AdminController extends Controller
 	protected function findModel($id)
 	{
         if (($model = ArchivePengolahanPenyerahan::findOne($id)) !== null) {
+            $model->creator = implode(',', $model->getCreators(true, 'title'));
             $model->jenisArsip = implode(',', $model->getJenis(false, 'title'));
 
             return $model;

@@ -47,9 +47,32 @@ echo $form->field($model, 'type_id')
 	->textarea(['rows' => 2, 'cols' => 50])
 	->label($model->getAttributeLabel('kode_box')); ?>
 
+<hr/>
+
+<?php
+$creatorSuggestUrl = Url::to(['/archive/setting/creator/suggest']);
+echo $form->field($model, 'creator', ['options' => ['class' => 'form-group row field-item']])
+    ->widget(Selectize::className(), [
+        'cascade' => true,
+        'url' => $creatorSuggestUrl,
+        'queryParam' => 'term',
+        'pluginOptions' => [
+            'valueField' => 'label',
+            'labelField' => 'label',
+            'searchField' => ['label'],
+            'persist' => false,
+            'createOnBlur' => false,
+            'create' => true,
+        ],
+    ])
+    ->label($model->getAttributeLabel('creator'))
+    ->hint(Yii::t('app', 'Record the name of the organization(s) or the individual(s) responsible for the creation, accumulation and maintenance of the records in the unit of description. Search for an existing name in the authority records by typing the first few characters of the name. Alternatively, type a new name to create and link to a new authority record.')); ?>
+
 <?php echo $form->field($model, 'pencipta_arsip')
 	->textarea(['rows' => 3, 'cols' => 50])
 	->label($model->getAttributeLabel('pencipta_arsip')); ?>
+
+<hr/>
 
 <?php echo $form->field($model, 'tahun')
 	->textInput(['maxlength' => true])
@@ -79,6 +102,8 @@ echo $form->field($model, 'type_id')
 	->textarea(['rows' => 2, 'cols' => 50])
 	->label($model->getAttributeLabel('lokasi')); ?>
 
+<hr/>
+
 <?php
 $subjectSuggestUrl = Url::to(['/admin/tag/suggest']);
 echo $form->field($model, 'jenisArsip', ['options' => ['class' => 'form-group row field-item']])
@@ -96,6 +121,8 @@ echo $form->field($model, 'jenisArsip', ['options' => ['class' => 'form-group ro
 		],
 	])
 	->label($model->getAttributeLabel('jenisArsip'));?>
+
+<hr/>
 
 <?php echo $form->field($model, 'color_code')
 	->textInput(['maxlength' => true])
