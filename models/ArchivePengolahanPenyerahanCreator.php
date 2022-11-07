@@ -32,9 +32,10 @@ use app\models\Users;
 
 class ArchivePengolahanPenyerahanCreator extends \app\components\ActiveRecord
 {
-    public $gridForbiddenColumn = ['penyerahanTypeId', 'creatorName', 'creationDisplayname'];
+    public $gridForbiddenColumn = ['creation_date', 'creationDisplayname'];
 
 	public $penyerahanTypeId;
+	public $penyerahanPenciptaArsip;
 	public $creatorName;
 	public $creationDisplayname;
 
@@ -70,7 +71,8 @@ class ArchivePengolahanPenyerahanCreator extends \app\components\ActiveRecord
 			'creator_id' => Yii::t('app', 'Creator'),
 			'creation_date' => Yii::t('app', 'Creation Date'),
 			'creation_id' => Yii::t('app', 'Creation'),
-			'penyerahanTypeId' => Yii::t('app', 'Penyerahan'),
+			'penyerahanTypeId' => Yii::t('app', 'Penyerahan Type'),
+			'penyerahanPenciptaArsip' => Yii::t('app', 'Kode Box / Pencipta Arsip'),
 			'creatorName' => Yii::t('app', 'Creator'),
 			'creationDisplayname' => Yii::t('app', 'Creation'),
 		];
@@ -81,7 +83,18 @@ class ArchivePengolahanPenyerahanCreator extends \app\components\ActiveRecord
 	 */
 	public function getPenyerahan()
 	{
-		return $this->hasOne(ArchivePengolahanPenyerahan::className(), ['id' => 'penyerahan_id']);
+		return $this->hasOne(ArchivePengolahanPenyerahan::className(), ['id' => 'penyerahan_id'])
+            ->select(['id', 'type_id', 'kode_box', 'pencipta_arsip']);
+	}
+
+	/**
+	 * @return \yii\db\ActiveQuery
+	 */
+	public function getType()
+	{
+		return $this->hasOne(ArchivePengolahanPenyerahanType::className(), ['id' => 'type_id'])
+            ->select(['id', 'type_name', 'feature'])
+            ->via('penyerahan');
 	}
 
 	/**
@@ -134,10 +147,20 @@ class ArchivePengolahanPenyerahanCreator extends \app\components\ActiveRecord
 		$this->templateColumns['penyerahanTypeId'] = [
 			'attribute' => 'penyerahanTypeId',
 			'value' => function($model, $key, $index, $column) {
-				return isset($model->penyerahan) ? $model->penyerahan->type->type_name : '-';
+				return isset($model->type) ? $model->type->type_name : '-';
 				// return $model->penyerahanTypeId;
 			},
+			'filter' => ArchivePengolahanPenyerahanType::getType(),
+			'visible' => !Yii::$app->request->get('penyerahan') && !Yii::$app->request->get('type') ? true : false,
+		];
+		$this->templateColumns['penyerahanPenciptaArsip'] = [
+			'attribute' => 'penyerahanPenciptaArsip',
+			'value' => function($model, $key, $index, $column) {
+				return self::parsePenyerahan($model, false);
+				// return $model->penyerahanPenciptaArsip;
+			},
 			'visible' => !Yii::$app->request->get('penyerahan') ? true : false,
+            'format' => 'raw',
 		];
 		$this->templateColumns['creatorName'] = [
 			'attribute' => 'creatorName',
