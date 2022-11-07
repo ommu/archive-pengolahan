@@ -27,12 +27,19 @@ class m221103_094234_archivePengolahan_module_create_table_penyerahan_card exten
 				'id' => Schema::TYPE_STRING . '(32) NOT NULL',
 				'publish' => Schema::TYPE_TINYINT . '(1) NOT NULL DEFAULT \'1\'',
 				'penyerahan_id' => Schema::TYPE_INTEGER . '(11) UNSIGNED',
+				'user_id' => Schema::TYPE_INTEGER . '(10) UNSIGNED NOT NULL',
+				'temporary_number' => Schema::TYPE_STRING . '(32) NOT NULL',
+				'archive_type' => Schema::TYPE_STRING,
+				'from_archive_date' => Schema::TYPE_STRING . '(64) NOT NULL',
+				'to_archive_date' => Schema::TYPE_STRING . '(64) NOT NULL',
+				'medium' => Schema::TYPE_TEXT . ' NOT NULL',
 				'creation_date' => Schema::TYPE_TIMESTAMP . ' NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT \'trigger\'',
 				'creation_id' => Schema::TYPE_INTEGER . '(11) UNSIGNED',
 				'modified_date' => Schema::TYPE_TIMESTAMP . ' NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT \'trigger\'',
 				'modified_id' => Schema::TYPE_INTEGER . '(11) UNSIGNED',
 				'updated_date' => Schema::TYPE_DATETIME . ' NOT NULL DEFAULT \'0000-00-00 00:00:00\' COMMENT \'trigger\'',
 				'PRIMARY KEY ([[id]])',
+				'CONSTRAINT ommu_archive_pengolahan_penyerahan_card_ibfk_1 FOREIGN KEY ([[penyerahan_id]]) REFERENCES {{%ommu_archive_pengolahan_penyerahan}} ([[id]]) ON DELETE CASCADE ON UPDATE CASCADE',
 			], $tableOptions);
 		}
 	}
