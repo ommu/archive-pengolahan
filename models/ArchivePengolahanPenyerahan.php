@@ -534,6 +534,20 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 	}
 
 	/**
+	 * function parsePenyerahan
+	 */
+	public static function parsePenyerahan($model, $urlTitle=true)
+	{
+		$title = $model->pencipta_arsip;
+        $penyerahanTitle = $urlTitle == true ? Html::a($title, ['penyerahan/admin/view', 'id' => $model->id], ['title' => $title, 'class' => 'modal-btn']) : $title ;
+
+        $html = Html::button($model->kode_box, ['class' => 'btn btn-info btn-xs']).'<br/>';
+        $html .= $penyerahanTitle;
+
+		return $html;
+	}
+
+	/**
 	 * @param returnAlias set true jika ingin kembaliannya path alias atau false jika ingin string
 	 * relative path. default true.
 	 */
