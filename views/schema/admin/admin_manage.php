@@ -25,9 +25,11 @@ if ($context->breadcrumbApp) {
 }
 $this->params['breadcrumbs'][] = $this->title;
 
-$this->params['menu']['content'] = [
-	['label' => Yii::t('app', 'Add Schema'), 'url' => Url::to(['create']), 'icon' => 'plus-square', 'htmlOptions' => ['class' => 'btn btn-success']],
-];
+if ($parent) {
+    $this->params['menu']['content'] = [
+        ['label' => Yii::t('app', 'Add Schema'), 'url' => Url::to(['create', 'id' => $parent->id]), 'icon' => 'plus-square', 'htmlOptions' => ['class' => 'btn btn-success']],
+    ];
+}
 $this->params['menu']['option'] = [
 	//['label' => Yii::t('app', 'Search'), 'url' => 'javascript:void(0);'],
 	['label' => Yii::t('app', 'Grid Option'), 'url' => 'javascript:void(0);'],
@@ -37,8 +39,8 @@ $this->params['menu']['option'] = [
 <div class="archive-pengolahan-schema-manage">
 <?php Pjax::begin(); ?>
 
-<?php if ($archive != null) {
-	echo $this->render('/archive/admin_view', ['model' => $archive, 'small' => true]);
+<?php if ($parent != null) {
+	echo $this->render('admin_view', ['model' => $parent, 'small' => true]);
 } ?>
 
 <?php //echo $this->render('_search', ['model' => $searchModel]); ?>

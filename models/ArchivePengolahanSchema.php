@@ -52,6 +52,7 @@ class ArchivePengolahanSchema extends \app\components\ActiveRecord
 	public $archiveTitle;
 	public $creationDisplayname;
 	public $modifiedDisplayname;
+	public $oChild;
 
 	/**
 	 * @return string the associated database table name
@@ -99,6 +100,7 @@ class ArchivePengolahanSchema extends \app\components\ActiveRecord
 			'archiveTitle' => Yii::t('app', 'From Archive'),
 			'creationDisplayname' => Yii::t('app', 'Creation'),
 			'modifiedDisplayname' => Yii::t('app', 'Modified'),
+			'oChild' => Yii::t('app', 'Childs'),
 		];
 	}
 
@@ -116,24 +118,70 @@ class ArchivePengolahanSchema extends \app\components\ActiveRecord
 	public function getCards($count=false, $publish=1)
 	{
         if ($count == false) {
-            return $this->hasMany(ArchivePengolahanSchemaCard::className(), ['schema_id' => 'id'])
-				->alias('cards')
-				->andOnCondition([sprintf('%s.publish', 'cards') => $publish]);
+            $model = $this->hasMany(ArchivePengolahanSchemaCard::className(), ['schema_id' => 'id'])
+				->alias('cards');
+                if ($publish != null) {
+                    $model->andOnCondition([sprintf('%s.publish', 'cards') => $publish]);
+                } else {
+                    $model->andOnCondition(['IN', sprintf('%s.publish', 'cards'), [0,1]]);
+                }
+    
+                return $model;
         }
 
 		$model = ArchivePengolahanSchemaCard::find()
             ->alias('t')
             ->where(['t.schema_id' => $this->id]);
-        if ($publish == 0) {
-            $model->unpublish();
-        } else if ($publish == 1) {
-            $model->published();
-        } else if ($publish == 2) {
-            $model->deleted();
+        if ($publish != null) {
+            if ($publish == 0) {
+                $model->unpublish();
+            } else if ($publish == 1) {
+                $model->published();
+            } else if ($publish == 2) {
+                $model->deleted();
+            }
+		} else {
+            $model->andWhere(['IN', 't.publish', [0,1]]);
         }
 		$cards = $model->count();
 
 		return $cards ? $cards : 0;
+	}
+
+	/**
+	 * @return \yii\db\ActiveQuery
+	 */
+	public function getChilds($count=false, $publish=1)
+	{
+        if ($count == false) {
+            $model = $this->hasMany(ArchivePengolahanSchema::className(), ['parent_id' => 'id'])
+				->alias('childs');
+                if ($publish != null) {
+                    $model->andOnCondition([sprintf('%s.publish', 'childs') => $publish]);
+                } else {
+                    $model->andOnCondition(['IN', sprintf('%s.publish', 'childs'), [0,1]]);
+                }
+    
+                return $model;
+        }
+
+		$model = ArchivePengolahanSchema::find()
+            ->alias('t')
+            ->where(['t.parent_id' => $this->id]);
+        if ($publish != null) {
+            if ($publish == 0) {
+                $model->unpublish();
+            } else if ($publish == 1) {
+                $model->published();
+            } else if ($publish == 2) {
+                $model->deleted();
+            }
+		} else {
+            $model->andWhere(['IN', 't.publish', [0,1]]);
+        }
+		$childs = $model->count();
+
+		return $childs ? $childs : 0;
 	}
 
 	/**
@@ -258,6 +306,16 @@ class ArchivePengolahanSchema extends \app\components\ActiveRecord
 			},
 			'filter' => $this->filterDatepicker($this, 'updated_date'),
 		];
+        $this->templateColumns['oChild'] = [
+            'attribute' => 'oChild',
+            'value' => function($model, $key, $index, $column) {
+                $childs = $model->getChilds(true);
+                return Html::a($childs, ['schema/admin/manage', 'parent' => $model->primaryKey], ['title' => Yii::t('app', '{count} childs', ['count' => $childs]), 'data-pjax' => 0]);
+            },
+			'filter' => $this->filterYesNo(),
+            'contentOptions' => ['class' => 'text-center'],
+            'format' => 'raw',
+        ];
 		$this->templateColumns['publish'] = [
 			'attribute' => 'publish',
 			'value' => function($model, $key, $index, $column) {

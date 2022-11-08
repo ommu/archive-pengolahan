@@ -27,8 +27,10 @@ class ArchivePengolahanSchema extends ArchivePengolahanSchemaModel
 	public function rules()
 	{
 		return [
-			[['id', 'parent_id', 'code', 'title', 'creation_date', 'modified_date', 'updated_date', 'archiveTitle', 'creationDisplayname', 'modifiedDisplayname'], 'safe'],
-			[['publish', 'archive_id', 'creation_id', 'modified_id'], 'integer'],
+			[['id', 'parent_id', 'code', 'title', 'creation_date', 'modified_date', 'updated_date', 
+                'parentTitle', 'archiveTitle', 'creationDisplayname', 'modifiedDisplayname'], 'safe'],
+			[['publish', 'archive_id', 'creation_id', 'modified_id',
+                'oChild'], 'integer'],
 		];
 	}
 
@@ -71,6 +73,9 @@ class ArchivePengolahanSchema extends ArchivePengolahanSchemaModel
 			// 'creation creation', 
 			// 'modified modified'
 		]);
+        if (isset($params['oChild']) && $params['oChild'] != '') {
+            $query->joinWith(['childs childs']);
+        }
         if ((isset($params['sort']) && in_array($params['sort'], ['archiveTitle', '-archiveTitle'])) || 
             (isset($params['archiveTitle']) && $params['archiveTitle'] != '')
         ) {
@@ -138,11 +143,24 @@ class ArchivePengolahanSchema extends ArchivePengolahanSchemaModel
 			'cast(t.updated_date as date)' => $this->updated_date,
 		]);
 
-        if ($this->isFond) {
-            $query->andWhere(['or',
-                ['=', 't.parent_id', ''],
-                ['is', 't.parent_id', null],
-            ]);
+        if (isset($params['parent']) && (isset($params['parent']) && $params['parent'] != '')) {
+            $query->andFilterWhere(['t.parent_id' => isset($params['parent']) ? $params['parent'] : $this->parent_id]);
+
+        } else {
+            if ($this->isFond) {
+                $query->andWhere(['or',
+                    ['=', 't.parent_id', ''],
+                    ['is', 't.parent_id', null],
+                ]);
+            }
+        }
+
+        if (isset($params['oChild']) && $params['oChild'] != '') {
+            if ($this->oChild == 1) {
+                $query->andWhere(['is not', 'childs.id', null]);
+            } else if ($this->oChild == 0) {
+                $query->andWhere(['is', 'childs.id', null]);
+            }
         }
 
 		if (!isset($params['publish']) || (isset($params['publish']) && $params['publish'] == '')) {
@@ -156,7 +174,7 @@ class ArchivePengolahanSchema extends ArchivePengolahanSchemaModel
         }
 
 		$query->andFilterWhere(['like', 't.id', $this->id])
-			->andFilterWhere(['like', 't.parent_id', $this->parent_id])
+			->andFilterWhere(['=', 't.parent_id', $this->parent_id])
 			->andFilterWhere(['like', 't.code', $this->code])
 			->andFilterWhere(['like', 't.title', $this->title])
 			->andFilterWhere(['like', 'archive.title', $this->archiveTitle])

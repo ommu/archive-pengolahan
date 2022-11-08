@@ -35,6 +35,7 @@ use yii\filters\VerbFilter;
 use ommu\archivePengolahan\models\ArchivePengolahanSchema;
 use ommu\archivePengolahan\models\search\ArchivePengolahanSchema as ArchivePengolahanSchemaSearch;
 use ommu\archivePengolahan\models\ArchivePengolahanSetting;
+use yii\helpers\ArrayHelper;
 
 class AdminController extends Controller
 {
@@ -44,6 +45,10 @@ class AdminController extends Controller
 	public function init()
 	{
         parent::init();
+
+        if (Yii::$app->request->get('id') || Yii::$app->request->get('parent')) {
+            $this->subMenu = $this->module->params['schemma_submenu'];
+        }
 
         $setting = new ArchivePengolahanSetting(['app' => 'archivePengolahanModule']);
 		$this->breadcrumbApp = $setting->breadcrumb;
@@ -98,8 +103,9 @@ class AdminController extends Controller
         }
         $columns = $searchModel->getGridColumn($cols);
 
-        if (($archive = Yii::$app->request->get('archive')) != null) {
-            $archive = \ommu\archivePengolahan\models\Archives::findOne($archive);
+        if (($parent = Yii::$app->request->get('parent')) != null) {
+            $this->subMenuParam = $parent;
+            $parent = \ommu\archivePengolahan\models\ArchivePengolahanSchema::findOne($parent);
         }
 
 		$this->view->title = Yii::t('app', 'Schemas');
@@ -109,7 +115,7 @@ class AdminController extends Controller
 			'searchModel' => $searchModel,
 			'dataProvider' => $dataProvider,
 			'columns' => $columns,
-			'archive' => $archive,
+			'parent' => $parent,
 		]);
 	}
 
@@ -120,7 +126,13 @@ class AdminController extends Controller
 	 */
 	public function actionCreate()
 	{
+		$id = Yii::$app->request->get('id');
+
         $model = new ArchivePengolahanSchema();
+        if ($id) {
+			$model = new ArchivePengolahanSchema(['parent_id' => $id]);
+        }
+        $parent = $model->parent;
 
         if (Yii::$app->request->isPost) {
             $model->load(Yii::$app->request->post());
@@ -131,7 +143,7 @@ class AdminController extends Controller
             if ($model->save()) {
                 Yii::$app->session->setFlash('success', Yii::t('app', 'Archive schema success created.'));
                 if ($model->stayInHere) {
-                    return $this->redirect(['create', 'stayInHere' => $model->stayInHere]);
+                    return $this->redirect(['create', 'id' => $model->parent_id, 'stayInHere' => $model->stayInHere]);
                 }
                 return $this->redirect(['manage']);
                 //return $this->redirect(['view', 'id' => $model->id]);
@@ -148,6 +160,7 @@ class AdminController extends Controller
 		$this->view->keywords = '';
 		return $this->render('admin_create', [
 			'model' => $model,
+			'parent' => $parent ?? null,
 		]);
 	}
 

@@ -118,3 +118,35 @@ setting_submenu:
       url:
         0: 'setting/admin/update'
       select: controller
+
+schemma_submenu:
+  0:
+    view:
+      label: Detail
+      url:
+        0: 'schema/admin/view'
+        id: $_GET*id
+      select: action
+    update:
+      label: Update
+      url:
+        0: 'schema/admin/update'
+        id: $_GET*id
+      select: action
+  1:
+    childs:
+      label: Childs
+      url:
+        0: 'schema/admin/manage'
+        parent: $_GET*id
+      select: action
+  2:
+    delete:
+      label: Delete
+      url:
+        0: 'fond/delete'
+        id: $_GET*id
+      htmlOptions:
+        data-confirm: Are you sure you want to delete this item?
+        data-method: post
+      select: action

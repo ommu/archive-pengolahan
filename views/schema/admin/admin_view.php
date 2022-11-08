@@ -24,11 +24,6 @@ if (!$small) {
     }
     $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Schema'), 'url' => ['index']];
     $this->params['breadcrumbs'][] = $model->title;
-
-    $this->params['menu']['content'] = [
-        ['label' => Yii::t('app', 'Update'), 'url' => Url::to(['update', 'id' => $model->id]), 'icon' => 'pencil', 'htmlOptions' => ['class' => 'btn btn-primary']],
-        ['label' => Yii::t('app', 'Delete'), 'url' => Url::to(['delete', 'id' => $model->id]), 'htmlOptions' => ['data-confirm' => Yii::t('app', 'Are you sure you want to delete this item?'), 'data-method' => 'post', 'class' => 'btn btn-danger'], 'icon' => 'trash'],
-    ];
 } ?>
 
 <div class="archive-pengolahan-schema-view">
@@ -47,9 +42,17 @@ $attributes = [
 		'visible' => !$small,
 	],
 	[
-		'attribute' => 'parent_id',
-		'value' => $model->parent_id ? $model->parent_id : '-',
+		'attribute' => 'parentTitle',
+		'value' => isset($model->parent) ? $model->parent->title : '-',
 		'visible' => !$small,
+	],
+	[
+		'attribute' => 'code',
+		'value' => $model->code ? $model->code : '-',
+	],
+	[
+		'attribute' => 'title',
+		'value' => $model->title ? $model->title : '-',
 	],
 	[
 		'attribute' => 'archiveTitle',
@@ -61,15 +64,15 @@ $attributes = [
             return $archiveTitle;
 		},
 		'format' => 'html',
-	],
-	[
-		'attribute' => 'code',
-		'value' => $model->code ? $model->code : '-',
 		'visible' => !$small,
 	],
 	[
-		'attribute' => 'title',
-		'value' => $model->title ? $model->title : '-',
+		'attribute' => 'oChild',
+		'value' => function ($model) {
+            $cards = $model->getChilds(true);
+            return Html::a($cards, ['schema/admin/manage', 'parent' => $model->primaryKey], ['title' => Yii::t('app', '{count} childs', ['count' => $cards])]);
+		},
+		'format' => 'html',
 		'visible' => !$small,
 	],
 	[

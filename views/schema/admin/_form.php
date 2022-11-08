@@ -41,9 +41,11 @@ $redactorOptions = [
 
 <?php //echo $form->errorSummary($model);?>
 
-<?php echo $form->field($model, 'parent_id')
-	->textInput(['maxlength' => true])
-	->label($model->getAttributeLabel('parent_id')); ?>
+<?php 
+if (!$model->getErrors() && $parent) {
+    $model->parent_id = $parent->id;
+}
+echo $form->field($model, 'parent_id', ['template' => '{input}', 'options' => ['tag' => null]])->hiddenInput(); ?>
 
 <?php echo $form->field($model, 'code')
 	->textInput(['maxlength' => true])
