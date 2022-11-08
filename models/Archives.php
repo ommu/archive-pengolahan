@@ -173,10 +173,12 @@ class Archives extends ArchivesModel
 			'attribute' => 'location',
 			'value' => function($model, $key, $index, $column) {
                 $location = $model->getLocations(false) != null ? 1 : 0;
-				return $this->filterYesNo($location);
+                $parseLocation = $location ? '<span class="glyphicon glyphicon-ok"></span>' : Yii::t('app', 'Set Location');
+				return Html::a($parseLocation, ['location/set', 'id' => $model->primaryKey], ['title' => $location ? Yii::t('app', 'Location') : Yii::t('app', 'Set Location'), 'data-pjax' => 0]);
 			},
 			'filter' => $this->filterYesNo(),
 			'contentOptions' => ['class' => 'text-center'],
+			'format' => 'raw',
 			'visible' => !$this->isFond ? true : false,
 		];
 		$this->templateColumns['preview'] = [
