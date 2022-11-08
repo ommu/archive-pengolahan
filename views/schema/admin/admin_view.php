@@ -17,6 +17,8 @@ use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\widgets\DetailView;
 
+!$small ? \ommu\archive\assets\AciTreeAsset::register($this) : '';
+
 if (!$small) {
     $context = $this->context;
     if ($context->breadcrumbApp) {
@@ -29,6 +31,13 @@ if (!$small) {
 <div class="archive-pengolahan-schema-view">
 
 <?php
+$treeDataUrl = Url::to(['data', 'id' => $model->id]);
+$js = <<<JS
+	var treeDataUrl = '$treeDataUrl';
+	var selectedId = '$model->id';
+JS;
+!$small ? $this->registerJs($js, \yii\web\View::POS_HEAD) : '';
+
 $attributes = [
 	[
 		'attribute' => 'id',
@@ -43,7 +52,11 @@ $attributes = [
 	],
 	[
 		'attribute' => 'parentTitle',
-		'value' => isset($model->parent) ? $model->parent->title : '-',
+		'value' => function ($model) {
+            $parent = $model->parent;
+            return $model::parseParent($parent);
+		},
+		'format' => 'raw',
 		'visible' => !$small,
 	],
 	[

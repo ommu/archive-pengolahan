@@ -1,22 +1,24 @@
 <?php
 /**
- * ArchivePengolahanSchema
+ * ArchivePengolahanSchemaCard
  * 
  * @author Putra Sudaryanto <putra@ommu.id>
  * @contact (+62)856-299-4114
  * @copyright Copyright (c) 2022 OMMU (www.ommu.id)
- * @created date 8 November 2022, 22:04 WIB
+ * @created date 8 November 2022, 22:05 WIB
  * @link https://bitbucket.org/ommu/archive-pengolahan
  *
- * This is the model class for table "ommu_archive_pengolahan_schema".
+ * This is the model class for table "ommu_archive_pengolahan_schema_card".
  *
- * The followings are the available columns in table "ommu_archive_pengolahan_schema":
+ * The followings are the available columns in table "ommu_archive_pengolahan_schema_card":
  * @property string $id
  * @property integer $publish
- * @property string $parent_id
+ * @property string $card_id
+ * @property string $fond_schema_id
+ * @property string $schema_id
+ * @property integer $final_id
+ * @property integer $fond_id
  * @property integer $archive_id
- * @property string $code
- * @property string $title
  * @property string $creation_date
  * @property integer $creation_id
  * @property string $modified_date
@@ -24,8 +26,11 @@
  * @property string $updated_date
  *
  * The followings are the available model relations:
+ * @property ArchivePengolahanSchema $schema
+ * @property ArchivePengolahanPenyerahanCard $card
+ * @property Archives $fond
  * @property Archives $archive
- * @property ArchivePengolahanSchemaCard[] $cards
+ * @property ArchivePengolahanFinal $final
  * @property Users $creation
  * @property Users $modified
  *
@@ -34,32 +39,34 @@
 namespace ommu\archivePengolahan\models;
 
 use Yii;
-use yii\helpers\Html;
 use yii\helpers\Url;
 use app\models\Users;
+use ommu\uuid\models\ArchivePengolahanSchema;
+use ommu\uuid\models\ArchivePengolahanPenyerahanCard;
 use thamtech\uuid\helpers\UuidHelper;
 
-class ArchivePengolahanSchema extends \app\components\ActiveRecord
+class ArchivePengolahanSchemaCard extends \app\components\ActiveRecord
 {
 	use \ommu\traits\UtilityTrait;
 
-    public $gridForbiddenColumn = ['modified_date', 'updated_date', 'parentTitle', 'archiveTitle', 'creationDisplayname', 'modifiedDisplayname'];
+    public $gridForbiddenColumn = ['schemaTitle', 'cardPenyerahanId', 'finalFondName', 'fondTitle', 'archiveTitle', 'creationDisplayname', 'modifiedDisplayname'];
 
     public $stayInHere;
-	public $isFond = true;
 
-	public $parentTitle;
+	public $schemaTitle;
+	public $cardPenyerahanId;
+	public $finalFondName;
+	public $fondTitle;
 	public $archiveTitle;
 	public $creationDisplayname;
 	public $modifiedDisplayname;
-	public $oChild;
 
 	/**
 	 * @return string the associated database table name
 	 */
 	public static function tableName()
 	{
-		return 'ommu_archive_pengolahan_schema';
+		return 'ommu_archive_pengolahan_schema_card';
 	}
 
 	/**
@@ -68,13 +75,16 @@ class ArchivePengolahanSchema extends \app\components\ActiveRecord
 	public function rules()
 	{
 		return [
-			[['id', 'code', 'title'], 'required'],
-			[['publish', 'archive_id', 'creation_id', 'modified_id', 'stayInHere'], 'integer'],
-			[['id', 'parent_id', 'title'], 'string'],
-			[['parent_id', 'archive_id', 'stayInHere'], 'safe'],
-			[['code'], 'string', 'max' => 32],
+			[['id', 'card_id', 'fond_schema_id', 'schema_id', 'final_id', 'fond_id', 'archive_id'], 'required'],
+			[['publish', 'final_id', 'fond_id', 'archive_id', 'creation_id', 'modified_id', 'stayInHere'], 'integer'],
+			[['stayInHere'], 'safe'],
+			[['id', 'card_id', 'fond_schema_id', 'schema_id'], 'string'],
 			[['id'], 'unique'],
+			[['fond_schema_id', 'schema_id'], 'exist', 'skipOnError' => true, 'targetClass' => ArchivePengolahanSchema::className(), 'targetAttribute' => ['schema_id' => 'id']],
+			[['card_id'], 'exist', 'skipOnError' => true, 'targetClass' => ArchivePengolahanPenyerahanCard::className(), 'targetAttribute' => ['card_id' => 'id']],
+			[['fond_id'], 'exist', 'skipOnError' => true, 'targetClass' => Archives::className(), 'targetAttribute' => ['fond_id' => 'id']],
 			[['archive_id'], 'exist', 'skipOnError' => true, 'targetClass' => Archives::className(), 'targetAttribute' => ['archive_id' => 'id']],
+			[['final_id'], 'exist', 'skipOnError' => true, 'targetClass' => ArchivePengolahanFinal::className(), 'targetAttribute' => ['final_id' => 'id']],
 		];
 	}
 
@@ -86,22 +96,58 @@ class ArchivePengolahanSchema extends \app\components\ActiveRecord
 		return [
 			'id' => Yii::t('app', 'ID'),
 			'publish' => Yii::t('app', 'Publish'),
-			'parent_id' => Yii::t('app', 'Parent'),
+			'card_id' => Yii::t('app', 'Card'),
+			'fond_schema_id' => Yii::t('app', 'Fond Schema'),
+			'schema_id' => Yii::t('app', 'Schema'),
+			'final_id' => Yii::t('app', 'Final'),
+			'fond_id' => Yii::t('app', 'Fond'),
 			'archive_id' => Yii::t('app', 'Archive'),
-			'code' => Yii::t('app', 'Code'),
-			'title' => Yii::t('app', 'Title'),
 			'creation_date' => Yii::t('app', 'Creation Date'),
 			'creation_id' => Yii::t('app', 'Creation'),
 			'modified_date' => Yii::t('app', 'Modified Date'),
 			'modified_id' => Yii::t('app', 'Modified'),
 			'updated_date' => Yii::t('app', 'Updated Date'),
 			'stayInHere' => Yii::t('app', 'stayInHere'),
-			'parentTitle' => Yii::t('app', 'Parent (Tree)'),
-			'archiveTitle' => Yii::t('app', 'From Archive'),
+			'schemaTitle' => Yii::t('app', 'Schema'),
+			'cardPenyerahanId' => Yii::t('app', 'Card'),
+			'finalFondName' => Yii::t('app', 'Final'),
+			'fondTitle' => Yii::t('app', 'Fond'),
+			'archiveTitle' => Yii::t('app', 'Archive'),
 			'creationDisplayname' => Yii::t('app', 'Creation'),
 			'modifiedDisplayname' => Yii::t('app', 'Modified'),
-			'oChild' => Yii::t('app', 'Childs'),
 		];
+	}
+
+	/**
+	 * @return \yii\db\ActiveQuery
+	 */
+	public function getCard()
+	{
+		return $this->hasOne(ArchivePengolahanPenyerahanCard::className(), ['id' => 'card_id']);
+	}
+
+	/**
+	 * @return \yii\db\ActiveQuery
+	 */
+	public function getFondSchema()
+	{
+		return $this->hasOne(ArchivePengolahanSchema::className(), ['id' => 'fond_schema_id']);
+	}
+
+	/**
+	 * @return \yii\db\ActiveQuery
+	 */
+	public function getSchema()
+	{
+		return $this->hasOne(ArchivePengolahanSchema::className(), ['id' => 'schema_id']);
+	}
+
+	/**
+	 * @return \yii\db\ActiveQuery
+	 */
+	public function getFond()
+	{
+		return $this->hasOne(Archives::className(), ['id' => 'fond_id']);
 	}
 
 	/**
@@ -115,73 +161,9 @@ class ArchivePengolahanSchema extends \app\components\ActiveRecord
 	/**
 	 * @return \yii\db\ActiveQuery
 	 */
-	public function getCards($count=false, $publish=1)
+	public function getFinal()
 	{
-        if ($count == false) {
-            $model = $this->hasMany(ArchivePengolahanSchemaCard::className(), ['schema_id' => 'id'])
-				->alias('cards');
-                if ($publish != null) {
-                    $model->andOnCondition([sprintf('%s.publish', 'cards') => $publish]);
-                } else {
-                    $model->andOnCondition(['IN', sprintf('%s.publish', 'cards'), [0,1]]);
-                }
-    
-                return $model;
-        }
-
-		$model = ArchivePengolahanSchemaCard::find()
-            ->alias('t')
-            ->where(['t.schema_id' => $this->id]);
-        if ($publish != null) {
-            if ($publish == 0) {
-                $model->unpublish();
-            } else if ($publish == 1) {
-                $model->published();
-            } else if ($publish == 2) {
-                $model->deleted();
-            }
-		} else {
-            $model->andWhere(['IN', 't.publish', [0,1]]);
-        }
-		$cards = $model->count();
-
-		return $cards ? $cards : 0;
-	}
-
-	/**
-	 * @return \yii\db\ActiveQuery
-	 */
-	public function getChilds($count=false, $publish=1)
-	{
-        if ($count == false) {
-            $model = $this->hasMany(ArchivePengolahanSchema::className(), ['parent_id' => 'id'])
-				->alias('childs');
-                if ($publish != null) {
-                    $model->andOnCondition([sprintf('%s.publish', 'childs') => $publish]);
-                } else {
-                    $model->andOnCondition(['IN', sprintf('%s.publish', 'childs'), [0,1]]);
-                }
-    
-                return $model;
-        }
-
-		$model = ArchivePengolahanSchema::find()
-            ->alias('t')
-            ->where(['t.parent_id' => $this->id]);
-        if ($publish != null) {
-            if ($publish == 0) {
-                $model->unpublish();
-            } else if ($publish == 1) {
-                $model->published();
-            } else if ($publish == 2) {
-                $model->deleted();
-            }
-		} else {
-            $model->andWhere(['IN', 't.publish', [0,1]]);
-        }
-		$childs = $model->count();
-
-		return $childs ? $childs : 0;
+		return $this->hasOne(ArchivePengolahanFinal::className(), ['id' => 'final_id']);
 	}
 
 	/**
@@ -203,21 +185,12 @@ class ArchivePengolahanSchema extends \app\components\ActiveRecord
 	}
 
 	/**
-	 * @return \yii\db\ActiveQuery
-	 */
-	public function getParent()
-	{
-		return $this->hasOne(ArchivePengolahanSchema::className(), ['id' => 'parent_id'])
-            ->select(['id', 'parent_id', 'archive_id', 'code', 'title']);
-	}
-
-	/**
 	 * {@inheritdoc}
-	 * @return \ommu\archivePengolahan\models\query\ArchivePengolahanSchema the active query used by this AR class.
+	 * @return \ommu\archivePengolahan\models\query\ArchivePengolahanSchemaCard the active query used by this AR class.
 	 */
 	public static function find()
 	{
-		return new \ommu\archivePengolahan\models\query\ArchivePengolahanSchema(get_called_class());
+		return new \ommu\archivePengolahan\models\query\ArchivePengolahanSchemaCard(get_called_class());
 	}
 
 	/**
@@ -240,26 +213,45 @@ class ArchivePengolahanSchema extends \app\components\ActiveRecord
 			'class' => 'app\components\grid\SerialColumn',
 			'contentOptions' => ['class' => 'text-center'],
 		];
-		$this->templateColumns['parentTitle'] = [
-			'attribute' => 'parentTitle',
+		$this->templateColumns['cardPenyerahanId'] = [
+			'attribute' => 'cardPenyerahanId',
 			'value' => function($model, $key, $index, $column) {
-				return isset($model->parent) ? $model->parent->title : '-';
+				return isset($model->card) ? $model->card->penyerahan->type->type_name : '-';
+				// return $model->cardPenyerahanId;
 			},
-			'format' => 'raw',
-			'visible' => !Yii::$app->request->get('parent') ? true : false,
+			'visible' => !Yii::$app->request->get('card') ? true : false,
 		];
-		$this->templateColumns['title'] = [
-			'attribute' => 'title',
+		$this->templateColumns['parentSchemaTitle'] = [
+			'attribute' => 'parentSchemaTitle',
 			'value' => function($model, $key, $index, $column) {
-				return $model->title;
+				return isset($model->parentSchema) ? $model->parentSchema->title : '-';
+				// return $model->parentSchemaTitle;
 			},
-			'format' => 'raw',
+			'visible' => !Yii::$app->request->get('schema') ? true : false,
 		];
-		$this->templateColumns['code'] = [
-			'attribute' => 'code',
+		$this->templateColumns['schemaTitle'] = [
+			'attribute' => 'schemaTitle',
 			'value' => function($model, $key, $index, $column) {
-				return $model->code;
+				return isset($model->schema) ? $model->schema->title : '-';
+				// return $model->schemaTitle;
 			},
+			'visible' => !Yii::$app->request->get('schema') ? true : false,
+		];
+		$this->templateColumns['finalFondName'] = [
+			'attribute' => 'finalFondName',
+			'value' => function($model, $key, $index, $column) {
+				return isset($model->final) ? $model->final->fond_name : '-';
+				// return $model->finalFondName;
+			},
+			'visible' => !Yii::$app->request->get('final') ? true : false,
+		];
+		$this->templateColumns['fondTitle'] = [
+			'attribute' => 'fondTitle',
+			'value' => function($model, $key, $index, $column) {
+				return isset($model->fond) ? $model->fond->title : '-';
+				// return $model->fondTitle;
+			},
+			'visible' => !Yii::$app->request->get('fond') ? true : false,
 		];
 		$this->templateColumns['archiveTitle'] = [
 			'attribute' => 'archiveTitle',
@@ -306,21 +298,11 @@ class ArchivePengolahanSchema extends \app\components\ActiveRecord
 			},
 			'filter' => $this->filterDatepicker($this, 'updated_date'),
 		];
-        $this->templateColumns['oChild'] = [
-            'attribute' => 'oChild',
-            'value' => function($model, $key, $index, $column) {
-                $childs = $model->getChilds(true);
-                return Html::a($childs, ['schema/admin/manage', 'parent' => $model->primaryKey], ['title' => Yii::t('app', '{count} childs', ['count' => $childs]), 'data-pjax' => 0]);
-            },
-			'filter' => $this->filterYesNo(),
-            'contentOptions' => ['class' => 'text-center'],
-            'format' => 'raw',
-        ];
 		$this->templateColumns['publish'] = [
 			'attribute' => 'publish',
 			'value' => function($model, $key, $index, $column) {
 				$url = Url::to(['publish', 'id' => $model->primaryKey]);
-				return $this->quickAction($url, $model->publish);
+				return $this->quickAction($url, $model->publish, 'deleted');
 			},
 			'filter' => $this->filterYesNo(),
 			'contentOptions' => ['class' => 'text-center'],
@@ -351,41 +333,20 @@ class ArchivePengolahanSchema extends \app\components\ActiveRecord
 	}
 
 	/**
-	 * function parseParent
-	 */
-	public static function parseParent($model, $aciTree=true)
-	{
-        if (!isset($model)) {
-            return Yii::$app->request->isAjax ? '-' : '<div id="tree" class="aciTree"></div>';
-        }
-
-		$title = self::htmlHardDecode($model->title);
-
-		$items[] = $model->getAttributeLabel('title').': '.Html::a($title, ['/archive/admin/view', 'id' => $model->id], ['title' => $title, 'class' => 'modal-btn']);
-
-        if (Yii::$app->request->isAjax) {
-            return Html::ul($items, ['encode' => false, 'class' => 'list-boxed']);
-        }
-		
-		$return = Html::ul($items, ['encode' => false, 'class' => 'list-boxed']);
-        if ($aciTree) {
-            $return .= '<hr/><div id="tree" class="aciTree"></div>';
-        }
-		return $return;
-	}
-
-	/**
 	 * after find attributes
 	 */
 	public function afterFind()
 	{
 		parent::afterFind();
 
-        $this->isFond = $this->parent_id != '' ? true : false;
+		// $this->cardPenyerahanId = isset($this->card) ? $this->card->penyerahan->type->type_name : '-';
+		// $this->parentSchemaTitle = isset($this->parentSchema) ? $this->parentSchema->title : '-';
+		// $this->schemaTitle = isset($this->schema) ? $this->schema->title : '-';
+		// $this->finalFondName = isset($this->final) ? $this->final->fond_name : '-';
+		// $this->fondTitle = isset($this->fond) ? $this->fond->title : '-';
 		// $this->archiveTitle = isset($this->archive) ? $this->archive->title : '-';
 		// $this->creationDisplayname = isset($this->creation) ? $this->creation->displayname : '-';
 		// $this->modifiedDisplayname = isset($this->modified) ? $this->modified->displayname : '-';
-		// $this->card = $this->getCards(true) ? 1 : 0;
 	}
 
 	/**

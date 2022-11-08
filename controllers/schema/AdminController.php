@@ -36,6 +36,7 @@ use ommu\archivePengolahan\models\ArchivePengolahanSchema;
 use ommu\archivePengolahan\models\search\ArchivePengolahanSchema as ArchivePengolahanSchemaSearch;
 use ommu\archivePengolahan\models\ArchivePengolahanSetting;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Url;
 
 class AdminController extends Controller
 {
@@ -233,7 +234,7 @@ class AdminController extends Controller
 
         if ($model->save(false, ['publish','modified_id'])) {
             Yii::$app->session->setFlash('success', Yii::t('app', 'Archive schema success deleted.'));
-            return $this->redirect(Yii::$app->request->referrer ?: ['manage']);
+            return $this->redirect(Yii::$app->request->referrer ?: ['manage', 'parent' => $model->parent_id]);
         }
 	}
 
@@ -251,8 +252,55 @@ class AdminController extends Controller
 
         if ($model->save(false, ['publish','modified_id'])) {
             Yii::$app->session->setFlash('success', Yii::t('app', 'Archive schema success updated.'));
-            return $this->redirect(Yii::$app->request->referrer ?: ['manage']);
+            return $this->redirect(Yii::$app->request->referrer ?: ['manage', 'parent' => $model->parent_id]);
         }
+	}
+
+	/**
+	 * Displays a single Archives model.
+	 * @param integer $id
+	 * @return mixed
+	 */
+	public function actionData($id)
+	{
+		Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+		$model = ArchivePengolahanSchema::findOne($id);
+
+        if ($model == null) return [];
+
+		$codes = [];
+		$result[] = $this->getData($model, $codes);
+
+		return $result;
+	}
+
+	/**
+	 * Displays a single Archives model.
+	 * @param integer $id
+	 * @return mixed
+	 */
+	public function getData($model, $codes)
+	{
+		$data = [
+			'id' => $model->id,
+			'code' => $model->code,
+			'level' => '',
+			'label' => $model::htmlHardDecode($model->title),
+			'inode' => $model->getChilds(true, 1) ? true : false,
+			'view-url' => Url::to(['view', 'id' => $model->id]),
+			'update-url' => Url::to(['update', 'id' => $model->id]),
+			'child-url' => Url::to(['manage', 'parent' => $model->id]),
+		];
+        if (!empty($codes)) {
+			$data = ArrayHelper::merge($data, ['open' => true, 'branch' => [$codes]]);
+        }
+		
+        if (isset($model->parent)) {
+			$data = $this->getData($model->parent, $data);
+        }
+
+		return $data;
 	}
 
 	/**

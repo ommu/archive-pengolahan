@@ -15,9 +15,24 @@
  */
 
 use yii\helpers\Html;
+use yii\helpers\Url;
 use app\components\widgets\ActiveForm;
 use yii\helpers\ArrayHelper;
 use yii\redactor\widgets\Redactor;
+
+\ommu\archive\assets\AciTreeAsset::register($this);
+
+$treeId = $model->id;
+if ($model->isNewRecord && $parent && !$model->getErrors()) {
+    $model->parent_id = $parent->id;
+    $treeId = $model->parent_id;
+}
+$treeDataUrl = Url::to(['data', 'id' => $treeId]);
+$js = <<<JS
+	var treeDataUrl = '$treeDataUrl';
+	var selectedId = '$model->parent_id';
+JS;
+	$this->registerJs($js, \yii\web\View::POS_HEAD);
 
 $redactorOptions = [
 	'buttons' => ['html', 'format', 'bold', 'italic', 'deleted'],
@@ -42,10 +57,9 @@ $redactorOptions = [
 <?php //echo $form->errorSummary($model);?>
 
 <?php 
-if (!$model->getErrors() && $parent) {
-    $model->parent_id = $parent->id;
-}
-echo $form->field($model, 'parent_id', ['template' => '{input}', 'options' => ['tag' => null]])->hiddenInput(); ?>
+echo $form->field($model, 'parent_id', ['template' => '{label}{beginWrapper}<div id="tree" class="aciTree"></div>{input}{error}{hint}{endWrapper}'])
+	->hiddenInput()
+	->label($model->getAttributeLabel('parent_id')); ?>
 
 <?php echo $form->field($model, 'code')
 	->textInput(['maxlength' => true])
