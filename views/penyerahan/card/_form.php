@@ -16,7 +16,13 @@
 
 use yii\helpers\Html;
 use app\components\widgets\ActiveForm;
+use yii\redactor\widgets\Redactor;
 use yii\helpers\ArrayHelper;
+
+$redactorOptions = [
+	'buttons' => ['html', 'format', 'bold', 'italic', 'deleted'],
+	'plugins' => ['fontcolor']
+];
 ?>
 
 <div class="archive-pengolahan-penyerahan-card-form">
@@ -33,7 +39,7 @@ use yii\helpers\ArrayHelper;
 	],
 ]); ?>
 
-<?php //echo $form->errorSummary($model);?>
+<?php echo $form->errorSummary($model);?>
 
 <?php
 $parsePenyerahan = $penyerahan::parsePenyerahan($penyerahan, true);
@@ -43,27 +49,59 @@ echo $form->field($model, 'penyerahan_id', ['template' => '{label}{beginWrapper}
 
 <hr/>
 
-<?php echo $form->field($model, 'user_id')
-	->textInput(['type' => 'number', 'min' => '1'])
+<?php 
+$parseUser = $user ? 
+    $user::parseUser($user) : 
+    Yii::t('app', 'Your account not have permission to add a description card, please contact administrator.');
+echo $form->field($model, 'user_id', ['template' => '{label}{beginWrapper}{input}{error}{hint}'.$parseUser.'{endWrapper}'])
+	->hiddenInput()
 	->label($model->getAttributeLabel('user_id')); ?>
 
 <hr/>
 
-<?php echo $form->field($model, 'temporary_number')
-	->textInput(['maxlength' => true])
+<?php 
+if ($model->isNewRecord && !$model->getErrors()) {
+    $model->temporary_number = $user ? $user->user_code.($user->archives + 1) : null;
+}
+$parseUser = Html::button($model->temporary_number, ['class' => 'btn btn-info btn-xs']);
+echo $form->field($model, 'temporary_number', ['template' => '{label}{beginWrapper}{input}{error}{hint}'.$parseUser.'{endWrapper}'])
+	->hiddenInput()
 	->label($model->getAttributeLabel('temporary_number')); ?>
+
+<?php echo $form->field($model, 'archive_description')
+    ->textarea(['rows' => 6, 'cols' => 50])
+    ->widget(Redactor::className(), ['clientOptions' => $redactorOptions])
+    ->label($model->getAttributeLabel('archive_description')); ?>
+
+<hr/>
 
 <?php $archiveType = $model::getArchiveType();
 echo $form->field($model, 'archive_type')
 	->dropDownList($archiveType, ['prompt' => ''])
 	->label($model->getAttributeLabel('archive_type')); ?>
 
-<?php echo $form->field($model, 'from_archive_date')
-	->textInput(['maxlength' => true])
+<?php $archiveTypeFromMonth = $form->field($model, 'archive_date[from][month]', ['template' => '{beginWrapper}{input}{endWrapper}', 'horizontalCssClasses' => ['wrapper' => 'col-sm-3 col-xs-4'], 'options' => ['tag' => null]])
+	->textInput(['type' => 'number', 'min' => 0, 'max' => 12, 'maxlength' => '2', 'placeholder' => $model->getAttributeLabel('month')])
+	->label($model->getAttributeLabel('archive_date[from][month]')); ?>
+
+<?php $archiveTypeFromYear = $form->field($model, 'archive_date[from][year]', ['template' => '{beginWrapper}{input}{endWrapper}', 'horizontalCssClasses' => ['wrapper' => 'col-sm-3 col-xs-4'], 'options' => ['tag' => null]])
+	->textInput(['type' => 'number', 'min' => 0, 'maxlength' => '4', 'placeholder' => $model->getAttributeLabel('year')])
+	->label($model->getAttributeLabel('archive_date[from][year]')); ?>
+
+<?php echo $form->field($model, 'archive_date[from][day]', ['template' => '{label}{beginWrapper}{input}{endWrapper}'.$archiveTypeFromMonth . $archiveTypeFromYear .'{error}', 'horizontalCssClasses' => ['wrapper' => 'col-sm-3 col-xs-4', 'error' => 'col-sm-9 col-xs-12']])
+	->textInput(['type' => 'number', 'min' => 0, 'max' => 31, 'maxlength' => '2', 'placeholder' => $model->getAttributeLabel('day')])
 	->label($model->getAttributeLabel('from_archive_date')); ?>
 
-<?php echo $form->field($model, 'to_archive_date')
-	->textInput(['maxlength' => true])
+<?php $archiveTypeToMonth = $form->field($model, 'archive_date[to][month]', ['template' => '{beginWrapper}{input}{endWrapper}', 'horizontalCssClasses' => ['wrapper' => 'col-sm-3 col-xs-4'], 'options' => ['tag' => null]])
+	->textInput(['type' => 'number', 'min' => 0, 'max' => 12, 'maxlength' => '2', 'placeholder' => $model->getAttributeLabel('day')])
+	->label($model->getAttributeLabel('archive_date[to][month]')); ?>
+
+<?php $archiveTypeToYear = $form->field($model, 'archive_date[to][year]', ['template' => '{beginWrapper}{input}{endWrapper}', 'horizontalCssClasses' => ['wrapper' => 'col-sm-3 col-xs-4'], 'options' => ['tag' => null]])
+	->textInput(['type' => 'number', 'min' => 0, 'maxlength' => '4', 'placeholder' => $model->getAttributeLabel('year')])
+	->label($model->getAttributeLabel('archive_date[to][year]')); ?>
+
+<?php echo $form->field($model, 'archive_date[to][day]', ['template' => '{label}{beginWrapper}{input}{endWrapper}'.$archiveTypeToMonth . $archiveTypeToYear .'{error}', 'horizontalCssClasses' => ['wrapper' => 'col-sm-3 col-xs-4', 'error' => 'col-sm-9 col-xs-12']])
+	->textInput(['type' => 'number', 'min' => 0, 'max' => 31, 'maxlength' => '2', 'placeholder' => $model->getAttributeLabel('day')])
 	->label($model->getAttributeLabel('to_archive_date')); ?>
 
 <?php

@@ -35,6 +35,7 @@ use yii\filters\VerbFilter;
 use ommu\archivePengolahan\models\ArchivePengolahanPenyerahanCard;
 use ommu\archivePengolahan\models\search\ArchivePengolahanPenyerahanCard as ArchivePengolahanPenyerahanCardSearch;
 use ommu\archivePengolahan\models\ArchivePengolahanPenyerahan;
+use ommu\archivePengolahan\models\ArchivePengolahanUsers;
 use ommu\archivePengolahan\models\ArchivePengolahanSetting;
 
 class CardController extends Controller
@@ -131,7 +132,16 @@ class CardController extends Controller
         }
 
         $penyerahan = ArchivePengolahanPenyerahan::findOne($id);
+        $user = ArchivePengolahanUsers::find()
+            ->select(['id', 'publish', 'user_id', 'user_code', 'archives'])
+            ->andWhere(['in', 'publish', [0,1]])
+            ->andWhere(['user_id' => Yii::$app->user->id])
+            ->one();
+
         $model = new ArchivePengolahanPenyerahanCard(['penyerahan_id' => $id]);
+        if ($user) {
+            $model->user_id = $user->id;
+        }
 
         if (Yii::$app->request->isPost) {
             $model->load(Yii::$app->request->post());
@@ -159,6 +169,7 @@ class CardController extends Controller
 		return $this->render('admin_create', [
 			'model' => $model,
 			'penyerahan' => $penyerahan,
+			'user' => $user,
 		]);
 	}
 

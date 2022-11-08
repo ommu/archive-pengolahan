@@ -27,7 +27,7 @@ class ArchivePengolahanPenyerahanCard extends ArchivePengolahanPenyerahanCardMod
 	public function rules()
 	{
 		return [
-			[['id', 'temporary_number', 'archive_type', 'from_archive_date', 'to_archive_date', 'medium', 'creation_date', 'modified_date', 'updated_date', 
+			[['id', 'temporary_number', 'archive_description', 'archive_type', 'from_archive_date', 'to_archive_date', 'archive_date', 'medium', 'creation_date', 'modified_date', 'updated_date', 
                 'userDisplayname', 'creationDisplayname', 'modifiedDisplayname', 'penyerahanPenciptaArsip'], 'safe'],
 			[['publish', 'penyerahan_id', 'user_id', 'creation_id', 'modified_id', 
                 'penyerahanTypeId'], 'integer'],
@@ -87,7 +87,7 @@ class ArchivePengolahanPenyerahanCard extends ArchivePengolahanPenyerahanCardMod
         if ((isset($params['sort']) && in_array($params['sort'], ['userDisplayname', '-userDisplayname'])) || 
             (isset($params['userDisplayname']) && $params['userDisplayname'] != '')
         ) {
-            $query->joinWith(['user user']);
+            $query->joinWith(['user user', 'member member']);
         }
         if ((isset($params['sort']) && in_array($params['sort'], ['creationDisplayname', '-creationDisplayname'])) || 
             (isset($params['creationDisplayname']) && $params['creationDisplayname'] != '')
@@ -122,8 +122,8 @@ class ArchivePengolahanPenyerahanCard extends ArchivePengolahanPenyerahanCardMod
 			'desc' => ['penyerahan.kode_box' => SORT_DESC],
 		];
 		$attributes['userDisplayname'] = [
-			'asc' => ['user.displayname' => SORT_ASC],
-			'desc' => ['user.displayname' => SORT_DESC],
+			'asc' => ['member.displayname' => SORT_ASC],
+			'desc' => ['member.displayname' => SORT_DESC],
 		];
 		$attributes['creationDisplayname'] = [
 			'asc' => ['creation.displayname' => SORT_ASC],
@@ -174,14 +174,19 @@ class ArchivePengolahanPenyerahanCard extends ArchivePengolahanPenyerahanCardMod
 
 		$query->andFilterWhere(['like', 't.id', $this->id])
 			->andFilterWhere(['like', 't.temporary_number', $this->temporary_number])
+			->andFilterWhere(['like', 't.archive_description', $this->archive_description])
 			->andFilterWhere(['like', 't.from_archive_date', $this->from_archive_date])
 			->andFilterWhere(['like', 't.to_archive_date', $this->to_archive_date])
+			->andFilterWhere(['like', 't.archive_date', $this->archive_date])
 			->andFilterWhere(['like', 't.medium', $this->medium])
 			->andFilterWhere(['or', 
                 ['like', 'penyerahan.kode_box', $this->penyerahanPenciptaArsip],
                 ['like', 'penyerahan.pencipta_arsip', $this->penyerahanPenciptaArsip]
             ])
-			->andFilterWhere(['like', 'user.displayname', $this->userDisplayname])
+			->andFilterWhere(['or', 
+                ['like', 'user.user_code', $this->userDisplayname],
+                ['like', 'member.displayname', $this->userDisplayname]
+            ])
 			->andFilterWhere(['like', 'creation.displayname', $this->creationDisplayname])
 			->andFilterWhere(['like', 'modified.displayname', $this->modifiedDisplayname]);
 

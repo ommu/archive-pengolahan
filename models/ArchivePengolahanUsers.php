@@ -156,7 +156,7 @@ class ArchivePengolahanUsers extends \app\components\ActiveRecord
 		$this->templateColumns['userDisplayname'] = [
 			'attribute' => 'userDisplayname',
 			'value' => function($model, $key, $index, $column) {
-				return isset($model->user) ? $model->user->displayname : '-';
+                return $model::parseUser($model, false);
 				// return $model->userDisplayname;
 			},
 			'visible' => !Yii::$app->request->get('user') ? true : false,
@@ -306,6 +306,26 @@ class ArchivePengolahanUsers extends \app\components\ActiveRecord
 	}
 
 	/**
+	 * function deletePermission
+	 */
+	public static function parseUser($user, $userCode=true) 
+	{
+        if ($user) {
+            $data = [];
+
+            $user->user->displayname ? array_push($data, $user->user->displayname) : '';
+            $user->user->email ? array_push($data, $user->user->email) : '';
+            if ($userCode) {
+                $user->user_code ? array_push($data, $user->user_code) : '';
+            }
+
+            return implode(' / ', $data);
+        }
+
+        return $user;
+	}
+
+	/**
 	 * after find attributes
 	 */
 	public function afterFind()
@@ -352,6 +372,7 @@ class ArchivePengolahanUsers extends \app\components\ActiveRecord
 	public function beforeSave($insert)
 	{
         if (parent::beforeSave($insert)) {
+			$this->user_code = strtoupper($this->user_code);
 			$this->groups = Json::encode($this->groups);
         }
         return true;

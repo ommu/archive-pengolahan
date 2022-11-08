@@ -68,13 +68,21 @@ $attributes = [
 	],
 	[
 		'attribute' => 'userDisplayname',
-		'value' => isset($model->user) ? $model->user->displayname : '-',
+		'value' => function ($model) {
+            return $model->user::parseUser($model->user, true);
+		},
 		'visible' => !$small,
 	],
 	[
 		'attribute' => 'temporary_number',
 		'value' => $model->temporary_number ? $model->temporary_number : '-',
 		'visible' => !$small,
+	],
+	[
+		'attribute' => 'temporary_number',
+		'value' => $model->archive_description ? $model->archive_description : '-',
+		'visible' => !$small,
+		'format' => 'raw',
 	],
 	[
 		'attribute' => 'archive_type',

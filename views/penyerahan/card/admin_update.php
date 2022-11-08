@@ -36,6 +36,7 @@ $this->params['menu']['content'] = [
 <?php echo $this->render('_form', [
 	'model' => $model,
     'penyerahan' => $model->penyerahan,
+    'user' => $model->user,
 ]); ?>
 
 </div>

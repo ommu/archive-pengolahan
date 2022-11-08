@@ -16,9 +16,11 @@
  * @property integer $penyerahan_id
  * @property integer $user_id
  * @property string $temporary_number
+ * @property string $archive_description
  * @property string $archive_type
  * @property string $from_archive_date
  * @property string $to_archive_date
+ * @property string $archive_date
  * @property string $medium
  * @property string $creation_date
  * @property integer $creation_id
@@ -28,8 +30,8 @@
  *
  * The followings are the available model relations:
  * @property ArchivePengolahanPenyerahan $penyerahan
+ * @property ArchivePengolahanUsers $user
  * @property ArchivePengolahanPenyerahanCardMedia[] $media
- * @property Users $user
  * @property Users $creation
  * @property Users $modified
  *
@@ -40,7 +42,9 @@ namespace ommu\archivePengolahan\models;
 use Yii;
 use yii\helpers\Html;
 use yii\helpers\Url;
+use yii\helpers\Json;
 use app\models\Users;
+use thamtech\uuid\helpers\UuidHelper;
 
 class ArchivePengolahanPenyerahanCard extends \app\components\ActiveRecord
 {
@@ -70,14 +74,16 @@ class ArchivePengolahanPenyerahanCard extends \app\components\ActiveRecord
 	public function rules()
 	{
 		return [
-			[['id', 'penyerahan_id', 'user_id', 'temporary_number', 'from_archive_date', 'to_archive_date', 'medium'], 'required'],
+			[['id', 'penyerahan_id', 'user_id', 'temporary_number', 'archive_description'], 'required'],
 			[['publish', 'penyerahan_id', 'user_id', 'creation_id', 'modified_id', 'stayInHere'], 'integer'],
-			[['archive_type', 'medium'], 'string'],
-			[['stayInHere'], 'safe'],
-			[['id', 'temporary_number'], 'string', 'max' => 32],
+			[['archive_description', 'archive_type', 'medium'], 'string'],
+			//[['archive_date'], 'json'],
+			[['from_archive_date', 'to_archive_date', 'archive_date', 'medium', 'stayInHere'], 'safe'],
+			[['temporary_number'], 'string', 'max' => 32],
 			[['from_archive_date', 'to_archive_date'], 'string', 'max' => 64],
 			[['id'], 'unique'],
 			[['penyerahan_id'], 'exist', 'skipOnError' => true, 'targetClass' => ArchivePengolahanPenyerahan::className(), 'targetAttribute' => ['penyerahan_id' => 'id']],
+			[['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => ArchivePengolahanUsers::className(), 'targetAttribute' => ['user_id' => 'id']],
 		];
 	}
 
@@ -92,9 +98,11 @@ class ArchivePengolahanPenyerahanCard extends \app\components\ActiveRecord
 			'penyerahan_id' => Yii::t('app', 'Penyerahan'),
 			'user_id' => Yii::t('app', 'User'),
 			'temporary_number' => Yii::t('app', 'Temporary Number'),
+			'archive_description' => Yii::t('app', 'Archive Description'),
 			'archive_type' => Yii::t('app', 'Archive Type'),
 			'from_archive_date' => Yii::t('app', 'From Archive Date'),
 			'to_archive_date' => Yii::t('app', 'To Archive Date'),
+			'archive_date' => Yii::t('app', 'Archive Date'),
 			'medium' => Yii::t('app', 'Medium'),
 			'creation_date' => Yii::t('app', 'Creation Date'),
 			'creation_id' => Yii::t('app', 'Creation'),
@@ -107,6 +115,9 @@ class ArchivePengolahanPenyerahanCard extends \app\components\ActiveRecord
 			'userDisplayname' => Yii::t('app', 'User'),
 			'creationDisplayname' => Yii::t('app', 'Creation'),
 			'modifiedDisplayname' => Yii::t('app', 'Modified'),
+			'day' => Yii::t('app', 'Day'),
+			'month' => Yii::t('app', 'Month'),
+			'year' => Yii::t('app', 'Year'),
 		];
 	}
 
@@ -132,6 +143,25 @@ class ArchivePengolahanPenyerahanCard extends \app\components\ActiveRecord
 	/**
 	 * @return \yii\db\ActiveQuery
 	 */
+	public function getUser()
+	{
+		return $this->hasOne(ArchivePengolahanUsers::className(), ['id' => 'user_id'])
+            ->select(['id', 'publish', 'user_id', 'user_code', 'archives']);
+	}
+
+	/**
+	 * @return \yii\db\ActiveQuery
+	 */
+	public function getMember()
+	{
+		return $this->hasOne(Users::className(), ['user_id' => 'user_id'])
+            ->select(['user_id', 'email', 'displayname'])
+            -via('user');
+	}
+
+	/**
+	 * @return \yii\db\ActiveQuery
+	 */
 	public function getMedia($count=false)
 	{
         if ($count == false) {
@@ -144,15 +174,6 @@ class ArchivePengolahanPenyerahanCard extends \app\components\ActiveRecord
 		$media = $model->count();
 
 		return $media ? $media : 0;
-	}
-
-	/**
-	 * @return \yii\db\ActiveQuery
-	 */
-	public function getUser()
-	{
-		return $this->hasOne(Users::className(), ['user_id' => 'user_id'])
-            ->select(['user_id', 'displayname']);
 	}
 
 	/**
@@ -223,7 +244,7 @@ class ArchivePengolahanPenyerahanCard extends \app\components\ActiveRecord
 		$this->templateColumns['userDisplayname'] = [
 			'attribute' => 'userDisplayname',
 			'value' => function($model, $key, $index, $column) {
-				return isset($model->user) ? $model->user->displayname : '-';
+                return $model->user ? $model->user::parseUser($model->user) : '-';
 				// return $model->userDisplayname;
 			},
 			'visible' => !Yii::$app->request->get('user') ? true : false,
@@ -234,8 +255,16 @@ class ArchivePengolahanPenyerahanCard extends \app\components\ActiveRecord
 				return $model->temporary_number;
 			},
 		];
+		$this->templateColumns['archive_description'] = [
+			'attribute' => 'archive_description',
+			'value' => function($model, $key, $index, $column) {
+				return $model->archive_description;
+			},
+			'format' => 'raw',
+		];
 		$this->templateColumns['archive_type'] = [
 			'attribute' => 'archive_type',
+			'label' => Yii::t('app', 'Type'),
 			'value' => function($model, $key, $index, $column) {
 				return self::getArchiveType($model->archive_type);
 			},
@@ -243,16 +272,27 @@ class ArchivePengolahanPenyerahanCard extends \app\components\ActiveRecord
 		];
 		$this->templateColumns['from_archive_date'] = [
 			'attribute' => 'from_archive_date',
+			'label' => Yii::t('app', 'From Date'),
 			'value' => function($model, $key, $index, $column) {
 				return $model->from_archive_date;
 			},
 		];
 		$this->templateColumns['to_archive_date'] = [
 			'attribute' => 'to_archive_date',
+			'label' => Yii::t('app', 'To Date'),
 			'value' => function($model, $key, $index, $column) {
 				return $model->to_archive_date;
 			},
 		];
+		// $this->templateColumns['archive_date'] = [
+		// 	'attribute' => 'archive_date',
+		// 	'value' => function($model, $key, $index, $column) {
+        //         if (is_array($model->archive_date) && empty($model->archive_date)) {
+        //             return '-';
+        //         }
+        //         return Json::encode($model->archive_date);
+		// 	},
+		// ];
 		$this->templateColumns['medium'] = [
 			'attribute' => 'medium',
 			'value' => function($model, $key, $index, $column) {
@@ -354,6 +394,13 @@ class ArchivePengolahanPenyerahanCard extends \app\components\ActiveRecord
 	{
 		parent::afterFind();
 
+        if ($this->archive_date == '') {
+            $this->archive_date = [];
+        } else {
+            $this->archive_date = Json::decode($this->archive_date);
+        }
+        $this->from_archive_date = $this->from_archive_date != '--' ? $this->from_archive_date : '';
+        $this->to_archive_date = $this->to_archive_date != '--' ? $this->to_archive_date : '';
 		// $this->penyerahanTypeId = isset($this->penyerahan) ? $this->penyerahan->type->type_name : '-';
 		// $this->userDisplayname = isset($this->user) ? $this->user->displayname : '-';
 		// $this->creationDisplayname = isset($this->creation) ? $this->creation->displayname : '-';
@@ -368,6 +415,8 @@ class ArchivePengolahanPenyerahanCard extends \app\components\ActiveRecord
 	{
         if (parent::beforeValidate()) {
             if ($this->isNewRecord) {
+                $this->id = UuidHelper::uuid();
+
                 if ($this->creation_id == null) {
                     $this->creation_id = !Yii::$app->user->isGuest ? Yii::$app->user->id : null;
                 }
@@ -376,6 +425,19 @@ class ArchivePengolahanPenyerahanCard extends \app\components\ActiveRecord
                     $this->modified_id = !Yii::$app->user->isGuest ? Yii::$app->user->id : null;
                 }
             }
+        }
+        return true;
+	}
+
+	/**
+	 * before save attributes
+	 */
+	public function beforeSave($insert)
+	{
+        if (parent::beforeSave($insert)) {
+			$this->from_archive_date = implode('-', $this->archive_date['from']);
+			$this->to_archive_date = implode('-', $this->archive_date['to']);
+			$this->archive_date = Json::encode($this->archive_date);
         }
         return true;
 	}

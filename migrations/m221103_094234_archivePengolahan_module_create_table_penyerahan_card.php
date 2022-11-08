@@ -27,11 +27,13 @@ class m221103_094234_archivePengolahan_module_create_table_penyerahan_card exten
 				'id' => Schema::TYPE_STRING . '(32) NOT NULL',
 				'publish' => Schema::TYPE_TINYINT . '(1) NOT NULL DEFAULT \'1\'',
 				'penyerahan_id' => Schema::TYPE_INTEGER . '(11) UNSIGNED',
-				'user_id' => Schema::TYPE_INTEGER . '(10) UNSIGNED NOT NULL',
+				'user_id' => Schema::TYPE_INTEGER . '(11) UNSIGNED',
 				'temporary_number' => Schema::TYPE_STRING . '(32) NOT NULL',
+				'archive_description' => Schema::TYPE_TEXT . ' NOT NULL COMMENT \'redactor\'',
 				'archive_type' => Schema::TYPE_STRING,
 				'from_archive_date' => Schema::TYPE_STRING . '(64) NOT NULL',
 				'to_archive_date' => Schema::TYPE_STRING . '(64) NOT NULL',
+				'archive_date' => Schema::TYPE_TEXT . ' NOT NULL COMMENT \'json\'',
 				'medium' => Schema::TYPE_TEXT . ' NOT NULL',
 				'creation_date' => Schema::TYPE_TIMESTAMP . ' NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT \'trigger\'',
 				'creation_id' => Schema::TYPE_INTEGER . '(11) UNSIGNED',
@@ -40,6 +42,7 @@ class m221103_094234_archivePengolahan_module_create_table_penyerahan_card exten
 				'updated_date' => Schema::TYPE_DATETIME . ' NOT NULL DEFAULT \'0000-00-00 00:00:00\' COMMENT \'trigger\'',
 				'PRIMARY KEY ([[id]])',
 				'CONSTRAINT ommu_archive_pengolahan_penyerahan_card_ibfk_1 FOREIGN KEY ([[penyerahan_id]]) REFERENCES {{%ommu_archive_pengolahan_penyerahan}} ([[id]]) ON DELETE CASCADE ON UPDATE CASCADE',
+				'CONSTRAINT ommu_archive_pengolahan_penyerahan_card_ibfk_2 FOREIGN KEY ([[user_id]]) REFERENCES {{%ommu_archive_pengolahan_users}} ([[id]]) ON DELETE CASCADE ON UPDATE CASCADE',
 			], $tableOptions);
 		}
 	}
