@@ -87,13 +87,13 @@ class m221106_105401_archivePengolahan_module_insert_role extends \yii\db\Migrat
 			]);
 		}
 
-		$tableName = Yii::$app->db->tablePrefix . $authManager->itemChildTable;
-        if (Yii::$app->db->getTableSchema($tableName, true)) {
-			$this->batchInsert($tableName, ['parent', 'child'], [
-				['archivePengolahanModLevelAdmin', 'archivePelestarian'],
-				['archivePengolahanModLevelAdmin', 'archiveArsiparis'],
-			]);
-		}
+		// $tableName = Yii::$app->db->tablePrefix . $authManager->itemChildTable;
+        // if (Yii::$app->db->getTableSchema($tableName, true)) {
+		// 	$this->batchInsert($tableName, ['parent', 'child'], [
+		// 		['archivePengolahanModLevelAdmin', 'archivePelestarian'],
+		// 		['archivePengolahanModLevelAdmin', 'archiveArsiparis'],
+		// 	]);
+		// }
 
 		$tableName = Yii::$app->db->tablePrefix . $authManager->itemTable;
         if (Yii::$app->db->getTableSchema($tableName, true)) {
