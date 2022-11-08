@@ -28,6 +28,14 @@ class Users extends UsersModel
     /**
      * @return \yii\db\ActiveQuery
      */
+    public function getSetting()
+    {
+        return new ArchivePengolahanSetting(['app' => 'archivePengolahanModule']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
     public function getArchiveUsers()
     {
         return $this->hasMany(ArchivePengolahanUsers::className(), ['user_id' => 'user_id'])

@@ -106,7 +106,7 @@ class Users extends UsersModel
 		// grid filtering conditions
         $query->andFilterWhere([
 			't.user_id' => $this->user_id,
-			't.level_id' => 2,
+			't.level_id' => $this->setting->userlevel_allow_permission,
 			'cast(t.creation_date as date)' => $this->creation_date,
 			'cast(t.lastlogin_date as date)' => $this->lastlogin_date,
 		]);
