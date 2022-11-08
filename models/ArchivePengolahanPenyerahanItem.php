@@ -186,7 +186,7 @@ class ArchivePengolahanPenyerahanItem extends \app\components\ActiveRecord
 		$this->templateColumns['penyerahanPenciptaArsip'] = [
 			'attribute' => 'penyerahanPenciptaArsip',
 			'value' => function($model, $key, $index, $column) {
-				return self::parsePenyerahan($model, false);
+				return $model->penyerahan::parsePenyerahan($model->penyerahan, false);
 				// return $model->penyerahanPenciptaArsip;
 			},
 			'visible' => !Yii::$app->request->get('penyerahan') ? true : false,
@@ -297,20 +297,6 @@ class ArchivePengolahanPenyerahanItem extends \app\components\ActiveRecord
             $model = self::findOne($id);
             return $model;
         }
-	}
-
-	/**
-	 * function parsePenyerahan
-	 */
-	public static function parsePenyerahan($model, $urlTitle=true)
-	{
-		$title = $model->penyerahan->pencipta_arsip;
-        $penyerahanTitle = $urlTitle == true ? Html::a($title, ['penyerahan/admin/view', 'id' => $model->penyerahan_id], ['title' => $title, 'class' => 'modal-btn']) : $title ;
-
-        $html = Html::button($model->penyerahan->kode_box, ['class' => 'btn btn-info btn-xs']).'<br/>';
-        $html .= $penyerahanTitle;
-
-		return $html;
 	}
 
 	/**

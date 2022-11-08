@@ -41,6 +41,7 @@ use yii\helpers\Inflector;
 use thamtech\uuid\helpers\UuidHelper;
 use ommu\archivePengolahan\models\ArchivePengolahanImport;
 use ommu\archivePengolahan\models\ArchivePengolahanSetting;
+use ommu\archivePengolahan\models\ArchivePengolahanPenyerahan;
 
 class ItemController extends Controller
 {
@@ -112,7 +113,7 @@ class ItemController extends Controller
 
         if (($penyerahan = Yii::$app->request->get('penyerahan')) != null) {
             $this->subMenuParam = $penyerahan;
-            $penyerahan = \ommu\archivePengolahan\models\ArchivePengolahanPenyerahan::findOne($penyerahan);
+            $penyerahan = ArchivePengolahanPenyerahan::findOne($penyerahan);
         }
 
 		$this->view->title = Yii::t('app', 'Penyerahan Items');
@@ -137,7 +138,7 @@ class ItemController extends Controller
 			throw new \yii\web\ForbiddenHttpException(Yii::t('app', 'The requested page does not exist.'));
         }
 
-        $penyerahan = \ommu\archivePengolahan\models\ArchivePengolahanPenyerahan::findOne($id);
+        $penyerahan = ArchivePengolahanPenyerahan::findOne($id);
         $model = new ArchivePengolahanPenyerahanItem(['penyerahan_id' => $id]);
 
         if (Yii::$app->request->isPost) {

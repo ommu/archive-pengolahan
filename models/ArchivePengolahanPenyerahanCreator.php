@@ -156,7 +156,7 @@ class ArchivePengolahanPenyerahanCreator extends \app\components\ActiveRecord
 		$this->templateColumns['penyerahanPenciptaArsip'] = [
 			'attribute' => 'penyerahanPenciptaArsip',
 			'value' => function($model, $key, $index, $column) {
-				return self::parsePenyerahan($model, false);
+				return $model->penyerahan::parsePenyerahan($model->penyerahan, false);
 				// return $model->penyerahanPenciptaArsip;
 			},
 			'visible' => !Yii::$app->request->get('penyerahan') ? true : false,

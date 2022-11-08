@@ -62,7 +62,7 @@ $attributes = [
 	[
 		'attribute' => 'penyerahanPenciptaArsip',
 		'value' => function ($model) {
-            return $model::parsePenyerahan($model, true);
+            return $model->penyerahan::parsePenyerahan($model->penyerahan, true);
 		},
 		'format' => 'raw',
 	],

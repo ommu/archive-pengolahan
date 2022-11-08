@@ -57,6 +57,7 @@ $attributes = [
             return implode(', ', $model->getCreators(true, 'title'));
 		},
 		'format' => 'html',
+		'visible' => !$small,
 	],
 	[
 		'attribute' => 'pencipta_arsip',

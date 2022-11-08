@@ -36,7 +36,7 @@ use yii\helpers\ArrayHelper;
 <?php //echo $form->errorSummary($model);?>
 
 <?php
-$parsePenyerahan = $model::parsePenyerahan($model, true);
+$parsePenyerahan = $penyerahan::parsePenyerahan($penyerahan, true);
 echo $form->field($model, 'penyerahan_id', ['template' => '{label}{beginWrapper}{input}{error}{hint}'.$parsePenyerahan.'{endWrapper}'])
 	->hiddenInput()
 	->label($model->getAttributeLabel('penyerahan_id')) ?>
