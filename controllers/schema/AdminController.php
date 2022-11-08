@@ -194,7 +194,7 @@ class AdminController extends Controller
             }
         }
 
-		$this->view->title = Yii::t('app', 'Update Schema: {title}', ['title' => $model->title]);
+		$this->view->title = Yii::t('app', 'Update Schema: {title}', ['title' => $model::htmlHardDecode($model->title)]);
 		$this->view->description = '';
 		$this->view->keywords = '';
 		return $this->render('admin_update', [
@@ -211,7 +211,7 @@ class AdminController extends Controller
 	{
         $model = $this->findModel($id);
 
-		$this->view->title = Yii::t('app', 'Detail Schema: {title}', ['title' => $model->title]);
+		$this->view->title = Yii::t('app', 'Detail Schema: {title}', ['title' => $model::htmlHardDecode($model->title)]);
 		$this->view->description = '';
 		$this->view->keywords = '';
 		return $this->oRender('admin_view', [

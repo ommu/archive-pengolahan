@@ -23,7 +23,7 @@ if (!$small) {
         $this->params['breadcrumbs'][] = ['label' => $context->breadcrumbAppParam['name'], 'url' => [$context->breadcrumbAppParam['url']]];
     }
     $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Schema'), 'url' => ['index']];
-    $this->params['breadcrumbs'][] = $model->title;
+    $this->params['breadcrumbs'][] = $model::htmlHardDecode($model->title);
 } ?>
 
 <div class="archive-pengolahan-schema-view">
@@ -52,7 +52,7 @@ $attributes = [
 	],
 	[
 		'attribute' => 'title',
-		'value' => $model->title ? $model->title : '-',
+		'value' => $model::htmlHardDecode($model->title) ? $model::htmlHardDecode($model->title) : '-',
 	],
 	[
 		'attribute' => 'archiveTitle',

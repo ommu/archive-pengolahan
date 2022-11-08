@@ -25,11 +25,13 @@ if ($context->breadcrumbApp) {
 }
 $this->params['breadcrumbs'][] = $this->title;
 
+$url = ['create'];
 if ($parent) {
-    $this->params['menu']['content'] = [
-        ['label' => Yii::t('app', 'Add Schema'), 'url' => Url::to(['create', 'id' => $parent->id]), 'icon' => 'plus-square', 'htmlOptions' => ['class' => 'btn btn-success']],
-    ];
+    $url = ['create', 'id' => $parent->id];
 }
+$this->params['menu']['content'] = [
+    ['label' => Yii::t('app', 'Add Schema'), 'url' => Url::to($url), 'icon' => 'plus-square', 'htmlOptions' => ['class' => 'btn btn-success']],
+];
 $this->params['menu']['option'] = [
 	//['label' => Yii::t('app', 'Search'), 'url' => 'javascript:void(0);'],
 	['label' => Yii::t('app', 'Grid Option'), 'url' => 'javascript:void(0);'],
