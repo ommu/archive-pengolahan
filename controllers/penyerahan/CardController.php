@@ -276,6 +276,7 @@ class CardController extends Controller
 	protected function findModel($id)
 	{
         if (($model = ArchivePengolahanPenyerahanCard::findOne($id)) !== null) {
+            $model->media = array_flip($model->getMedias(true));
 
             return $model;
         }

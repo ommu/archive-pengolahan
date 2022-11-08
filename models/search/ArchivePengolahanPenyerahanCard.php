@@ -30,7 +30,7 @@ class ArchivePengolahanPenyerahanCard extends ArchivePengolahanPenyerahanCardMod
 			[['id', 'temporary_number', 'archive_description', 'archive_type', 'from_archive_date', 'to_archive_date', 'archive_date', 'medium', 'creation_date', 'modified_date', 'updated_date', 
                 'userDisplayname', 'creationDisplayname', 'modifiedDisplayname', 'penyerahanPenciptaArsip'], 'safe'],
 			[['publish', 'penyerahan_id', 'user_id', 'creation_id', 'modified_id', 
-                'penyerahanTypeId'], 'integer'],
+                'media', 'penyerahanTypeId'], 'integer'],
 		];
 	}
 
@@ -99,6 +99,9 @@ class ArchivePengolahanPenyerahanCard extends ArchivePengolahanPenyerahanCardMod
         ) {
             $query->joinWith(['modified modified']);
         }
+        if (isset($params['media']) && $params['media'] != '') {
+            $query->joinWith(['medias medias']);
+        }
 
 		$query->groupBy(['id']);
 
@@ -160,6 +163,7 @@ class ArchivePengolahanPenyerahanCard extends ArchivePengolahanPenyerahanCardMod
 			't.modified_id' => isset($params['modified']) ? $params['modified'] : $this->modified_id,
 			'cast(t.updated_date as date)' => $this->updated_date,
 			'penyerahan.type_id' => $this->penyerahanTypeId,
+			'medias.media_id' => $this->media,
 		]);
 
 		if (!isset($params['publish']) || (isset($params['publish']) && $params['publish'] == '')) {

@@ -12,6 +12,7 @@
 
 use ommu\archivePengolahan\Events;
 use ommu\archivePengolahan\models\ArchivePengolahanPenyerahan;
+use ommu\archivePengolahan\models\ArchivePengolahanPenyerahanCard;
 
 return [
 	'id' => 'archive-pengolahan',
@@ -20,7 +21,12 @@ return [
 		[
 			'class'    => ArchivePengolahanPenyerahan::className(),
 			'event'    => ArchivePengolahanPenyerahan::EVENT_BEFORE_SAVE_PENYERAHAN,
-			'callback' => [Events::className(), 'onBeforeSaveArchives']
+			'callback' => [Events::className(), 'onBeforeSavePenyerahan']
 		],
+		[
+			'class'    => ArchivePengolahanPenyerahanCard::className(),
+			'event'    => ArchivePengolahanPenyerahanCard::EVENT_BEFORE_SAVE_PENYERAHAN_CARD,
+			'callback' => [Events::className(), 'onBeforeSavePenyerahanCard']
+        ],
 	],
 ];

@@ -105,6 +105,12 @@ $attributes = [
 		'visible' => !$small,
 	],
 	[
+        'attribute' => 'media',
+		'value' => $model::parseMedia($model->getMedias(true, 'title'), 'media', ', '),
+		'format' => 'html',
+		'visible' => !$small ? true : false,
+	],
+	[
 		'attribute' => 'creation_date',
 		'value' => Yii::$app->formatter->asDatetime($model->creation_date, 'medium'),
 		'visible' => !$small,

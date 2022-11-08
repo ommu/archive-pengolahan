@@ -20,18 +20,29 @@ use ommu\archive\models\ArchiveCreator;
 use ommu\archivePengolahan\models\ArchivePengolahanPenyerahanCreator;
 use yii\helpers\Inflector;
 use app\models\CoreTags;
+use ommu\archivePengolahan\models\ArchivePengolahanPenyerahanCardMedia;
 
 class Events extends \yii\base\BaseObject
 {
 	/**
 	 * {@inheritdoc}
 	 */
-	public static function onBeforeSaveArchives($event)
+	public static function onBeforeSavePenyerahan($event)
 	{
 		$penyerahan = $event->sender;
 
 		self::setJenisArsip($penyerahan);
 		self::setArchiveCreator($penyerahan);
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public static function onBeforeSavePenyerahanCard($event)
+	{
+		$card = $event->sender;
+
+		self::setArchiveMedia($card);
 	}
 
 	/**
@@ -119,6 +130,41 @@ class Events extends \yii\base\BaseObject
 				$model = ArchivePengolahanPenyerahanCreator::find()
 					->select(['id'])
 					->andWhere(['penyerahan_id' => $penyerahan->id, 'creator_id' => $key])
+					->one();
+                $model->delete();
+			}
+		}
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public static function setArchiveMedia($card)
+	{
+		$oldMedia = array_flip($card->getMedias(true));
+		$media = $card->media;
+
+		// insert difference media
+        if (is_array($media)) {
+			foreach ($media as $val) {
+                if (in_array($val, $oldMedia)) {
+					unset($oldMedia[array_keys($oldMedia, $val)[0]]);
+					continue;
+				}
+
+				$model = new ArchivePengolahanPenyerahanCardMedia();
+				$model->card_id = $card->id;
+				$model->media_id = $val;
+				$model->save();
+			}
+		}
+
+		// drop difference media
+        if (!empty($oldMedia)) {
+			foreach ($oldMedia as $key => $val) {
+				$model = ArchivePengolahanPenyerahanCardMedia::find()
+					->select(['id'])
+					->andWhere(['id' => $key])
 					->one();
                 $model->delete();
 			}

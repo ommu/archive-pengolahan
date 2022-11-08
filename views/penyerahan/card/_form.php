@@ -18,6 +18,8 @@ use yii\helpers\Html;
 use app\components\widgets\ActiveForm;
 use yii\redactor\widgets\Redactor;
 use yii\helpers\ArrayHelper;
+use ommu\archive\models\ArchiveMedia;
+use ommu\selectize\Selectize;
 
 $redactorOptions = [
 	'buttons' => ['html', 'format', 'bold', 'italic', 'deleted'],
@@ -109,6 +111,22 @@ echo $form->field($model, 'medium', ['options' => ['class' => 'form-group row fi
     ->textarea(['rows' => 2, 'cols' => 50])
     ->label($model->getAttributeLabel('medium'))
     ->hint(Yii::t('app', 'Record the extent of the unit of description by giving the number of physical or logical units in arabic numerals and the unit of measurement. Give the specific medium (media) of the unit of description. Separate multiple extents with a linebreak.')); ?>
+
+<hr/>
+
+<?php
+echo $form->field($model, 'media', ['options' => ['class' => 'form-group row field-item']])
+	->widget(Selectize::className(), [
+		'cascade' => true,
+		'items' => ArchiveMedia::getMedia(1),
+		'options' => [
+			'multiple' => true,
+		],
+		'pluginOptions' => [
+			'plugins' => ['remove_button'],
+		],
+	])
+	->label($model->getAttributeLabel('media'));?>
 
 <hr/>
 
