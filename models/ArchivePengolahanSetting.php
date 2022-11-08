@@ -26,6 +26,7 @@ class ArchivePengolahanSetting extends \yii\base\Model
 	public $meta_keyword;
 	public $breadcrumb_param;
 	public $breadcrumb;
+	public $userlevel_allow_permission;
 
 	/**
 	 * @return array validation rules for model attributes.
@@ -33,10 +34,10 @@ class ArchivePengolahanSetting extends \yii\base\Model
 	public function rules()
 	{
 		return [
-			[['app_type', 'license', 'permission', 'meta_description', 'meta_keyword', 'breadcrumb_param'], 'required'],
+			[['app_type', 'license', 'permission', 'meta_description', 'meta_keyword', 'breadcrumb_param', 'userlevel_allow_permission'], 'required'],
 			[['permission'], 'integer'],
 			[['meta_description', 'meta_keyword'], 'string'],
-			//[['breadcrumb_param'], 'json'],
+			//[['breadcrumb_param', 'userlevel_allow_permission'], 'json'],
 			[['license'], 'string', 'max' => 32],
 		];
 	}
@@ -56,6 +57,7 @@ class ArchivePengolahanSetting extends \yii\base\Model
 			'breadcrumb' => Yii::t('app', 'Breadcrumb Apps'),
 			'breadcrumb_status' => Yii::t('app', 'Breadcrumb Apps Status'),
 			'breadcrumb_app' => Yii::t('app', 'Breadcrumb Apps Name and URL'),
+			'userlevel_allow_permission' => Yii::t('app', 'Userlevel Allow Permission'),
 		];
 	}
 
@@ -70,8 +72,8 @@ class ArchivePengolahanSetting extends \yii\base\Model
 		$this->permission = Yii::$app->setting->get($this->getId('permission'), 1);
 		$this->meta_description = Yii::$app->setting->get($this->getId('meta_description'), 'module pengolahan arsip');
 		$this->meta_keyword = Yii::$app->setting->get($this->getId('meta_keyword'), 'pengolahan, arsip, pengolahan arsip');
-		$this->breadcrumb_param = Yii::$app->setting->get($this->getId('breadcrumb_param'));
 
+		$this->breadcrumb_param = Yii::$app->setting->get($this->getId('breadcrumb_param'));
         if ($this->breadcrumb_param == '') {
             $breadcrumb_param = [];
         } else {
@@ -82,6 +84,16 @@ class ArchivePengolahanSetting extends \yii\base\Model
         }
 
 		$this->breadcrumb = Yii::$app->setting->get($this->getId('breadcrumb'));
+
+		$this->userlevel_allow_permission = Yii::$app->setting->get($this->getId('userlevel_allow_permission'), Json::encode([1,2]));
+        if ($this->userlevel_allow_permission == '') {
+            $userlevel_allow_permission = [];
+        } else {
+            $userlevel_allow_permission = Json::decode($this->userlevel_allow_permission);
+        }
+        if (!empty($userlevel_allow_permission)) {
+            $this->userlevel_allow_permission = $userlevel_allow_permission;
+        }
 	}
 
 	/**
@@ -214,6 +226,7 @@ class ArchivePengolahanSetting extends \yii\base\Model
 
 		$this->breadcrumb = $this->getBreadcrumbApps() ? 1 : 0;
 		$this->breadcrumb_param = Json::encode($this->breadcrumb_param);
+		$this->userlevel_allow_permission = Json::encode($this->userlevel_allow_permission);
 
 		return true;
 	}
@@ -233,6 +246,7 @@ class ArchivePengolahanSetting extends \yii\base\Model
 		Yii::$app->setting->set($this->getId('meta_keyword'), $this->meta_keyword);
 		Yii::$app->setting->set($this->getId('breadcrumb_param'), $this->breadcrumb_param);
 		Yii::$app->setting->set($this->getId('breadcrumb'), $this->breadcrumb);
+		Yii::$app->setting->set($this->getId('userlevel_allow_permission'), $this->userlevel_allow_permission);
 		
 		return true;
 	}
@@ -248,5 +262,6 @@ class ArchivePengolahanSetting extends \yii\base\Model
 		Yii::$app->setting->delete($this->getId('meta_keyword'));
 		Yii::$app->setting->delete($this->getId('breadcrumb_param'));
 		Yii::$app->setting->delete($this->getId('breadcrumb'));
+		Yii::$app->setting->delete($this->getId('userlevel_allow_permission'), $this->userlevel_allow_permission);
 	}
 }

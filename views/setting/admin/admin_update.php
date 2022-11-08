@@ -13,6 +13,7 @@
 
 use yii\helpers\Html;
 use app\components\widgets\ActiveForm;
+use ommu\users\models\UserLevel;
 
 $context = $this->context;
 if ($context->breadcrumbApp) {
@@ -61,6 +62,13 @@ $this->params['breadcrumbs'][] = Yii::t('app', 'Settings');
     <?php echo $form->field($model, 'meta_keyword')
         ->textarea(['rows' => 6, 'cols' => 50])
         ->label($model->getAttributeLabel('meta_keyword')); ?>
+
+    <hr/>
+
+    <?php $level = UserLevel::getLevel(null);
+    echo $form->field($model, 'userlevel_allow_permission')
+        ->checkboxList($level)
+        ->label($model->getAttributeLabel('userlevel_allow_permission')); ?>
 
     <hr/>
 
