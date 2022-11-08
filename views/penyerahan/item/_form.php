@@ -17,6 +17,12 @@
 use yii\helpers\Html;
 use app\components\widgets\ActiveForm;
 use yii\helpers\ArrayHelper;
+use yii\redactor\widgets\Redactor;
+
+$redactorOptions = [
+	'buttons' => ['html', 'format', 'bold', 'italic', 'deleted'],
+	'plugins' => ['fontcolor']
+];
 ?>
 
 <div class="archive-pengolahan-penyerahan-item-form">
@@ -48,8 +54,9 @@ echo $form->field($model, 'penyerahan_id', ['template' => '{label}{beginWrapper}
 	->label($model->getAttributeLabel('archive_number')); ?>
 
 <?php echo $form->field($model, 'archive_description')
-	->textarea(['rows' => 4, 'cols' => 50])
-	->label($model->getAttributeLabel('archive_description')); ?>
+    ->textarea(['rows' => 6, 'cols' => 50])
+    ->widget(Redactor::className(), ['clientOptions' => $redactorOptions])
+    ->label($model->getAttributeLabel('archive_description')); ?>
 
 <?php echo $form->field($model, 'year')
 	->textInput(['maxlength' => true])
