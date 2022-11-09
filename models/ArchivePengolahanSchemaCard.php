@@ -41,8 +41,6 @@ namespace ommu\archivePengolahan\models;
 use Yii;
 use yii\helpers\Url;
 use app\models\Users;
-use ommu\uuid\models\ArchivePengolahanSchema;
-use ommu\uuid\models\ArchivePengolahanPenyerahanCard;
 use thamtech\uuid\helpers\UuidHelper;
 
 class ArchivePengolahanSchemaCard extends \app\components\ActiveRecord
