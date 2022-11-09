@@ -16,8 +16,12 @@
 
 use yii\helpers\Url;
 
+$context = $this->context;
+if ($context->breadcrumbApp) {
+	$this->params['breadcrumbs'][] = ['label' => $context->breadcrumbAppParam['name'], 'url' => [$context->breadcrumbAppParam['url']]];
+}
 $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Manuver Kartu'), 'url' => ['index']];
-$this->params['breadcrumbs'][] = ['label' => $model->card->penyerahan->type->type_name, 'url' => ['view', 'id' => $model->id]];
+$this->params['breadcrumbs'][] = ['label' => $model->schema->code.' '.$model::htmlHardDecode($model->schema->title), 'url' => ['view', 'id' => $model->id]];
 $this->params['breadcrumbs'][] = Yii::t('app', 'Update');
 
 $this->params['menu']['content'] = [

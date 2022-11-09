@@ -17,9 +17,13 @@ use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\widgets\DetailView;
 
+$context = $this->context;
+if ($context->breadcrumbApp) {
+	$this->params['breadcrumbs'][] = ['label' => $context->breadcrumbAppParam['name'], 'url' => [$context->breadcrumbAppParam['url']]];
+}
 if (!$small) {
     $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Manuver Kartu'), 'url' => ['index']];
-    $this->params['breadcrumbs'][] = $model->card->penyerahan->type->type_name;
+    $this->params['breadcrumbs'][] = $model->schema->code.' '.$model::htmlHardDecode($model->schema->title);
 
     $this->params['menu']['content'] = [
         ['label' => Yii::t('app', 'Update'), 'url' => Url::to(['update', 'id' => $model->id]), 'icon' => 'pencil', 'htmlOptions' => ['class' => 'btn btn-primary']],

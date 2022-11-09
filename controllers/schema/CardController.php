@@ -34,9 +34,22 @@ use mdm\admin\components\AccessControl;
 use yii\filters\VerbFilter;
 use ommu\archivePengolahan\models\ArchivePengolahanSchemaCard;
 use ommu\archivePengolahan\models\search\ArchivePengolahanSchemaCard as ArchivePengolahanSchemaCardSearch;
+use ommu\archivePengolahan\models\ArchivePengolahanSetting;
 
 class CardController extends Controller
 {
+	/**
+	 * {@inheritdoc}
+	 */
+	public function init()
+	{
+        parent::init();
+
+        $setting = new ArchivePengolahanSetting(['app' => 'archivePengolahanModule']);
+		$this->breadcrumbApp = $setting->breadcrumb;
+		$this->breadcrumbAppParam = $setting->getBreadcrumbAppParam();
+	}
+
 	/**
 	 * {@inheritdoc}
 	 */

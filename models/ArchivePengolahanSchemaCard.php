@@ -129,7 +129,8 @@ class ArchivePengolahanSchemaCard extends \app\components\ActiveRecord
 	 */
 	public function getFondSchema()
 	{
-		return $this->hasOne(ArchivePengolahanSchema::className(), ['id' => 'fond_schema_id']);
+		return $this->hasOne(ArchivePengolahanSchema::className(), ['id' => 'fond_schema_id'])
+            ->select(['id', 'code', 'title']);
 	}
 
 	/**
@@ -137,7 +138,8 @@ class ArchivePengolahanSchemaCard extends \app\components\ActiveRecord
 	 */
 	public function getSchema()
 	{
-		return $this->hasOne(ArchivePengolahanSchema::className(), ['id' => 'schema_id']);
+		return $this->hasOne(ArchivePengolahanSchema::className(), ['id' => 'schema_id'])
+            ->select(['id', 'parent_id', 'code', 'title']);
 	}
 
 	/**
