@@ -122,31 +122,13 @@ $attributes = [
 		'visible' => !$small,
 	],
 	[
-		'attribute' => 'oItem',
-		'value' => function ($model) {
-            $items = $model->grid->item;
-            return Html::a($items, ['penyerahan/item/manage', 'penyerahan' => $model->primaryKey], ['title' => Yii::t('app', '{count} items', ['count' => $items]), 'data-pjax' => 0]);
-		},
-		'format' => 'raw',
-		'visible' => !$small,
-	],
-	[
-		'attribute' => 'oCard',
-		'value' => function ($model) {
-            $cards = $model->grid->card;
-            return Html::a($cards, ['penyerahan/card/manage', 'penyerahan' => $model->primaryKey], ['title' => Yii::t('app', '{count} cards', ['count' => $cards]), 'data-pjax' => 0]);
-		},
-		'format' => 'raw',
-		'visible' => !$small,
-	],
-	[
 		'attribute' => 'publication_file',
 		'value' => function ($model) {
 			$uploadPath = $model::getUploadPath(false);
 			return $model->publication_file ? Html::a($model->publication_file, Url::to(join('/', ['@webpublic', $uploadPath, $model->publication_file])), ['alt' => $model->publication_file, 'target' => '_blank']): '-';
 		},
 		'format' => 'raw',
-		'visible' => !$small,
+		'visible' => !$small && (!empty($model->type->feature) && in_array('publication', $model->type->feature)) ? true : false,
 	],
 	[
 		'attribute' => 'pengolahan_status',
@@ -156,6 +138,24 @@ $attributes = [
 	[
 		'attribute' => 'pengolahan_tahun',
 		'value' => $model->pengolahan_tahun ? $model->pengolahan_tahun : '-',
+		'visible' => !$small,
+	],
+	[
+		'attribute' => 'oItem',
+		'value' => function ($model) {
+            $items = $model->grid->item ?? 0;
+            return Html::a($items, ['penyerahan/item/manage', 'penyerahan' => $model->primaryKey], ['title' => Yii::t('app', '{count} items', ['count' => $items]), 'data-pjax' => 0]);
+		},
+		'format' => 'raw',
+		'visible' => !$small && (!empty($model->type->feature) && in_array('item', $model->type->feature)) ? true : false,
+	],
+	[
+		'attribute' => 'oCard',
+		'value' => function ($model) {
+            $cards = $model->grid->card ?? 0;
+            return Html::a($cards, ['penyerahan/card/manage', 'penyerahan' => $model->primaryKey], ['title' => Yii::t('app', '{count} cards', ['count' => $cards]), 'data-pjax' => 0]);
+		},
+		'format' => 'raw',
 		'visible' => !$small,
 	],
 	[

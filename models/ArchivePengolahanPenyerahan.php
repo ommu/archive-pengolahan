@@ -468,9 +468,12 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 		$this->templateColumns['oItem'] = [
 			'attribute' => 'oItem',
 			'value' => function($model, $key, $index, $column) {
-				// $items = $model->getItems(true);
-				$items = $model->grid->item;
-				return Html::a($items, ['penyerahan/item/manage', 'penyerahan' => $model->primaryKey], ['title' => Yii::t('app', '{count} items', ['count' => $items]), 'data-pjax' => 0]);
+                if (!empty($model->type->feature) && in_array('item', $model->type->feature)) {
+                    // $items = $model->getItems(true);
+                    $items = $model->grid->item ?? 0;
+                    return Html::a($items, ['penyerahan/item/manage', 'penyerahan' => $model->primaryKey], ['title' => Yii::t('app', '{count} items', ['count' => $items]), 'data-pjax' => 0]);
+                }
+				return '-';
 			},
 			'filter' => $this->filterYesNo(),
 			'contentOptions' => ['class' => 'text-center'],
@@ -480,7 +483,7 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 			'attribute' => 'oCard',
 			'value' => function($model, $key, $index, $column) {
 				// $cards = $model->getCards(true);
-				$cards = $model->grid->card;
+				$cards = $model->grid->card ?? 0;
 				return Html::a($cards, ['penyerahan/card/manage', 'penyerahan' => $model->primaryKey], ['title' => Yii::t('app', '{count} cards', ['count' => $cards]), 'data-pjax' => 0]);
 			},
 			'filter' => $this->filterYesNo(),

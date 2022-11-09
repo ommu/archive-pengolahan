@@ -34,9 +34,9 @@ class m221106_114535_archivePengolahan_module_insert_menu extends \yii\db\Migrat
 			]);
 
 			$this->batchInsert($tableName, ['name', 'module', 'icon', 'parent', 'route', 'order', 'data'], [
-				['Tipe Penyerahan', 'archive-pengolahan', null, Menu::getParentId('Archive Settings#archive-pengolahan'), '/archive-pengolahan/penyerahan/admin/index', 1, null],
-				['Jenis Arsip', 'archive-pengolahan', null, Menu::getParentId('Archive Settings#archive-pengolahan'), '/archive-pengolahan/luring/admin/index', 2, null],
-				['Physical Storage', 'archive-location', null, Menu::getParentId('Archive Settings#archive-pengolahan'), '/archive-pengolahan/location/index', 3, null],
+				['Tipe Penyerahan', 'archive-pengolahan', null, Menu::getParentId('Archive Settings#archive-pengolahan'), '/archive-pengolahan/setting/type/index', 1, null],
+				['Jenis Arsip', 'archive-pengolahan', null, Menu::getParentId('Archive Settings#archive-pengolahan'), '/archive-pengolahan/setting/jenis/index', 2, null],
+				['Physical Storage', 'archive-location', null, Menu::getParentId('Archive Settings#archive-pengolahan'), '/archive-location/admin/index', 3, null],
 				['User Group', 'archive-pengolahan', null, Menu::getParentId('Archive Settings#archive-pengolahan'), '/archive-pengolahan/user/group/index', 4, null],
 				['Users', 'archive-pengolahan', null, Menu::getParentId('Archive Settings#archive-pengolahan'), '/archive-pengolahan/user/admin/index', 5, null],
 				['Archive Settings', 'archive-pengolahan', null, Menu::getParentId('Archive Settings#archive-pengolahan'), '/archive-pengolahan/setting/admin/update', 6, null],
