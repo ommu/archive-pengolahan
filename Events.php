@@ -27,6 +27,17 @@ class Events extends \yii\base\BaseObject
 	/**
 	 * {@inheritdoc}
 	 */
+	public static function onBeforeSaveArchives($event)
+	{
+		$penyerahan = $event->sender;
+
+		self::setJenisArsip($penyerahan);
+		self::setArchiveCreator($penyerahan);
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
 	public static function onBeforeSavePenyerahan($event)
 	{
 		$penyerahan = $event->sender;
