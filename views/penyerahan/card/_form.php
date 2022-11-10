@@ -15,6 +15,7 @@
  */
 
 use yii\helpers\Html;
+use yii\helpers\Url;
 use app\components\widgets\ActiveForm;
 use yii\redactor\widgets\Redactor;
 use yii\helpers\ArrayHelper;
@@ -145,6 +146,40 @@ echo $form->field($model, 'media', ['options' => ['class' => 'form-group row fie
     ->hint($model->getAttributeLabel('total')); ?>
 
 <hr/>
+
+<?php
+$subjectSuggestUrl = Url::to(['/admin/tag/suggest']);
+echo $form->field($model, 'subject', ['options' => ['class' => 'form-group row field-item']])
+	->widget(Selectize::className(), [
+        'cascade' => true,
+		'url' => $subjectSuggestUrl,
+		'queryParam' => 'term',
+		'pluginOptions' => [
+			'valueField' => 'label',
+			'labelField' => 'label',
+			'searchField' => ['label'],
+			'persist' => false,
+			'createOnBlur' => false,
+			'create' => true,
+		],
+	])
+	->label($model->getAttributeLabel('subject'));?>
+
+<?php
+echo $form->field($model, 'function', ['options' => ['class' => 'form-group row field-item']])
+	->widget(Selectize::className(), [
+		'url' => $subjectSuggestUrl,
+		'queryParam' => 'term',
+		'pluginOptions' => [
+			'valueField' => 'label',
+			'labelField' => 'label',
+			'searchField' => ['label'],
+			'persist' => false,
+			'createOnBlur' => false,
+			'create' => true,
+		],
+	])
+	->label($model->getAttributeLabel('function'));?>
 
 <hr/>
 

@@ -106,13 +106,25 @@ $attributes = [
 	],
 	[
         'attribute' => 'media',
-		'value' => $model::parseMedia($model->getMedias(true, 'title'), 'media', ', '),
+		'value' => $model::parseFilter($model->getMedias(true, 'title'), 'media', ', '),
 		'format' => 'html',
 		'visible' => !$small ? true : false,
 	],
 	[
 		'attribute' => 'medium',
 		'value' => $model->medium ? $model->medium : '-',
+		'visible' => !$small,
+	],
+	[
+		'attribute' => 'subject',
+		'value' => $model::parseFilter($model->getSubjects(true, 'title'), 'subjectId', ', '),
+		'format' => 'html',
+		'visible' => !$small,
+	],
+	[
+		'attribute' => 'function',
+		'value' => $model::parseFilter($model->getFunctions(true, 'title'), 'functionId', ', '),
+		'format' => 'html',
 		'visible' => !$small,
 	],
 	[

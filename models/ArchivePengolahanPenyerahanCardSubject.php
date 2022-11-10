@@ -1,24 +1,25 @@
 <?php
 /**
- * ArchivePengolahanPenyerahanJenis
+ * ArchivePengolahanPenyerahanCardSubject
  * 
  * @author Putra Sudaryanto <putra@ommu.id>
  * @contact (+62)856-299-4114
  * @copyright Copyright (c) 2022 OMMU (www.ommu.id)
- * @created date 12 October 2022, 19:11 WIB
+ * @created date 11 November 2022, 01:01 WIB
  * @link https://bitbucket.org/ommu/archive-pengolahan
  *
- * This is the model class for table "ommu_archive_pengolahan_penyerahan_jenis".
+ * This is the model class for table "ommu_archive_pengolahan_penyerahan_card_subject".
  *
- * The followings are the available columns in table "ommu_archive_pengolahan_penyerahan_jenis":
+ * The followings are the available columns in table "ommu_archive_pengolahan_penyerahan_card_subject":
  * @property integer $id
- * @property integer $penyerahan_id
+ * @property string $type
+ * @property string $card_id
  * @property integer $tag_id
  * @property string $creation_date
  * @property integer $creation_id
  *
  * The followings are the available model relations:
- * @property ArchivePengolahanPenyerahan $penyerahan
+ * @property ArchivePengolahanPenyerahanCard $card
  * @property CoreTags $tag
  * @property Users $creation
  *
@@ -27,27 +28,26 @@
 namespace ommu\archivePengolahan\models;
 
 use Yii;
-use yii\helpers\Html;
 use yii\helpers\Inflector;
 use app\models\CoreTags;
 use app\models\Users;
 
-class ArchivePengolahanPenyerahanJenis extends \app\components\ActiveRecord
+class ArchivePengolahanPenyerahanCardSubject extends \app\components\ActiveRecord
 {
     public $gridForbiddenColumn = [];
 
+    public $stayInHere;
+
 	public $tagBody;
-	public $penyerahanArsip;
+	public $cardArchiveDescription;
 	public $creationDisplayname;
-	public $penyerahanTypeId;
-	public $penyerahans;
 
 	/**
 	 * @return string the associated database table name
 	 */
 	public static function tableName()
 	{
-		return 'ommu_archive_pengolahan_penyerahan_jenis';
+		return 'ommu_archive_pengolahan_penyerahan_card_subject';
 	}
 
 	/**
@@ -56,10 +56,12 @@ class ArchivePengolahanPenyerahanJenis extends \app\components\ActiveRecord
 	public function rules()
 	{
 		return [
-			[['penyerahan_id', 'tagBody'], 'required'],
-			[['penyerahan_id', 'tag_id', 'creation_id'], 'integer'],
-			[['tagBody'], 'string'],
-			[['penyerahan_id'], 'exist', 'skipOnError' => true, 'targetClass' => ArchivePengolahanPenyerahan::className(), 'targetAttribute' => ['penyerahan_id' => 'id']],
+			[['type', 'card_id', 'tagBody'], 'required'],
+			[['tag_id', 'creation_id', 'stayInHere'], 'integer'],
+			[['type', 'tagBody'], 'string'],
+			[['stayInHere'], 'safe'],
+			[['card_id'], 'string', 'max' => 32],
+			[['card_id'], 'exist', 'skipOnError' => true, 'targetClass' => ArchivePengolahanPenyerahanCard::className(), 'targetAttribute' => ['card_id' => 'id']],
 		];
 	}
 
@@ -70,35 +72,24 @@ class ArchivePengolahanPenyerahanJenis extends \app\components\ActiveRecord
 	{
 		return [
 			'id' => Yii::t('app', 'ID'),
-			'penyerahan_id' => Yii::t('app', 'Penyerahan'),
-			'tag_id' => Yii::t('app', 'Jenis Arsip'),
+			'type' => Yii::t('app', 'Type'),
+			'card_id' => Yii::t('app', 'Card'),
+			'tag_id' => Yii::t('app', 'Tag'),
 			'creation_date' => Yii::t('app', 'Creation Date'),
 			'creation_id' => Yii::t('app', 'Creation'),
-			'tagBody' => Yii::t('app', 'Jenis Arsip'),
-			'penyerahanArsip' => Yii::t('app', 'Penyerahan'),
+			'stayInHere' => Yii::t('app', 'stayInHere'),
+			'tagBody' => Yii::t('app', 'Tag'),
+			'cardArchiveDescription' => Yii::t('app', 'Card'),
 			'creationDisplayname' => Yii::t('app', 'Creation'),
-			'penyerahanTypeId' => Yii::t('app', 'Tipe Penyerahan'),
-			'penyerahans' => Yii::t('app', 'Penyerahan'),
 		];
 	}
 
 	/**
 	 * @return \yii\db\ActiveQuery
 	 */
-	public function getPenyerahan()
+	public function getCard()
 	{
-		return $this->hasOne(ArchivePengolahanPenyerahan::className(), ['id' => 'penyerahan_id'])
-            ->select(['id', 'type_id', 'kode_box', 'pencipta_arsip']);
-	}
-
-	/**
-	 * @return \yii\db\ActiveQuery
-	 */
-	public function getType()
-	{
-		return $this->hasOne(ArchivePengolahanPenyerahanType::className(), ['id' => 'type_id'])
-            ->select(['id', 'type_name'])
-            ->via('penyerahan');
+		return $this->hasOne(ArchivePengolahanPenyerahanCard::className(), ['id' => 'card_id']);
 	}
 
 	/**
@@ -120,23 +111,12 @@ class ArchivePengolahanPenyerahanJenis extends \app\components\ActiveRecord
 	}
 
 	/**
-	 * @return \yii\db\ActiveQuery
-	 */
-	public function getIsData()
-	{
-        if ((Yii::$app->request->get('data') && Yii::$app->request->get('data') == 'true') || Yii::$app->request->get('type') || Yii::$app->request->get('penyerahan')) {
-            return true;
-        }
-        return false;
-	}
-
-	/**
 	 * {@inheritdoc}
-	 * @return \ommu\archivePengolahan\models\query\ArchivePengolahanPenyerahanJenis the active query used by this AR class.
+	 * @return \ommu\archivePengolahan\models\query\ArchivePengolahanPenyerahanCardSubject the active query used by this AR class.
 	 */
 	public static function find()
 	{
-		return new \ommu\archivePengolahan\models\query\ArchivePengolahanPenyerahanJenis(get_called_class());
+		return new \ommu\archivePengolahan\models\query\ArchivePengolahanPenyerahanCardSubject(get_called_class());
 	}
 
 	/**
@@ -159,40 +139,28 @@ class ArchivePengolahanPenyerahanJenis extends \app\components\ActiveRecord
 			'class' => 'app\components\grid\SerialColumn',
 			'contentOptions' => ['class' => 'text-center'],
 		];
+		$this->templateColumns['type'] = [
+			'attribute' => 'type',
+			'value' => function($model, $key, $index, $column) {
+				return self::getType($model->type);
+			},
+			'filter' => self::getType(),
+		];
+		$this->templateColumns['cardArchiveDescription'] = [
+			'attribute' => 'cardArchiveDescription',
+			'value' => function($model, $key, $index, $column) {
+				return isset($model->card) ? $model->card->archive_description : '-';
+				// return $model->cardArchiveDescription;
+			},
+			'visible' => !Yii::$app->request->get('card') ? true : false,
+		];
 		$this->templateColumns['tagBody'] = [
 			'attribute' => 'tagBody',
 			'value' => function($model, $key, $index, $column) {
 				return isset($model->tag) ? $model->tag->body : '-';
 				// return $model->tagBody;
 			},
-		];
-		$this->templateColumns['penyerahanArsip'] = [
-			'attribute' => 'penyerahanArsip',
-			'value' => function($model, $key, $index, $column) {
-				return isset($model->penyerahan) ? $model->penyerahan->kode_box : '-';
-				// return $model->penyerahanArsip;
-			},
-			'visible' => $this->isData ? (!Yii::$app->request->get('penyerahan') ? true : false) : false,
-		];
-		$this->templateColumns['penyerahanTypeId'] = [
-			'attribute' => 'penyerahanTypeId',
-			'value' => function($model, $key, $index, $column) {
-				return isset($model->type) ? $model->type->type_name : '-';
-				// return $model->typeName;
-			},
-			'filter' => ArchivePengolahanPenyerahanType::getType(),
-			'visible' => $this->isData ? (!Yii::$app->request->get('type') && !Yii::$app->request->get('penyerahan') ? true : false) : false,
-		];
-		$this->templateColumns['penyerahans'] = [
-			'attribute' => 'penyerahans',
-			'value' => function($model, $key, $index, $column) {
-                $penyerahans = $model->penyerahans;
-				return Html::a($penyerahans, ['penyerahan/admin/manage', 'tag' => $model->tag_id], ['title' => Yii::t('app', '{count} penyerahan', ['count' => $penyerahans]), 'data-pjax' => 0]);
-			},
-			'filter' => false,
-            'contentOptions' => ['class' => 'text-center'],
-			'format' => 'raw',
-			'visible' => !$this->isData,
+			'visible' => !Yii::$app->request->get('tag') ? true : false,
 		];
 		$this->templateColumns['creation_date'] = [
 			'attribute' => 'creation_date',
@@ -200,7 +168,6 @@ class ArchivePengolahanPenyerahanJenis extends \app\components\ActiveRecord
 				return Yii::$app->formatter->asDatetime($model->creation_date, 'medium');
 			},
 			'filter' => $this->filterDatepicker($this, 'creation_date'),
-			'visible' => $this->isData,
 		];
 		$this->templateColumns['creationDisplayname'] = [
 			'attribute' => 'creationDisplayname',
@@ -208,7 +175,7 @@ class ArchivePengolahanPenyerahanJenis extends \app\components\ActiveRecord
 				return isset($model->creation) ? $model->creation->displayname : '-';
 				// return $model->creationDisplayname;
 			},
-			'visible' => $this->isData,
+			'visible' => !Yii::$app->request->get('creation') ? true : false,
 		];
 	}
 
@@ -234,6 +201,23 @@ class ArchivePengolahanPenyerahanJenis extends \app\components\ActiveRecord
 	}
 
 	/**
+	 * function getType
+	 */
+	public static function getType($value=null)
+	{
+		$items = array(
+			'subject' => Yii::t('app', 'Subject'),
+			'function' => Yii::t('app', 'Function'),
+		);
+
+        if ($value !== null) {
+            return $items[$value];
+        } else {
+            return $items;
+        }
+	}
+
+	/**
 	 * after find attributes
 	 */
 	public function afterFind()
@@ -241,7 +225,7 @@ class ArchivePengolahanPenyerahanJenis extends \app\components\ActiveRecord
 		parent::afterFind();
 
 		// $this->tagBody = isset($this->tag) ? $this->tag->body : '';
-		// $this->penyerahanArsip = isset($this->penyerahan) ? $this->penyerahan->kode_box : '-';
+		// $this->cardArchiveDescription = isset($this->card) ? $this->card->archive_description : '-';
 		// $this->creationDisplayname = isset($this->creation) ? $this->creation->displayname : '-';
 	}
 

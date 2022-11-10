@@ -28,9 +28,9 @@ class ArchivePengolahanPenyerahanCard extends ArchivePengolahanPenyerahanCardMod
 	{
 		return [
 			[['id', 'temporary_number', 'archive_description', 'archive_type', 'from_archive_date', 'to_archive_date', 'archive_date', 'medium', 'creation_date', 'modified_date', 'updated_date', 
-                'userDisplayname', 'creationDisplayname', 'modifiedDisplayname', 'penyerahanPenciptaArsip'], 'safe'],
+                'userDisplayname', 'creationDisplayname', 'modifiedDisplayname', 'penyerahanPenciptaArsip', 'subject', 'function'], 'safe'],
 			[['publish', 'penyerahan_id', 'user_id', 'creation_id', 'modified_id', 
-                'media', 'penyerahanTypeId'], 'integer'],
+                'media', 'penyerahanTypeId', 'subjectId', 'functionId'], 'integer'],
 		];
 	}
 
@@ -102,6 +102,22 @@ class ArchivePengolahanPenyerahanCard extends ArchivePengolahanPenyerahanCardMod
         if (isset($params['media']) && $params['media'] != '') {
             $query->joinWith(['medias medias']);
         }
+        if (isset($params['subjectId']) && $params['subjectId'] != '') {
+            $query->joinWith(['subjects subjects']);
+        }
+        if ((isset($params['sort']) && in_array($params['sort'], ['subject', '-subject'])) || 
+            (isset($params['subject']) && $params['subject'] != '')
+        ) {
+            $query->joinWith(['subjects.tag subject']);
+        }
+        if (isset($params['functionId']) && $params['functionId'] != '') {
+            $query->joinWith(['functions functions']);
+        }
+        if ((isset($params['sort']) && in_array($params['sort'], ['function', '-function'])) || 
+            (isset($params['function']) && $params['function'] != '')
+        ) {
+            $query->joinWith(['functions.tag function']);
+        }
 
 		$query->groupBy(['id']);
 
@@ -166,6 +182,9 @@ class ArchivePengolahanPenyerahanCard extends ArchivePengolahanPenyerahanCardMod
 			'medias.media_id' => $this->media,
 		]);
 
+		$query->andFilterWhere(['subjects.tag_id' => $this->subjectId]);
+		$query->andFilterWhere(['functions.tag_id' => $this->functionId]);
+
 		if (!isset($params['publish']) || (isset($params['publish']) && $params['publish'] == '')) {
             $query->andFilterWhere(['IN', 't.publish', [0,1]]);
         } else {
@@ -192,7 +211,9 @@ class ArchivePengolahanPenyerahanCard extends ArchivePengolahanPenyerahanCardMod
                 ['like', 'member.displayname', $this->userDisplayname]
             ])
 			->andFilterWhere(['like', 'creation.displayname', $this->creationDisplayname])
-			->andFilterWhere(['like', 'modified.displayname', $this->modifiedDisplayname]);
+			->andFilterWhere(['like', 'modified.displayname', $this->modifiedDisplayname])
+			->andFilterWhere(['like', 'subject.body', $this->subject])
+			->andFilterWhere(['like', 'function.body', $this->function]);
 
 		return $dataProvider;
 	}

@@ -21,6 +21,7 @@ use ommu\archivePengolahan\models\ArchivePengolahanPenyerahanCreator;
 use yii\helpers\Inflector;
 use app\models\CoreTags;
 use ommu\archivePengolahan\models\ArchivePengolahanPenyerahanCardMedia;
+use ommu\archivePengolahan\models\ArchivePengolahanPenyerahanCardSubject;
 
 class Events extends \yii\base\BaseObject
 {
@@ -54,6 +55,8 @@ class Events extends \yii\base\BaseObject
 		$card = $event->sender;
 
 		self::setArchiveMedia($card);
+		self::setArchiveSubject($card);
+		self::setArchiveSubject($card, 'function');
 	}
 
 	/**
@@ -176,6 +179,52 @@ class Events extends \yii\base\BaseObject
 				$model = ArchivePengolahanPenyerahanCardMedia::find()
 					->select(['id'])
 					->andWhere(['id' => $key])
+					->one();
+                $model->delete();
+			}
+		}
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public static function setArchiveSubject($card, $type='subject')
+	{
+        $subject = [];
+        if ($type == 'subject') {
+			$oldSubject = $card->getSubjects(true, 'title');
+            if ($card->subject) {
+                $subject = explode(',', $card->subject);
+            }
+		} else {
+			$oldSubject = $card->getFunctions(true, 'title');
+            if ($card->function) {
+                $subject = explode(',', $card->function);
+            }
+		}
+
+		// insert difference subject
+        if (is_array($subject)) {
+			foreach ($subject as $val) {
+                if (in_array($val, $oldSubject)) {
+					unset($oldSubject[array_keys($oldSubject, $val)[0]]);
+					continue;
+				}
+
+				$model = new ArchivePengolahanPenyerahanCardSubject();
+				$model->type = $type;
+				$model->card_id = $card->id;
+				$model->tagBody = $val;
+				$model->save();
+			}
+		}
+
+		// drop difference subject
+        if (!empty($oldSubject)) {
+			foreach ($oldSubject as $key => $val) {
+				$model = ArchivePengolahanPenyerahanCardSubject::find()
+					->select(['id'])
+					->where(['type' => $type, 'card_id' => $card->id, 'tag_id' => $key])
 					->one();
                 $model->delete();
 			}

@@ -35,6 +35,8 @@
  * @property ArchivePengolahanPenyerahanCardMedia[] $media
  * @property Users $creation
  * @property Users $modified
+ * @property ArchiveRelatedSubject[] $subjects
+ * @property ArchiveRelatedSubject[] $functions
  *
  */
 
@@ -53,17 +55,21 @@ class ArchivePengolahanPenyerahanCard extends \app\components\ActiveRecord
 {
 	use \ommu\traits\UtilityTrait;
 
-    public $gridForbiddenColumn = ['creation_date', 'modified_date', 'updated_date', 'media', 'userDisplayname', 'creationDisplayname', 'modifiedDisplayname'];
+    public $gridForbiddenColumn = ['creation_date', 'modified_date', 'updated_date', 'media', 'subject', 'function', 'userDisplayname', 'creationDisplayname', 'modifiedDisplayname'];
 
     public $stayInHere;
 
     public $media;
+    public $subject;
+    public $function;
 
 	public $penyerahanTypeId;
 	public $penyerahanPenciptaArsip;
 	public $userDisplayname;
 	public $creationDisplayname;
 	public $modifiedDisplayname;
+    public $subjectId;
+    public $functionId;
 
 	const EVENT_BEFORE_SAVE_PENYERAHAN_CARD = 'BeforeSavePenyerahanCard';
 
@@ -85,7 +91,7 @@ class ArchivePengolahanPenyerahanCard extends \app\components\ActiveRecord
 			[['publish', 'penyerahan_id', 'user_id', 'creation_id', 'modified_id', 'stayInHere'], 'integer'],
 			[['id', 'archive_description', 'archive_type'], 'string'],
 			//[['archive_date', 'medium_json'], 'json'],
-			[['from_archive_date', 'to_archive_date', 'archive_date', 'medium', 'medium_json', 'stayInHere', 'media'], 'safe'],
+			[['from_archive_date', 'to_archive_date', 'archive_date', 'medium', 'medium_json', 'stayInHere', 'media', 'subject', 'function'], 'safe'],
 			[['temporary_number'], 'string', 'max' => 32],
 			[['from_archive_date', 'to_archive_date'], 'string', 'max' => 64],
 			[['medium'], 'string', 'max' => 255],
@@ -120,6 +126,8 @@ class ArchivePengolahanPenyerahanCard extends \app\components\ActiveRecord
 			'updated_date' => Yii::t('app', 'Updated Date'),
 			'stayInHere' => Yii::t('app', 'stayInHere'),
 			'media' => Yii::t('app', 'Media Type'),
+			'subject' => Yii::t('app', 'Subject'),
+			'function' => Yii::t('app', 'Function'),
 			'penyerahanTypeId' => Yii::t('app', 'Penyerahan Type'),
 			'penyerahanPenciptaArsip' => Yii::t('app', 'Kode Box / Pencipta Arsip'),
 			'userDisplayname' => Yii::t('app', 'User'),
@@ -204,6 +212,36 @@ class ArchivePengolahanPenyerahanCard extends \app\components\ActiveRecord
 	}
 
 	/**
+	 * @return \yii\db\ActiveQuery
+	 */
+	public function getSubjects($result=false, $val='id')
+	{
+        if ($result == true) {
+            return \yii\helpers\ArrayHelper::map($this->subjects, 'tag_id', $val=='id' ? 'id' : 'tag.body');
+        }
+
+		return $this->hasMany(ArchivePengolahanPenyerahanCardSubject::className(), ['card_id' => 'id'])
+			->alias('subjects')
+            ->select(['id', 'card_id', 'tag_id'])
+			->andOnCondition([sprintf('%s.type', 'subjects') => 'subject']);
+	}
+
+	/**
+	 * @return \yii\db\ActiveQuery
+	 */
+	public function getFunctions($result=false, $val='id')
+	{
+        if ($result == true) {
+            return \yii\helpers\ArrayHelper::map($this->functions, 'tag_id', $val=='id' ? 'id' : 'tag.body');
+        }
+
+		return $this->hasMany(ArchivePengolahanPenyerahanCardSubject::className(), ['card_id' => 'id'])
+			->alias('functions')
+            ->select(['id', 'card_id', 'tag_id'])
+			->andOnCondition([sprintf('%s.type', 'functions') => 'function']);
+	}
+
+	/**
 	 * {@inheritdoc}
 	 * @return \ommu\archivePengolahan\models\query\ArchivePengolahanPenyerahanCard the active query used by this AR class.
 	 */
@@ -271,17 +309,6 @@ class ArchivePengolahanPenyerahanCard extends \app\components\ActiveRecord
 			},
 			'format' => 'raw',
 		];
-		$this->templateColumns['archive_type'] = [
-			'attribute' => 'archive_type',
-			'label' => Yii::t('app', 'Type'),
-			'value' => function($model, $key, $index, $column) {
-                if ($model->archive_type) {
-                    return self::getArchiveType($model->archive_type);
-                }
-                return '-';
-			},
-			'filter' => self::getArchiveType(),
-		];
 		$this->templateColumns['from_archive_date'] = [
 			'attribute' => 'from_archive_date',
 			'label' => Yii::t('app', 'From Date'),
@@ -296,29 +323,45 @@ class ArchivePengolahanPenyerahanCard extends \app\components\ActiveRecord
 				return $model->to_archive_date;
 			},
 		];
+		$this->templateColumns['archive_type'] = [
+			'attribute' => 'archive_type',
+			'label' => Yii::t('app', 'Type'),
+			'value' => function($model, $key, $index, $column) {
+                if ($model->archive_type) {
+                    return self::getArchiveType($model->archive_type);
+                }
+                return '-';
+			},
+			'filter' => self::getArchiveType(),
+		];
 		$this->templateColumns['media'] = [
 			'attribute' => 'media',
 			'label' => Yii::t('app', 'Media'),
 			'value' => function($model, $key, $index, $column) {
-				return self::parseMedia($model->getMedias(true, 'title'), 'media', ', ');
+				return self::parseFilter($model->getMedias(true, 'title'), 'media', ', ');
 			},
 			'filter' => ArchiveMedia::getMedia(),
 			'format' => 'html',
 		];
-		// $this->templateColumns['archive_date'] = [
-		// 	'attribute' => 'archive_date',
-		// 	'value' => function($model, $key, $index, $column) {
-        //         if (is_array($model->archive_date) && empty($model->archive_date)) {
-        //             return '-';
-        //         }
-        //         return Json::encode($model->archive_date);
-		// 	},
-		// ];
 		$this->templateColumns['medium'] = [
 			'attribute' => 'medium',
 			'value' => function($model, $key, $index, $column) {
 				return $model->medium;
 			},
+		];
+		$this->templateColumns['subject'] = [
+			'attribute' => 'subject',
+			'value' => function($model, $key, $index, $column) {
+				return self::parseFilter($model->getSubjects(true, 'title'), 'subjectId', ', ');
+			},
+			'format' => 'html',
+		];
+		$this->templateColumns['function'] = [
+			'attribute' => 'function',
+			'value' => function($model, $key, $index, $column) {
+				return self::parseFilter($model->getFunctions(true, 'title'), 'functionId', ', ');
+			},
+			'format' => 'html',
 		];
 		$this->templateColumns['creation_date'] = [
 			'attribute' => 'creation_date',
@@ -409,9 +452,9 @@ class ArchivePengolahanPenyerahanCard extends \app\components\ActiveRecord
 	}
 
 	/**
-	 * function parseMedia
+	 * function parseFilter
 	 */
-	public static function parseMedia($medias, $attr='media', $sep='li')
+	public static function parseFilter($medias, $attr='media', $sep='li')
 	{
         if (!is_array($medias) || (is_array($medias) && empty($medias))) {
             return '-';
@@ -455,6 +498,8 @@ class ArchivePengolahanPenyerahanCard extends \app\components\ActiveRecord
 		// $this->creationDisplayname = isset($this->creation) ? $this->creation->displayname : '-';
 		// $this->modifiedDisplayname = isset($this->modified) ? $this->modified->displayname : '-';
 		// $this->media = $this->getMedia(true) ? 1 : 0;
+		// $this->subject =  implode(',', $this->getSubjects(true, 'title'));
+		// $this->function =  implode(',', $this->getFunctions(true, 'title'));
 	}
 
 	/**
