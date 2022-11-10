@@ -85,16 +85,6 @@ $attributes = [
 		'format' => 'raw',
 	],
 	[
-		'attribute' => 'archive_type',
-		'value' => function ($model) {
-            if ($model->archive_type) {
-                return $model::getArchiveType($model->archive_type);
-            }
-            return '-';
-		},
-		'visible' => !$small,
-	],
-	[
 		'attribute' => 'from_archive_date',
 		'value' => $model->from_archive_date ? $model->from_archive_date : '-',
 		'visible' => !$small,
@@ -102,6 +92,16 @@ $attributes = [
 	[
 		'attribute' => 'to_archive_date',
 		'value' => $model->to_archive_date ? $model->to_archive_date : '-',
+		'visible' => !$small,
+	],
+	[
+		'attribute' => 'archive_type',
+		'value' => function ($model) {
+            if ($model->archive_type) {
+                return $model::getArchiveType($model->archive_type);
+            }
+            return '-';
+		},
 		'visible' => !$small,
 	],
 	[

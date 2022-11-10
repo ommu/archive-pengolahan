@@ -35,8 +35,12 @@ SQL;
 CREATE
     TRIGGER `archivePengolahanAfterUpdatePenyerahan` AFTER UPDATE ON `ommu_archive_pengolahan_penyerahan` 
     FOR EACH ROW BEGIN
-	IF (NEW.publish <> OLD.publish AND NEW.publish = 2) THEN
-		UPDATE `ommu_archive_pengolahan_penyerahan_type_grid` SET `penyerahan` = `penyerahan` - 1 WHERE `id` = NEW.type_id;
+	IF (NEW.publish <> OLD.publish) THEN
+		IF (NEW.publish = 2) THEN
+			UPDATE `ommu_archive_pengolahan_penyerahan_type_grid` SET `penyerahan` = `penyerahan` - 1 WHERE `id` = NEW.type_id;
+		ELSEIF (OLD.publish = 2) THEN
+			UPDATE `ommu_archive_pengolahan_penyerahan_type_grid` SET `penyerahan` = `penyerahan` + 1 WHERE `id` = NEW.type_id;
+		END IF;
 	END IF;
     END;
 SQL;

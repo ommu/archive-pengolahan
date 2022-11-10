@@ -59,8 +59,12 @@ SQL;
 CREATE
     TRIGGER `archivePengolahanAfterUpdatePenyerahanItem` AFTER UPDATE ON `ommu_archive_pengolahan_penyerahan_item` 
     FOR EACH ROW BEGIN
-	IF (NEW.publish <> OLD.publish AND NEW.publish = 2) THEN
-		UPDATE `ommu_archive_pengolahan_penyerahan_grid` SET `item` = `item` - 1 WHERE `id` = NEW.penyerahan_id;
+	IF (NEW.publish <> OLD.publish) THEN
+		IF (NEW.publish = 2) THEN
+			UPDATE `ommu_archive_pengolahan_penyerahan_grid` SET `item` = `item` - 1 WHERE `id` = NEW.penyerahan_id;
+		ELSEIF (OLD.publish = 2) THEN
+			UPDATE `ommu_archive_pengolahan_penyerahan_grid` SET `item` = `item` + 1 WHERE `id` = NEW.penyerahan_id;
+		END IF;
 	END IF;
     END;
 SQL;
@@ -81,8 +85,12 @@ SQL;
 CREATE
     TRIGGER `archivePengolahanAfterUpdatePenyerahanCard` AFTER UPDATE ON `ommu_archive_pengolahan_penyerahan_card` 
     FOR EACH ROW BEGIN
-	IF (NEW.publish <> OLD.publish AND NEW.publish = 2) THEN
-		UPDATE `ommu_archive_pengolahan_penyerahan_grid` SET `card` = `card` - 1 WHERE `id` = NEW.penyerahan_id;
+	IF (NEW.publish <> OLD.publish) THEN
+		IF (NEW.publish = 2) THEN
+			UPDATE `ommu_archive_pengolahan_penyerahan_grid` SET `card` = `card` - 1 WHERE `id` = NEW.penyerahan_id;
+		ELSEIF (OLD.publish = 2) THEN
+			UPDATE `ommu_archive_pengolahan_penyerahan_grid` SET `card` = `card` + 1 WHERE `id` = NEW.penyerahan_id;
+		END IF;
 	END IF;
     END;
 SQL;
