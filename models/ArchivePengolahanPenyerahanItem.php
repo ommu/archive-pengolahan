@@ -203,6 +203,7 @@ class ArchivePengolahanPenyerahanItem extends \app\components\ActiveRecord
 			'value' => function($model, $key, $index, $column) {
 				return $model->archive_description;
 			},
+            'format' => 'html',
 		];
 		$this->templateColumns['year'] = [
 			'attribute' => 'year',

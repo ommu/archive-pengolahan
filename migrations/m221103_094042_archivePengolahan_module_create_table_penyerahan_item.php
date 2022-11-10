@@ -28,7 +28,7 @@ class m221103_094042_archivePengolahan_module_create_table_penyerahan_item exten
 				'publish' => Schema::TYPE_TINYINT . '(1) NOT NULL DEFAULT \'1\' COMMENT \'deleted\'',
 				'penyerahan_id' => Schema::TYPE_INTEGER . '(11) UNSIGNED NOT NULL',
 				'archive_number' => Schema::TYPE_STRING . '(16) NOT NULL',
-				'archive_description' => Schema::TYPE_TEXT . ' NOT NULL',
+				'archive_description' => Schema::TYPE_TEXT . ' NOT NULL COMMENT \'redactor\'',
 				'year' => Schema::TYPE_STRING . '(8) NOT NULL',
 				'volume' => Schema::TYPE_STRING . '(16) NOT NULL',
 				'code' => Schema::TYPE_STRING . '(16) NOT NULL',

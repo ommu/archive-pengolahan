@@ -105,7 +105,7 @@ echo $form->field($model, 'creator', ['options' => ['class' => 'form-group row f
 <hr/>
 
 <?php
-$subjectSuggestUrl = Url::to(['/admin/tag/suggest']);
+$subjectSuggestUrl = Url::to(['setting/jenis/suggest']);
 echo $form->field($model, 'jenisArsip', ['options' => ['class' => 'form-group row field-item']])
 	->widget(Selectize::className(), [
         'cascade' => true,
