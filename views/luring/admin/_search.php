@@ -50,8 +50,6 @@ use ommu\archivePengolahan\models\ArchiveLevel;
 
 		<?php echo $form->field($model, 'archive_file');?>
 
-		<?php echo $form->field($model, 'senarai_file');?>
-
 		<?php echo $form->field($model, 'creation_date')
 			->input('date');?>
 

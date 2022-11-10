@@ -76,7 +76,7 @@ $attributes = [
 	],
 	[
 		'attribute' => 'creator',
-		'value' => $model::parseRelated($model->getCreators(true, 'title'), null),
+		'value' => $model::parseRelated($model->getCreators(true, 'title'), null, ', '),
 		'format' => 'html',
 		'visible' => (!$small && in_array('creator', $model->level->field)) || ($small && $model->isFond) ? true : false,
 	],
@@ -92,7 +92,7 @@ $attributes = [
 	],
 	[
 		'attribute' => 'media',
-		'value' => $model::parseRelated($model->getMedias(true, 'title'), null),
+		'value' => $model::parseRelated($model->getMedias(true, 'title'), null, ', '),
 		'format' => 'html',
 		'visible' => !$small && in_array('media', $model->level->field) ? true : false,
 	],
@@ -100,12 +100,6 @@ $attributes = [
 		'attribute' => 'archive_type',
 		'value' => $model::getArchiveType($model->archive_type ? $model->archive_type : '-'),
 		'visible' => !$small && in_array('archive_type', $model->level->field) ? true : false,
-	],
-	[
-		'attribute' => 'repository',
-		'value' => $model::parseRelated($model->getRepositories(true, 'title'), null, ', '),
-		'format' => 'html',
-		'visible' => !$small && in_array('repository', $model->level->field) ? true : false,
 	],
 	[
 		'attribute' => 'location',
@@ -118,11 +112,6 @@ $attributes = [
 		'format' => 'html',
 		'visible' => !$small && !$isFond,
 	],
-	// [
-	// 	'attribute' => 'senarai_file',
-	// 	'value' => $model->senarai_file ? $model->senarai_file : '-',
-	// 	'visible' => !$small,
-	// ],
 	[
 		'attribute' => 'creation_date',
 		'value' => Yii::$app->formatter->asDatetime($model->creation_date, 'medium'),

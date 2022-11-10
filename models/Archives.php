@@ -22,8 +22,7 @@ use ommu\archive\models\ArchiveMedia;
 
 class Archives extends ArchivesModel
 {
-	public $gridForbiddenColumn = ['archive_type', 'creation_date', 'creationDisplayname', 'modified_date', 'modifiedDisplayname', 'updated_date', 
-        'preview'];
+	public $gridForbiddenColumn = ['archive_type', 'creation_date', 'creationDisplayname', 'modified_date', 'modifiedDisplayname', 'updated_date'];
 
 	/**
 	 * Set default columns to display
@@ -108,14 +107,6 @@ class Archives extends ArchivesModel
 			'filter' => self::getArchiveType(),
 			'visible' => !$this->isFond ? true : false,
 		];
-		$this->templateColumns['repository'] = [
-			'attribute' => 'repository',
-			'value' => function($model, $key, $index, $column) {
-				return self::parseRelated($model->getRepositories(true, 'title'), null, ', ');
-			},
-			'format' => 'html',
-			'visible' => $this->isFond ? true : false,
-		];
 		$this->templateColumns['creation_date'] = [
 			'attribute' => 'creation_date',
 			'value' => function($model, $key, $index, $column) {
@@ -153,11 +144,21 @@ class Archives extends ArchivesModel
 			},
 			'filter' => $this->filterDatepicker($this, 'updated_date'),
 		];
+		$this->templateColumns['publish'] = [
+			'attribute' => 'publish',
+			'label' => Yii::t('app', 'Status'),
+			'value' => function($model, $key, $index, $column) {
+				return self::getPublish($model->publish);
+			},
+			'filter' => self::getPublish(),
+			'contentOptions' => ['class' => 'text-center'],
+			'visible' => !Yii::$app->request->get('trash') ? true : false,
+		];
 		$this->templateColumns['oFile'] = [
 			'attribute' => 'oFile',
-			'label' => Yii::t('app', 'Luring'),
+			'label' => Yii::t('app', 'Document'),
 			'value' => function($model, $key, $index, $column) {
-                $senaraiFile = Html::a(Yii::t('app', 'Document'), ['luring/document/create', 'id' => $model->primaryKey], ['title' => Yii::t('app', 'Generate Senarai Luring'), 'class' => 'modal-btn']);
+                $senaraiFile = Html::a(Yii::t('app', 'Generate'), ['luring/document/create', 'id' => $model->primaryKey], ['title' => Yii::t('app', 'Generate Senarai Luring'), 'class' => 'modal-btn']);
                 $oFile = $model->grid->luring;
                 if ($oFile) {
                     $senaraiFile = Html::a('<span class="glyphicon glyphicon-ok"></span>', ['luring/document/manage', 'archive' => $model->primaryKey], ['title' => Yii::t('app', 'View Senarai Luring'), 'data-pjax' => 0]);
@@ -180,25 +181,6 @@ class Archives extends ArchivesModel
 			'contentOptions' => ['class' => 'text-center'],
 			'format' => 'raw',
 			'visible' => !$this->isFond ? true : false,
-		];
-		$this->templateColumns['preview'] = [
-			'attribute' => 'preview',
-			'value' => function($model, $key, $index, $column) {
-				return $this->filterYesNo($model->preview);
-			},
-			'filter' => $this->filterYesNo(),
-			'contentOptions' => ['class' => 'text-center'],
-			'visible' => !$this->isFond ? true : false,
-		];
-		$this->templateColumns['publish'] = [
-			'attribute' => 'publish',
-			'label' => Yii::t('app', 'Status'),
-			'value' => function($model, $key, $index, $column) {
-				return self::getPublish($model->publish);
-			},
-			'filter' => self::getPublish(),
-			'contentOptions' => ['class' => 'text-center'],
-			'visible' => !Yii::$app->request->get('trash') ? true : false,
 		];
 	}
 }
