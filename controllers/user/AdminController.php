@@ -129,7 +129,7 @@ class AdminController extends Controller
             // $model->order = $postData['order'] ? $postData['order'] : 0;
 
             if ($model->save()) {
-                Yii::$app->session->setFlash('success', Yii::t('app', 'Archive user success created.'));
+                Yii::$app->session->setFlash('success', Yii::t('app', 'User permission success created.'));
                 return $this->redirect(['manage']);
 
             } else {
@@ -166,7 +166,7 @@ class AdminController extends Controller
             // $model->order = $postData['order'] ? $postData['order'] : 0;
 
             if ($model->save()) {
-                Yii::$app->session->setFlash('success', Yii::t('app', 'Archive user success updated.'));
+                Yii::$app->session->setFlash('success', Yii::t('app', 'User permission success updated.'));
                 if ($model->stayInHere) {
                     return $this->redirect(['update', 'id' => $model->id, 'stayInHere' => $model->stayInHere]);
                 }
@@ -218,7 +218,7 @@ class AdminController extends Controller
 		$model->publish = 2;
 
         if ($model->save(false, ['publish','modified_id'])) {
-            Yii::$app->session->setFlash('success', Yii::t('app', 'Archive user success deleted.'));
+            Yii::$app->session->setFlash('success', Yii::t('app', 'User permission success deleted.'));
             return $this->redirect(Yii::$app->request->referrer ?: ['manage']);
         }
 	}

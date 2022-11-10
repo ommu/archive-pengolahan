@@ -142,7 +142,7 @@ class AdminController extends Controller
             // $model->order = $postData['order'] ? $postData['order'] : 0;
 
             if ($model->save()) {
-                Yii::$app->session->setFlash('success', Yii::t('app', 'Archive schema success created.'));
+                Yii::$app->session->setFlash('success', Yii::t('app', 'Schema success created.'));
                 if ($model->stayInHere) {
                     return $this->redirect(['create', 'id' => $model->parent_id, 'stayInHere' => $model->stayInHere]);
                 }
@@ -182,7 +182,7 @@ class AdminController extends Controller
             // $model->order = $postData['order'] ? $postData['order'] : 0;
 
             if ($model->save()) {
-                Yii::$app->session->setFlash('success', Yii::t('app', 'Archive schema success updated.'));
+                Yii::$app->session->setFlash('success', Yii::t('app', 'Schema success updated.'));
                 if ($model->stayInHere) {
                     return $this->redirect(['update', 'id' => $model->id, 'stayInHere' => $model->stayInHere]);
                 }
@@ -233,7 +233,7 @@ class AdminController extends Controller
 		$model->publish = 2;
 
         if ($model->save(false, ['publish','modified_id'])) {
-            Yii::$app->session->setFlash('success', Yii::t('app', 'Archive schema success deleted.'));
+            Yii::$app->session->setFlash('success', Yii::t('app', 'Schema success deleted.'));
             return $this->redirect(Yii::$app->request->referrer ?: ['manage', 'parent' => $model->parent_id]);
         }
 	}
@@ -251,7 +251,7 @@ class AdminController extends Controller
 		$model->publish = $replace;
 
         if ($model->save(false, ['publish','modified_id'])) {
-            Yii::$app->session->setFlash('success', Yii::t('app', 'Archive schema success updated.'));
+            Yii::$app->session->setFlash('success', Yii::t('app', 'Schema success updated.'));
             return $this->redirect(Yii::$app->request->referrer ?: ['manage', 'parent' => $model->parent_id]);
         }
 	}

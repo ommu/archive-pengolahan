@@ -126,7 +126,7 @@ class TypeController extends Controller
             // $model->order = $postData['order'] ? $postData['order'] : 0;
 
             if ($model->save()) {
-                Yii::$app->session->setFlash('success', Yii::t('app', 'Archive penyerahan type success created.'));
+                Yii::$app->session->setFlash('success', Yii::t('app', 'Penyerahan type success created.'));
                 if ($model->stayInHere) {
                     return $this->redirect(['create', 'stayInHere' => $model->stayInHere]);
                 }
@@ -164,7 +164,7 @@ class TypeController extends Controller
             // $model->order = $postData['order'] ? $postData['order'] : 0;
 
             if ($model->save()) {
-                Yii::$app->session->setFlash('success', Yii::t('app', 'Archive penyerahan type success updated.'));
+                Yii::$app->session->setFlash('success', Yii::t('app', 'Penyerahan type success updated.'));
                 if ($model->stayInHere) {
                     return $this->redirect(['update', 'id' => $model->id, 'stayInHere' => $model->stayInHere]);
                 }
@@ -215,7 +215,7 @@ class TypeController extends Controller
 		$model->publish = 2;
 
         if ($model->save(false, ['publish','modified_id'])) {
-            Yii::$app->session->setFlash('success', Yii::t('app', 'Archive penyerahan type success deleted.'));
+            Yii::$app->session->setFlash('success', Yii::t('app', 'Penyerahan type success deleted.'));
             return $this->redirect(Yii::$app->request->referrer ?: ['manage']);
         }
 	}
@@ -233,7 +233,7 @@ class TypeController extends Controller
 		$model->publish = $replace;
 
         if ($model->save(false, ['publish','modified_id'])) {
-            Yii::$app->session->setFlash('success', Yii::t('app', 'Archive penyerahan type success updated.'));
+            Yii::$app->session->setFlash('success', Yii::t('app', 'Penyerahan type success updated.'));
             return $this->redirect(Yii::$app->request->referrer ?: ['manage']);
         }
 	}

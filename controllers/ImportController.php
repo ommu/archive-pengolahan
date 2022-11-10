@@ -139,7 +139,7 @@ class ImportController extends Controller
 		$model = $this->findModel($id);
 		$model->delete();
 
-		Yii::$app->session->setFlash('success', Yii::t('app', 'Archive import success deleted.'));
+		Yii::$app->session->setFlash('success', Yii::t('app', 'Import success deleted.'));
 		return $this->redirect(Yii::$app->request->referrer ?: ['manage']);
 	}
 
@@ -155,7 +155,7 @@ class ImportController extends Controller
 		$model->rollback = 1;
 
         if ($model->save()) {
-            Yii::$app->session->setFlash('success', Yii::t('app', 'Archive import success rollback.'));
+            Yii::$app->session->setFlash('success', Yii::t('app', 'Import success rollback.'));
             return $this->redirect(Yii::$app->request->referrer ?: ['manage', 'type' => $model->type]);
         }
 	}

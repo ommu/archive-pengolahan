@@ -150,7 +150,7 @@ class CardController extends Controller
             // $model->order = $postData['order'] ? $postData['order'] : 0;
 
             if ($model->save()) {
-                Yii::$app->session->setFlash('success', Yii::t('app', 'Archive penyerahan card success created.'));
+                Yii::$app->session->setFlash('success', Yii::t('app', 'Penyerahan card success created.'));
                 if ($model->stayInHere) {
                     return $this->redirect(['create', 'id' => $model->penyerahan_id, 'stayInHere' => $model->stayInHere]);
                 }
@@ -190,7 +190,7 @@ class CardController extends Controller
             // $model->order = $postData['order'] ? $postData['order'] : 0;
 
             if ($model->save()) {
-                Yii::$app->session->setFlash('success', Yii::t('app', 'Archive penyerahan card success updated.'));
+                Yii::$app->session->setFlash('success', Yii::t('app', 'Penyerahan card success updated.'));
                 if ($model->stayInHere) {
                     return $this->redirect(['update', 'id' => $model->id, 'stayInHere' => $model->stayInHere]);
                 }
@@ -243,7 +243,7 @@ class CardController extends Controller
 		$model->publish = 2;
 
         if ($model->save(false, ['publish','modified_id'])) {
-            Yii::$app->session->setFlash('success', Yii::t('app', 'Archive penyerahan card success deleted.'));
+            Yii::$app->session->setFlash('success', Yii::t('app', 'Penyerahan card success deleted.'));
             return $this->redirect(Yii::$app->request->referrer ?: ['manage', 'penyerahan' => $model->penyerahan_id]);
         }
 	}
@@ -261,7 +261,7 @@ class CardController extends Controller
 		$model->publish = $replace;
 
         if ($model->save(false, ['publish','modified_id'])) {
-            Yii::$app->session->setFlash('success', Yii::t('app', 'Archive penyerahan card success updated.'));
+            Yii::$app->session->setFlash('success', Yii::t('app', 'Penyerahan card success updated.'));
             return $this->redirect(Yii::$app->request->referrer ?: ['manage', 'penyerahan' => $model->penyerahan_id]);
         }
 	}

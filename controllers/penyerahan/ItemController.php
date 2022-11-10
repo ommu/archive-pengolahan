@@ -148,7 +148,7 @@ class ItemController extends Controller
             // $model->order = $postData['order'] ? $postData['order'] : 0;
 
             if ($model->save()) {
-                Yii::$app->session->setFlash('success', Yii::t('app', 'Archive penyerahan item success created.'));
+                Yii::$app->session->setFlash('success', Yii::t('app', 'Penyerahan item success created.'));
                 if ($model->stayInHere) {
                     return $this->redirect(['create', 'id' => $model->penyerahan_id, 'stayInHere' => $model->stayInHere]);
                 }
@@ -189,7 +189,7 @@ class ItemController extends Controller
             // $model->order = $postData['order'] ? $postData['order'] : 0;
 
             if ($model->save()) {
-                Yii::$app->session->setFlash('success', Yii::t('app', 'Archive penyerahan item success updated.'));
+                Yii::$app->session->setFlash('success', Yii::t('app', 'Penyerahan item success updated.'));
                 if ($model->stayInHere) {
                     return $this->redirect(['update', 'id' => $model->id, 'stayInHere' => $model->stayInHere]);
                 }
@@ -242,7 +242,7 @@ class ItemController extends Controller
 		$model->publish = 2;
 
         if ($model->save(false, ['publish','modified_id'])) {
-            Yii::$app->session->setFlash('success', Yii::t('app', 'Archive penyerahan item success deleted.'));
+            Yii::$app->session->setFlash('success', Yii::t('app', 'Penyerahan item success deleted.'));
             return $this->redirect(Yii::$app->request->referrer ?: ['manage', 'penyerahan' => $model->penyerahan_id]);
         }
 	}
@@ -260,7 +260,7 @@ class ItemController extends Controller
 		$model->publish = $replace;
 
         if ($model->save(false, ['publish','modified_id'])) {
-            Yii::$app->session->setFlash('success', Yii::t('app', 'Archive penyerahan item success updated.'));
+            Yii::$app->session->setFlash('success', Yii::t('app', 'Penyerahan item success updated.'));
             return $this->redirect(Yii::$app->request->referrer ?: ['manage', 'penyerahan' => $model->penyerahan_id]);
         }
 	}
@@ -341,7 +341,7 @@ class ItemController extends Controller
                                     $errors['row#'.$key] = $model->getErrors();
                                 }
 							}
-							Yii::$app->session->setFlash('success', Yii::t('app', 'Archive penyerahan item success imported.'));
+							Yii::$app->session->setFlash('success', Yii::t('app', 'Penyerahan item success imported.'));
 						} catch (\Exception $e) {
 							throw $e;
 						} catch (\Throwable $e) {

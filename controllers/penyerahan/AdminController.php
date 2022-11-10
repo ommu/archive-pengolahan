@@ -149,7 +149,7 @@ class AdminController extends Controller
             // $model->order = $postData['order'] ? $postData['order'] : 0;
 
             if ($model->save()) {
-                Yii::$app->session->setFlash('success', Yii::t('app', 'Archive penyerahan success created.'));
+                Yii::$app->session->setFlash('success', Yii::t('app', 'Penyerahan success created.'));
                 if ($model->stayInHere) {
                     return $this->redirect(['create', 'stayInHere' => $model->stayInHere]);
                 }
@@ -193,7 +193,7 @@ class AdminController extends Controller
             // $model->order = $postData['order'] ? $postData['order'] : 0;
 
             if ($model->save()) {
-                Yii::$app->session->setFlash('success', Yii::t('app', 'Archive penyerahan success updated.'));
+                Yii::$app->session->setFlash('success', Yii::t('app', 'Penyerahan success updated.'));
                 if ($model->stayInHere) {
                     return $this->redirect(['update', 'id' => $model->id, 'stayInHere' => $model->stayInHere]);
                 }
@@ -261,7 +261,7 @@ class AdminController extends Controller
 		$model->publish = 2;
 		$model->save(false, ['publish','modified_id']);
 
-		Yii::$app->session->setFlash('success', Yii::t('app', 'Archive penyerahan success deleted.'));
+		Yii::$app->session->setFlash('success', Yii::t('app', 'Penyerahan success deleted.'));
 		return $this->redirect(Yii::$app->request->referrer ?: ['manage']);
 	}
 
@@ -290,7 +290,7 @@ class AdminController extends Controller
             // $model->order = $postData['order'] ? $postData['order'] : 0;
 
             if ($model->save()) {
-                Yii::$app->session->setFlash('success', Yii::t('app', 'Archive penyerahan success add publication item.'));
+                Yii::$app->session->setFlash('success', Yii::t('app', 'Penyerahan success add publication item.'));
                 if ($model->stayInHere) {
                     return $this->redirect(['publication', 'id' => $model->id, 'stayInHere' => $model->stayInHere]);
                 }
@@ -335,7 +335,7 @@ class AdminController extends Controller
             // $model->order = $postData['order'] ? $postData['order'] : 0;
 
             if ($model->save()) {
-                Yii::$app->session->setFlash('success', Yii::t('app', 'Archive penyerahan success updated status pengolahan.'));
+                Yii::$app->session->setFlash('success', Yii::t('app', 'Penyerahan success updated status pengolahan.'));
                 if ($model->stayInHere) {
                     return $this->redirect(['status', 'id' => $model->id, 'stayInHere' => $model->stayInHere]);
                 }
@@ -452,7 +452,7 @@ class AdminController extends Controller
                                     $errors['row#'.$key] = $model->getErrors();
                                 }
 							}
-							Yii::$app->session->setFlash('success', Yii::t('app', 'Archive penyerahan success imported.'));
+							Yii::$app->session->setFlash('success', Yii::t('app', 'Penyerahan success imported.'));
 						} catch (\Exception $e) {
 							throw $e;
 						} catch (\Throwable $e) {

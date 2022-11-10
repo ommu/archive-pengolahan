@@ -126,7 +126,7 @@ class GroupController extends Controller
             // $model->order = $postData['order'] ? $postData['order'] : 0;
 
             if ($model->save()) {
-                Yii::$app->session->setFlash('success', Yii::t('app', 'Archive user group success created.'));
+                Yii::$app->session->setFlash('success', Yii::t('app', 'User group success created.'));
                 if ($model->stayInHere) {
                     return $this->redirect(['create', 'stayInHere' => $model->stayInHere]);
                 }
@@ -164,7 +164,7 @@ class GroupController extends Controller
             // $model->order = $postData['order'] ? $postData['order'] : 0;
 
             if ($model->save()) {
-                Yii::$app->session->setFlash('success', Yii::t('app', 'Archive user group success updated.'));
+                Yii::$app->session->setFlash('success', Yii::t('app', 'User group success updated.'));
                 if ($model->stayInHere) {
                     return $this->redirect(['update', 'id' => $model->id, 'stayInHere' => $model->stayInHere]);
                 }
@@ -215,7 +215,7 @@ class GroupController extends Controller
 		$model->publish = 2;
 
         if ($model->save(false, ['publish','modified_id'])) {
-            Yii::$app->session->setFlash('success', Yii::t('app', 'Archive user group success deleted.'));
+            Yii::$app->session->setFlash('success', Yii::t('app', 'User group success deleted.'));
             return $this->redirect(Yii::$app->request->referrer ?: ['manage']);
         }
 	}
@@ -233,7 +233,7 @@ class GroupController extends Controller
 		$model->publish = $replace;
 
         if ($model->save(false, ['publish','modified_id'])) {
-            Yii::$app->session->setFlash('success', Yii::t('app', 'Archive user group success updated.'));
+            Yii::$app->session->setFlash('success', Yii::t('app', 'User group success updated.'));
             return $this->redirect(Yii::$app->request->referrer ?: ['manage']);
         }
 	}
