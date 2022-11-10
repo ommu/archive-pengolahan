@@ -79,14 +79,19 @@ $attributes = [
 		'visible' => !$small,
 	],
 	[
-		'attribute' => 'temporary_number',
+		'attribute' => 'archive_description',
 		'value' => $model->archive_description ? $model->archive_description : '-',
 		'visible' => !$small,
 		'format' => 'raw',
 	],
 	[
 		'attribute' => 'archive_type',
-		'value' => $model::getArchiveType($model->archive_type),
+		'value' => function ($model) {
+            if ($model->archive_type) {
+                return $model::getArchiveType($model->archive_type);
+            }
+            return '-';
+		},
 		'visible' => !$small,
 	],
 	[
@@ -100,15 +105,15 @@ $attributes = [
 		'visible' => !$small,
 	],
 	[
-		'attribute' => 'medium',
-		'value' => $model->medium ? $model->medium : '-',
-		'visible' => !$small,
-	],
-	[
         'attribute' => 'media',
 		'value' => $model::parseMedia($model->getMedias(true, 'title'), 'media', ', '),
 		'format' => 'html',
 		'visible' => !$small ? true : false,
+	],
+	[
+		'attribute' => 'medium',
+		'value' => $model->medium ? $model->medium : '-',
+		'visible' => !$small,
 	],
 	[
 		'attribute' => 'creation_date',

@@ -22,6 +22,7 @@
  * @property string $to_archive_date
  * @property string $archive_date
  * @property string $medium
+ * @property string $medium_json
  * @property string $creation_date
  * @property integer $creation_id
  * @property string $modified_date
@@ -82,11 +83,12 @@ class ArchivePengolahanPenyerahanCard extends \app\components\ActiveRecord
 		return [
 			[['id', 'penyerahan_id', 'user_id', 'temporary_number', 'archive_description'], 'required'],
 			[['publish', 'penyerahan_id', 'user_id', 'creation_id', 'modified_id', 'stayInHere'], 'integer'],
-			[['id', 'archive_description', 'archive_type', 'medium'], 'string'],
-			//[['archive_date'], 'json'],
-			[['from_archive_date', 'to_archive_date', 'archive_date', 'medium', 'stayInHere', 'media'], 'safe'],
+			[['id', 'archive_description', 'archive_type'], 'string'],
+			//[['archive_date', 'medium_json'], 'json'],
+			[['from_archive_date', 'to_archive_date', 'archive_date', 'medium', 'medium_json', 'stayInHere', 'media'], 'safe'],
 			[['temporary_number'], 'string', 'max' => 32],
 			[['from_archive_date', 'to_archive_date'], 'string', 'max' => 64],
+			[['medium'], 'string', 'max' => 255],
 			[['id'], 'unique'],
 			[['penyerahan_id'], 'exist', 'skipOnError' => true, 'targetClass' => ArchivePengolahanPenyerahan::className(), 'targetAttribute' => ['penyerahan_id' => 'id']],
 			[['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => ArchivePengolahanUsers::className(), 'targetAttribute' => ['user_id' => 'id']],
@@ -110,6 +112,7 @@ class ArchivePengolahanPenyerahanCard extends \app\components\ActiveRecord
 			'to_archive_date' => Yii::t('app', 'To Archive Date'),
 			'archive_date' => Yii::t('app', 'Archive Date'),
 			'medium' => Yii::t('app', 'Medium'),
+			'medium_json' => Yii::t('app', 'Medium'),
 			'creation_date' => Yii::t('app', 'Creation Date'),
 			'creation_id' => Yii::t('app', 'Creation'),
 			'modified_date' => Yii::t('app', 'Modified Date'),
@@ -125,6 +128,9 @@ class ArchivePengolahanPenyerahanCard extends \app\components\ActiveRecord
 			'day' => Yii::t('app', 'Day'),
 			'month' => Yii::t('app', 'Month'),
 			'year' => Yii::t('app', 'Year'),
+			'total' => Yii::t('app', 'Total'),
+			'unit' => Yii::t('app', 'Unit'),
+			'condition' => Yii::t('app', 'Condition'),
 		];
 	}
 
@@ -269,7 +275,10 @@ class ArchivePengolahanPenyerahanCard extends \app\components\ActiveRecord
 			'attribute' => 'archive_type',
 			'label' => Yii::t('app', 'Type'),
 			'value' => function($model, $key, $index, $column) {
-				return self::getArchiveType($model->archive_type);
+                if ($model->archive_type) {
+                    return self::getArchiveType($model->archive_type);
+                }
+                return '-';
 			},
 			'filter' => self::getArchiveType(),
 		];
@@ -434,8 +443,13 @@ class ArchivePengolahanPenyerahanCard extends \app\components\ActiveRecord
         } else {
             $this->archive_date = Json::decode($this->archive_date);
         }
-        $this->from_archive_date = $this->from_archive_date != '--' ? $this->from_archive_date : '';
-        $this->to_archive_date = $this->to_archive_date != '--' ? $this->to_archive_date : '';
+
+        if ($this->medium_json == '') {
+            $this->medium_json = [];
+        } else {
+            $this->medium_json = Json::decode($this->medium_json);
+        }
+
 		// $this->penyerahanTypeId = isset($this->penyerahan) ? $this->penyerahan->type->type_name : '-';
 		// $this->userDisplayname = isset($this->user) ? $this->user->displayname : '-';
 		// $this->creationDisplayname = isset($this->creation) ? $this->creation->displayname : '-';
@@ -476,9 +490,21 @@ class ArchivePengolahanPenyerahanCard extends \app\components\ActiveRecord
                 Event::trigger(self::className(), self::EVENT_BEFORE_SAVE_PENYERAHAN_CARD, $event);
             }
 
-			$this->from_archive_date = implode('-', $this->archive_date['from']);
-			$this->to_archive_date = implode('-', $this->archive_date['to']);
-			$this->archive_date = Json::encode($this->archive_date);
+            if (is_array($this->archive_date)) {
+                $archive_date = $this->archive_date;
+                $this->archive_date = Json::encode($this->archive_date);
+                $from_archive_date = array_filter($archive_date['from']);
+                $this->from_archive_date = implode(' ', $from_archive_date);
+                $to_archive_date = array_filter($archive_date['to']);
+                $this->to_archive_date = implode(' ', $to_archive_date);
+            }
+
+            if (is_array($this->medium_json)) {
+                $medium_json = $this->medium_json;
+                $this->medium_json = Json::encode($this->medium_json);
+                $medium_json = array_filter($medium_json);
+                $this->medium = implode(' ', $medium_json);
+            }
         }
         return true;
 	}

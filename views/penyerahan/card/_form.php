@@ -65,10 +65,11 @@ echo $form->field($model, 'user_id', ['template' => '{label}{beginWrapper}{input
 if ($model->isNewRecord && !$model->getErrors()) {
     $model->temporary_number = $user ? $user->user_code.($user->archives + 1) : null;
 }
-$parseUser = Html::button($model->temporary_number, ['class' => 'btn btn-info btn-xs']);
-echo $form->field($model, 'temporary_number', ['template' => '{label}{beginWrapper}{input}{error}{hint}'.$parseUser.'{endWrapper}'])
-	->hiddenInput()
+echo $form->field($model, 'temporary_number', ['template' => '{label}{beginWrapper}{input}{error}{hint}'.$model->temporary_number.'{endWrapper}'])
+    ->hiddenInput()
 	->label($model->getAttributeLabel('temporary_number')); ?>
+
+<hr/>
 
 <?php echo $form->field($model, 'archive_description')
     ->textarea(['rows' => 6, 'cols' => 50])
@@ -77,42 +78,42 @@ echo $form->field($model, 'temporary_number', ['template' => '{label}{beginWrapp
 
 <hr/>
 
+<?php $archiveTypeFromMonth = $form->field($model, 'archive_date[from][month]', ['template' => '{beginWrapper}{input}{hint}{endWrapper}', 'horizontalCssClasses' => ['wrapper' => 'col-sm-3 col-xs-4'], 'options' => ['tag' => null]])
+	->textInput(['type' => 'number', 'min' => 0, 'max' => 12, 'maxlength' => '2', 'placeholder' => $model->getAttributeLabel('month')])
+	->label($model->getAttributeLabel('archive_date[from][month]'))
+    ->hint($model->getAttributeLabel('month')); ?>
+
+<?php $archiveTypeFromYear = $form->field($model, 'archive_date[from][year]', ['template' => '{beginWrapper}{input}{hint}{endWrapper}', 'horizontalCssClasses' => ['wrapper' => 'col-sm-3 col-xs-4'], 'options' => ['tag' => null]])
+	->textInput(['type' => 'number', 'min' => 0, 'maxlength' => '4', 'placeholder' => $model->getAttributeLabel('year')])
+	->label($model->getAttributeLabel('archive_date[from][year]'))
+    ->hint($model->getAttributeLabel('year')); ?>
+
+<?php echo $form->field($model, 'archive_date[from][day]', ['template' => '{label}{beginWrapper}{input}{hint}{endWrapper}'.$archiveTypeFromMonth . $archiveTypeFromYear .'{error}', 'horizontalCssClasses' => ['wrapper' => 'col-sm-3 col-xs-4', 'error' => 'col-sm-9 col-xs-12']])
+	->textInput(['type' => 'number', 'min' => 0, 'max' => 31, 'maxlength' => '2', 'placeholder' => $model->getAttributeLabel('day')])
+	->label($model->getAttributeLabel('from_archive_date'))
+    ->hint($model->getAttributeLabel('day')); ?>
+
+<?php $archiveTypeToMonth = $form->field($model, 'archive_date[to][month]', ['template' => '{beginWrapper}{input}{hint}{endWrapper}', 'horizontalCssClasses' => ['wrapper' => 'col-sm-3 col-xs-4'], 'options' => ['tag' => null]])
+	->textInput(['type' => 'number', 'min' => 0, 'max' => 12, 'maxlength' => '2', 'placeholder' => $model->getAttributeLabel('month')])
+	->label($model->getAttributeLabel('archive_date[to][month]'))
+    ->hint($model->getAttributeLabel('month')); ?>
+
+<?php $archiveTypeToYear = $form->field($model, 'archive_date[to][year]', ['template' => '{beginWrapper}{input}{hint}{endWrapper}', 'horizontalCssClasses' => ['wrapper' => 'col-sm-3 col-xs-4'], 'options' => ['tag' => null]])
+	->textInput(['type' => 'number', 'min' => 0, 'maxlength' => '4', 'placeholder' => $model->getAttributeLabel('year')])
+	->label($model->getAttributeLabel('archive_date[to][year]'))
+    ->hint($model->getAttributeLabel('year')); ?>
+
+<?php echo $form->field($model, 'archive_date[to][day]', ['template' => '{label}{beginWrapper}{input}{hint}{endWrapper}'.$archiveTypeToMonth . $archiveTypeToYear .'{error}', 'horizontalCssClasses' => ['wrapper' => 'col-sm-3 col-xs-4', 'error' => 'col-sm-9 col-xs-12']])
+	->textInput(['type' => 'number', 'min' => 0, 'max' => 31, 'maxlength' => '2', 'placeholder' => $model->getAttributeLabel('day')])
+	->label($model->getAttributeLabel('to_archive_date'))
+    ->hint($model->getAttributeLabel('day')); ?>
+
+<hr/>
+
 <?php $archiveType = $model::getArchiveType();
 echo $form->field($model, 'archive_type')
 	->dropDownList($archiveType, ['prompt' => ''])
 	->label($model->getAttributeLabel('archive_type')); ?>
-
-<?php $archiveTypeFromMonth = $form->field($model, 'archive_date[from][month]', ['template' => '{beginWrapper}{input}{endWrapper}', 'horizontalCssClasses' => ['wrapper' => 'col-sm-3 col-xs-4'], 'options' => ['tag' => null]])
-	->textInput(['type' => 'number', 'min' => 0, 'max' => 12, 'maxlength' => '2', 'placeholder' => $model->getAttributeLabel('month')])
-	->label($model->getAttributeLabel('archive_date[from][month]')); ?>
-
-<?php $archiveTypeFromYear = $form->field($model, 'archive_date[from][year]', ['template' => '{beginWrapper}{input}{endWrapper}', 'horizontalCssClasses' => ['wrapper' => 'col-sm-3 col-xs-4'], 'options' => ['tag' => null]])
-	->textInput(['type' => 'number', 'min' => 0, 'maxlength' => '4', 'placeholder' => $model->getAttributeLabel('year')])
-	->label($model->getAttributeLabel('archive_date[from][year]')); ?>
-
-<?php echo $form->field($model, 'archive_date[from][day]', ['template' => '{label}{beginWrapper}{input}{endWrapper}'.$archiveTypeFromMonth . $archiveTypeFromYear .'{error}', 'horizontalCssClasses' => ['wrapper' => 'col-sm-3 col-xs-4', 'error' => 'col-sm-9 col-xs-12']])
-	->textInput(['type' => 'number', 'min' => 0, 'max' => 31, 'maxlength' => '2', 'placeholder' => $model->getAttributeLabel('day')])
-	->label($model->getAttributeLabel('from_archive_date')); ?>
-
-<?php $archiveTypeToMonth = $form->field($model, 'archive_date[to][month]', ['template' => '{beginWrapper}{input}{endWrapper}', 'horizontalCssClasses' => ['wrapper' => 'col-sm-3 col-xs-4'], 'options' => ['tag' => null]])
-	->textInput(['type' => 'number', 'min' => 0, 'max' => 12, 'maxlength' => '2', 'placeholder' => $model->getAttributeLabel('day')])
-	->label($model->getAttributeLabel('archive_date[to][month]')); ?>
-
-<?php $archiveTypeToYear = $form->field($model, 'archive_date[to][year]', ['template' => '{beginWrapper}{input}{endWrapper}', 'horizontalCssClasses' => ['wrapper' => 'col-sm-3 col-xs-4'], 'options' => ['tag' => null]])
-	->textInput(['type' => 'number', 'min' => 0, 'maxlength' => '4', 'placeholder' => $model->getAttributeLabel('year')])
-	->label($model->getAttributeLabel('archive_date[to][year]')); ?>
-
-<?php echo $form->field($model, 'archive_date[to][day]', ['template' => '{label}{beginWrapper}{input}{endWrapper}'.$archiveTypeToMonth . $archiveTypeToYear .'{error}', 'horizontalCssClasses' => ['wrapper' => 'col-sm-3 col-xs-4', 'error' => 'col-sm-9 col-xs-12']])
-	->textInput(['type' => 'number', 'min' => 0, 'max' => 31, 'maxlength' => '2', 'placeholder' => $model->getAttributeLabel('day')])
-	->label($model->getAttributeLabel('to_archive_date')); ?>
-
-<?php
-echo $form->field($model, 'medium', ['options' => ['class' => 'form-group row field-item']])
-    ->textarea(['rows' => 2, 'cols' => 50])
-    ->label($model->getAttributeLabel('medium'))
-    ->hint(Yii::t('app', 'Record the extent of the unit of description by giving the number of physical or logical units in arabic numerals and the unit of measurement. Give the specific medium (media) of the unit of description. Separate multiple extents with a linebreak.')); ?>
-
-<hr/>
 
 <?php
 echo $form->field($model, 'media', ['options' => ['class' => 'form-group row field-item']])
@@ -127,6 +128,23 @@ echo $form->field($model, 'media', ['options' => ['class' => 'form-group row fie
 		],
 	])
 	->label($model->getAttributeLabel('media'));?>
+
+<?php $mediumUnit = $form->field($model, 'medium_json[unit]', ['template' => '{beginWrapper}{input}{hint}{endWrapper}', 'horizontalCssClasses' => ['wrapper' => 'col-sm-3 col-xs-4'], 'options' => ['tag' => null]])
+	->textInput(['placeholder' => $model->getAttributeLabel('unit')])
+	->label($model->getAttributeLabel('medium_json[unit]'))
+    ->hint($model->getAttributeLabel('unit')); ?>
+
+<?php $mediumCondition = $form->field($model, 'medium_json[condition]', ['template' => '{beginWrapper}{input}{hint}{endWrapper}', 'horizontalCssClasses' => ['wrapper' => 'col-sm-3 col-xs-4'], 'options' => ['tag' => null]])
+	->textInput(['placeholder' => $model->getAttributeLabel('condition')])
+	->label($model->getAttributeLabel('medium_json[condition]'))
+    ->hint($model->getAttributeLabel('condition')); ?>
+
+<?php echo $form->field($model, 'medium_json[total]', ['template' => '{label}{beginWrapper}{input}{hint}{endWrapper}'.$mediumUnit . $mediumCondition .'{error}', 'horizontalCssClasses' => ['wrapper' => 'col-sm-3 col-xs-4', 'error' => 'col-sm-9 col-xs-12 col-sm-offset-3']])
+	->textInput(['type' => 'number', 'placeholder' => $model->getAttributeLabel('total')])
+	->label($model->getAttributeLabel('medium'))
+    ->hint($model->getAttributeLabel('total')); ?>
+
+<hr/>
 
 <hr/>
 

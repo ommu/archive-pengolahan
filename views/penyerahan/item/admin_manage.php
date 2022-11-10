@@ -31,7 +31,9 @@ if ($penyerahan) {
     $this->params['breadcrumbs'][] = $this->title;
 }
 
+$importHistoryUrl = ['import/manage', 'type' => 'item'];
 if ($penyerahan) {
+    $importHistoryUrl = ['import/manage', 'type' => 'item', 'id' => $penyerahan->id];
     $this->params['menu']['content'] = [
         ['label' => Yii::t('app', 'Add Item'), 'url' => Url::to(['create', 'id' => $penyerahan->id]), 'icon' => 'plus-square', 'htmlOptions' => ['class' => 'btn btn-success']],
         ['label' => Yii::t('app', 'Import Item'), 'url' => Url::to(['import', 'id' => $penyerahan->id]), 'icon' => 'plus-square', 'htmlOptions' => ['class' => 'btn btn-dark']],
@@ -40,7 +42,7 @@ if ($penyerahan) {
 $this->params['menu']['option'] = [
 	//['label' => Yii::t('app', 'Search'), 'url' => 'javascript:void(0);'],
 	['label' => Yii::t('app', 'Grid Option'), 'url' => 'javascript:void(0);'],
-	['label' => Yii::t('app', 'Import Histories'), 'url' => Url::to(['import/manage', 'type' => 'item'])],
+	['label' => Yii::t('app', 'Import Histories'), 'url' => Url::to($importHistoryUrl)],
 ];
 ?>
 

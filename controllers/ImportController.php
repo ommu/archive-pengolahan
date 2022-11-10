@@ -80,6 +80,9 @@ class ImportController extends Controller
 	 */
 	public function actionManage()
 	{
+        $id = Yii::$app->request->get('id');
+        $type = Yii::$app->request->get('type');
+
         $searchModel = new ArchivePengolahanImportSearch();
         $queryParams = Yii::$app->request->queryParams;
 		$dataProvider = $searchModel->search($queryParams);
@@ -102,6 +105,8 @@ class ImportController extends Controller
 			'searchModel' => $searchModel,
 			'dataProvider' => $dataProvider,
 			'columns' => $columns,
+			'type' => $type ?? null,
+			'id' => $id ?? null,
 		]);
 	}
 
