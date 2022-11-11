@@ -26,6 +26,12 @@ $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Schema'), 'url' => [
 $this->params['breadcrumbs'][] = ['label' => $model::htmlHardDecode($model->title), 'url' => ['view', 'id' => $model->id]];
 $this->params['breadcrumbs'][] = Yii::t('app', 'Tree');
 
+if ($sync) {
+    $this->params['menu']['content'] = [
+        ['label' => Yii::t('app', 'Back to Sync Schema'), 'url' => Url::to(['schema/sync/index']), 'icon' => 'arrow-left', 'htmlOptions' => ['class' => 'btn btn-warning']],
+    ];
+}
+
 $treeDataUrl = Url::to(['schema/admin/manuver', 'id' => $model->id]);
 $js = <<<JS
 	var treeDataUrl = '$treeDataUrl';

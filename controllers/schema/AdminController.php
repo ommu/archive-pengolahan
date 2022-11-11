@@ -279,12 +279,14 @@ class AdminController extends Controller
 	public function actionTree($id)
 	{
 		$model = $this->findModel($id);
+        $sync = Yii::$app->request->get('sync');
 
 		$this->view->title = Yii::t('app', 'Tree Schema');
 		$this->view->description = '';
 		$this->view->keywords = '';
 		return $this->render('admin_tree', [
 			'model' => $model,
+			'sync' => $sync ?? null,
 		]);
 	}
 

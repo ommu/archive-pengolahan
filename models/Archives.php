@@ -27,6 +27,20 @@ class Archives extends ArchivesModel
 	public $isSchema = false;
 
 	/**
+	 * @return \yii\db\ActiveQuery
+	 */
+	public function getSchemas($relation=true)
+	{
+        if ($relation == false) {
+            return !empty($this->schemas) ? $this->schemas[0] : null;
+        }
+
+		return $this->hasMany(ArchivePengolahanSchema::className(), ['archive_id' => 'id'])
+			->alias('schemas')
+            ->select(['id', 'archive_id']);
+	}
+
+	/**
 	 * Set default columns to display
 	 */
 	public function init()
@@ -192,7 +206,8 @@ class Archives extends ArchivesModel
 			'label' => Yii::t('app', 'Sync Schema'),
 			'value' => function($model, $key, $index, $column) {
                 if ($model->sync_schema) {
-                    return Html::a('<span class="glyphicon glyphicon-ok"></span>', ['schema/admin/tree', 'id' => $model->primaryKey], ['title' => Yii::t('app', 'View Schema'), 'data-pjax' => 0]);
+                    $schema = $model->getSchemas(false);
+                    return Html::a('<span class="glyphicon glyphicon-ok"></span>', ['schema/admin/tree', 'id' => $schema->id, 'sync' => true], ['title' => Yii::t('app', 'View Schema'), 'data-pjax' => 0]);
                 }
 				return $this->quickAction(Url::to(['run', 'id' => $model->primaryKey]), $model->publish, 'Sync,Sync');
 			},
