@@ -27,11 +27,11 @@ class Archives extends ArchivesModel
 	public function rules()
 	{
 		return [
-			[['id', 'publish', 'level_id', 'creation_id', 'modified_id', 
+			[['id', 'publish', 'level_id', 'sync_schema', 'creation_id', 'modified_id', 
                 'media', 'location', 
                 'oFile',
                 'rackId', 'roomId', 'depoId', 'buildingId'], 'integer'],
-			[['title', 'code', 'medium', 'archive_type', 'archive_date', 'archive_file', 'creation_date', 'modified_date', 'updated_date', 
+			[['title', 'code', 'medium', 'archive_type', 'archive_date', 'creation_date', 'modified_date', 'updated_date', 
                 'creationDisplayname', 'modifiedDisplayname', 'creator'], 'safe'],
 		];
 	}
@@ -131,10 +131,6 @@ class Archives extends ArchivesModel
 		$dataProvider = new ActiveDataProvider($dataParams);
 
 		$attributes = array_keys($this->getTableSchema()->columns);
-		$attributes['level_id'] = [
-			'asc' => ['level.message' => SORT_ASC],
-			'desc' => ['level.message' => SORT_DESC],
-		];
 		$attributes['creationDisplayname'] = [
 			'asc' => ['creation.displayname' => SORT_ASC],
 			'desc' => ['creation.displayname' => SORT_DESC],
@@ -170,8 +166,8 @@ class Archives extends ArchivesModel
 		// grid filtering conditions
         $query->andFilterWhere([
 			't.id' => $this->id,
-			't.level_id' => isset($params['level']) ? $params['level'] : $this->level_id,
 			't.archive_type' => $this->archive_type,
+			't.sync_schema' => $this->sync_schema,
 			'cast(t.creation_date as date)' => $this->creation_date,
 			't.creation_id' => isset($params['creation']) ? $params['creation'] : $this->creation_id,
 			'cast(t.modified_date as date)' => $this->modified_date,
@@ -222,7 +218,6 @@ class Archives extends ArchivesModel
 			->andFilterWhere(['like', 't.code', $this->code])
 			->andFilterWhere(['like', 't.medium', $this->medium])
 			->andFilterWhere(['like', 't.archive_date', $this->archive_date])
-			->andFilterWhere(['like', 't.archive_file', $this->archive_file])
 			->andFilterWhere(['like', 'creation.displayname', $this->creationDisplayname])
 			->andFilterWhere(['like', 'modified.displayname', $this->modifiedDisplayname])
 			->andFilterWhere(['like', 'creator.creator_name', $this->creator]);

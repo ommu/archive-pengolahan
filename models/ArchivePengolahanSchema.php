@@ -364,7 +364,7 @@ class ArchivePengolahanSchema extends \app\components\ActiveRecord
 
 		$title = self::htmlHardDecode($model->title);
 
-		$items[] = $model->getAttributeLabel('title').': '.Html::a($title, ['/archive/admin/view', 'id' => $model->id], ['title' => $title, 'class' => 'modal-btn']);
+		$items[] = $model->getAttributeLabel('title').': '.Html::a($title, ['view', 'id' => $model->id], ['title' => $title, 'class' => 'modal-btn']);
 
         if (Yii::$app->request->isAjax) {
             return Html::ul($items, ['encode' => false, 'class' => 'list-boxed']);

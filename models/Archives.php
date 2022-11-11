@@ -24,6 +24,8 @@ class Archives extends ArchivesModel
 {
 	public $gridForbiddenColumn = ['archive_type', 'creation_date', 'creationDisplayname', 'modified_date', 'modifiedDisplayname', 'updated_date'];
 
+	public $isSchema = false;
+
 	/**
 	 * Set default columns to display
 	 */
@@ -66,7 +68,7 @@ class Archives extends ArchivesModel
 				return self::parseRelated($model->getCreators(true, 'title'), null, ', ');
 			},
 			'format' => 'html',
-			'visible' => $this->isFond ? true : false,
+			'visible' => $this->isFond || ($this->isFond && $this->isSchema) ? true : false,
 		];
 		$this->templateColumns['archive_date'] = [
 			'attribute' => 'archive_date',
@@ -171,7 +173,7 @@ class Archives extends ArchivesModel
 			'filter' => $this->filterYesNo(),
 			'contentOptions' => ['class' => 'text-center'],
 			'format' => 'raw',
-			'visible' => $this->isFond ? true : false,
+			'visible' => $this->isFond && !$this->isSchema ? true : false,
 		];
 		$this->templateColumns['location'] = [
 			'attribute' => 'location',
@@ -184,6 +186,20 @@ class Archives extends ArchivesModel
 			'contentOptions' => ['class' => 'text-center'],
 			'format' => 'raw',
 			'visible' => !$this->isFond ? true : false,
+		];
+		$this->templateColumns['sync_schema'] = [
+			'attribute' => 'sync_schema',
+			'label' => Yii::t('app', 'Sync Schema'),
+			'value' => function($model, $key, $index, $column) {
+                if ($model->sync_schema) {
+                    return Html::a('<span class="glyphicon glyphicon-ok"></span>', ['schema/admin/tree', 'id' => $model->primaryKey], ['title' => Yii::t('app', 'View Schema'), 'data-pjax' => 0]);
+                }
+				return $this->quickAction(Url::to(['run', 'id' => $model->primaryKey]), $model->publish, 'Sync,Sync');
+			},
+			'filter' => $this->filterYesNo(),
+			'contentOptions' => ['class' => 'text-center'],
+			'format' => 'raw',
+			'visible' => $this->isFond || ($this->isFond && $this->isSchema) ? true : false,
 		];
 	}
 }

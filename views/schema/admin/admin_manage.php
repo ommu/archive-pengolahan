@@ -18,6 +18,7 @@ use yii\helpers\Html;
 use yii\helpers\Url;
 use app\components\grid\GridView;
 use yii\widgets\Pjax;
+use yii\helpers\ArrayHelper;
 
 $context = $this->context;
 if ($context->breadcrumbApp) {
@@ -40,6 +41,9 @@ if ($parent) {
 $this->params['menu']['content'] = [
     ['label' => $addTitle, 'url' => Url::to($url), 'icon' => 'plus-square', 'htmlOptions' => ['class' => 'btn btn-success']],
 ];
+if (!$parent) {
+    $this->params['menu']['content'] = ArrayHelper::merge($this->params['menu']['content'], [['label' => Yii::t('app', 'Sync Schema From Senarai'), 'url' => Url::to(['schema/sync/manage']), 'icon' => 'plus-square', 'htmlOptions' => ['class' => 'btn btn-warning']]]);
+}
 $this->params['menu']['option'] = [
 	//['label' => Yii::t('app', 'Search'), 'url' => 'javascript:void(0);'],
 	['label' => Yii::t('app', 'Grid Option'), 'url' => 'javascript:void(0);'],
