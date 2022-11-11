@@ -107,6 +107,9 @@ class AdminController extends Controller
         if (($parent = Yii::$app->request->get('parent')) != null) {
             $this->subMenuParam = $parent;
             $parent = \ommu\archivePengolahan\models\ArchivePengolahanSchema::findOne($parent);
+            if (!$parent->isFond) {
+                unset($this->subMenu[1]['tree']);
+            }
         }
 
 		$this->view->title = Yii::t('app', 'Schemas');
@@ -127,10 +130,8 @@ class AdminController extends Controller
 	 */
 	public function actionCreate()
 	{
-		$id = Yii::$app->request->get('id');
-
         $model = new ArchivePengolahanSchema();
-        if ($id) {
+        if (($id = Yii::$app->request->get('id')) != null) {
 			$model = new ArchivePengolahanSchema(['parent_id' => $id]);
         }
         $parent = $model->parent;
@@ -146,8 +147,7 @@ class AdminController extends Controller
                 if ($model->stayInHere) {
                     return $this->redirect(['create', 'id' => $model->parent_id, 'stayInHere' => $model->stayInHere]);
                 }
-                return $this->redirect(['manage']);
-                //return $this->redirect(['view', 'id' => $model->id]);
+                return $this->redirect(['view', 'id' => $model->id]);
 
             } else {
                 if (Yii::$app->request->isAjax) {
@@ -156,6 +156,9 @@ class AdminController extends Controller
             }
         }
 
+        if (!$parent->isFond) {
+            unset($this->subMenu[1]['tree']);
+        }
 		$this->view->title = Yii::t('app', 'Create Schema');
 		$this->view->description = '';
 		$this->view->keywords = '';
@@ -195,6 +198,9 @@ class AdminController extends Controller
             }
         }
 
+        if (!$model->isFond) {
+            unset($this->subMenu[1]['tree']);
+        }
 		$this->view->title = Yii::t('app', 'Update Schema: {title}', ['title' => $model::htmlHardDecode($model->title)]);
 		$this->view->description = '';
 		$this->view->keywords = '';
@@ -212,6 +218,9 @@ class AdminController extends Controller
 	{
         $model = $this->findModel($id);
 
+        if (!$model->isFond) {
+            unset($this->subMenu[1]['tree']);
+        }
 		$this->view->title = Yii::t('app', 'Detail Schema: {title}', ['title' => $model::htmlHardDecode($model->title)]);
 		$this->view->description = '';
 		$this->view->keywords = '';
@@ -261,6 +270,23 @@ class AdminController extends Controller
 	 * @param integer $id
 	 * @return mixed
 	 */
+	public function actionTree($id)
+	{
+		$model = $this->findModel($id);
+
+		$this->view->title = Yii::t('app', 'Tree Schema');
+		$this->view->description = '';
+		$this->view->keywords = '';
+		return $this->render('admin_tree', [
+			'model' => $model,
+		]);
+	}
+
+	/**
+	 * Displays a single Archives model.
+	 * @param integer $id
+	 * @return mixed
+	 */
 	public function actionData($id)
 	{
 		Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
@@ -280,14 +306,34 @@ class AdminController extends Controller
 	 * @param integer $id
 	 * @return mixed
 	 */
+	public function actionManuver($id)
+	{
+		Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+		$model = ArchivePengolahanSchema::findOne($id);
+
+        if ($model == null) return [];
+
+		$codes = [];
+		$result[] = $this->getManuver($model);
+
+		return $result;
+	}
+
+	/**
+	 * Displays a single Archives model.
+	 * @param integer $id
+	 * @return mixed
+	 */
 	public function getData($model, $codes)
 	{
 		$data = [
 			'id' => $model->id,
 			'code' => $model->code,
-			'level' => '',
 			'label' => $model::htmlHardDecode($model->title),
 			'inode' => $model->getChilds(true, 1) ? true : false,
+			'manuver' => false,
+			'menuver-url' => false,
 			'view-url' => Url::to(['view', 'id' => $model->id]),
 			'update-url' => Url::to(['update', 'id' => $model->id]),
 			'child-url' => Url::to(['manage', 'parent' => $model->id]),
@@ -302,6 +348,43 @@ class AdminController extends Controller
 
 		return $data;
 	}
+
+	/**
+	 * Displays a single Archives model.
+	 * @param integer $id
+	 * @return mixed
+	 */
+	public function getManuver($model, $manuver=false)
+	{
+		$data = [
+			'id' => $model->id,
+			'code' => $model->code,
+			'label' => $model::htmlHardDecode($model->title),
+			'inode' => $model->getChilds(true, 1) ? true : false,
+			'manuver' => $manuver,
+			'menuver-url' => $manuver ? Url::to(['view', 'id' => $model->id]) : false,
+			'view-url' => $manuver ? false : Url::to(['view', 'id' => $model->id]),
+			'update-url' => $manuver ? false : Url::to(['update', 'id' => $model->id]),
+			'child-url' => $manuver ? false : Url::to(['manage', 'parent' => $model->id]),
+		];
+
+        $childs = $model->getChilds()
+            ->select(['id', 'parent_id', 'code', 'title'])
+            ->orderBy('code ASC')
+            ->all();
+
+        if ($childs) {
+            $cards = [];
+            $i = 0;
+            foreach ($childs as $child) {
+                $cards[$i] = $this->getManuver($child);
+                $i++;
+            }
+            $data = ArrayHelper::merge($data, ['open' => true, 'branch' => $cards]);
+        }
+
+		return $data;
+    }
 
 	/**
 	 * Finds the ArchivePengolahanSchema model based on its primary key value.

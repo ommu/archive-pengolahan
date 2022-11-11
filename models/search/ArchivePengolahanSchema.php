@@ -174,7 +174,6 @@ class ArchivePengolahanSchema extends ArchivePengolahanSchemaModel
         }
 
 		$query->andFilterWhere(['like', 't.id', $this->id])
-			->andFilterWhere(['=', 't.parent_id', $this->parent_id])
 			->andFilterWhere(['like', 't.code', $this->code])
 			->andFilterWhere(['like', 't.title', $this->title])
 			->andFilterWhere(['like', 'archive.title', $this->archiveTitle])

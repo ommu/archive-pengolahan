@@ -43,10 +43,11 @@ class ArchivePengolahanSchema extends \app\components\ActiveRecord
 {
 	use \ommu\traits\UtilityTrait;
 
-    public $gridForbiddenColumn = ['modified_date', 'updated_date', 'parentTitle', 'archiveTitle', 'creationDisplayname', 'modifiedDisplayname'];
+    public $gridForbiddenColumn = ['creation_date', 'modified_date', 'updated_date', 'parentTitle', 'archiveTitle', 'creationDisplayname', 'modifiedDisplayname'];
 
     public $stayInHere;
 	public $isFond = true;
+	public $isManuver = false;
 
 	public $parentTitle;
 	public $archiveTitle;
@@ -260,6 +261,7 @@ class ArchivePengolahanSchema extends \app\components\ActiveRecord
 			'value' => function($model, $key, $index, $column) {
 				return $model->code;
 			},
+			'visible' => !$this->isManuver ? true : false,
 		];
 		$this->templateColumns['archiveTitle'] = [
 			'attribute' => 'archiveTitle',
@@ -315,6 +317,7 @@ class ArchivePengolahanSchema extends \app\components\ActiveRecord
 			'filter' => $this->filterYesNo(),
             'contentOptions' => ['class' => 'text-center'],
             'format' => 'raw',
+			'visible' => !$this->isManuver ? true : false,
         ];
 		$this->templateColumns['publish'] = [
 			'attribute' => 'publish',
@@ -325,7 +328,7 @@ class ArchivePengolahanSchema extends \app\components\ActiveRecord
 			'filter' => $this->filterYesNo(),
 			'contentOptions' => ['class' => 'text-center'],
 			'format' => 'raw',
-			'visible' => !Yii::$app->request->get('trash') ? true : false,
+			'visible' => !$this->isManuver && !Yii::$app->request->get('trash') ? true : false,
 		];
 	}
 
@@ -381,7 +384,7 @@ class ArchivePengolahanSchema extends \app\components\ActiveRecord
 	{
 		parent::afterFind();
 
-        $this->isFond = $this->parent_id != '' ? true : false;
+        $this->isFond = $this->parent_id == '' ? true : false;
 		// $this->archiveTitle = isset($this->archive) ? $this->archive->title : '-';
 		// $this->creationDisplayname = isset($this->creation) ? $this->creation->displayname : '-';
 		// $this->modifiedDisplayname = isset($this->modified) ? $this->modified->displayname : '-';

@@ -134,6 +134,12 @@ schemma_submenu:
         id: $_GET*id
       select: action
   1:
+    tree:
+      label: Tree
+      url:
+        0: 'schema/admin/tree'
+        id: $_GET*id
+      select: action
     childs:
       label: Childs
       url:
