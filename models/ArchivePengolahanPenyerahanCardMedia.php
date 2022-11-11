@@ -58,7 +58,7 @@ class ArchivePengolahanPenyerahanCardMedia extends \app\components\ActiveRecord
 			[['card_id', 'media_id'], 'required'],
 			[['media_id', 'creation_id', 'stayInHere'], 'integer'],
 			[['stayInHere'], 'safe'],
-			[['card_id'], 'string', 'max' => 32],
+			[['card_id'], 'string', 'max' => 36],
 			[['card_id'], 'exist', 'skipOnError' => true, 'targetClass' => ArchivePengolahanPenyerahanCard::className(), 'targetAttribute' => ['card_id' => 'id']],
 			[['media_id'], 'exist', 'skipOnError' => true, 'targetClass' => ArchiveMedia::className(), 'targetAttribute' => ['media_id' => 'id']],
 		];

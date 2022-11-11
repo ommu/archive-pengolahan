@@ -24,12 +24,12 @@ class m221108_215748_archivePengolahan_module_create_table_schema extends \yii\d
 		$tableName = Yii::$app->db->tablePrefix . '{{%ommu_archive_pengolahan_schema}}';
 		if (!Yii::$app->db->getTableSchema($tableName, true)) {
 			$this->createTable($tableName, [
-				'id' => Schema::TYPE_STRING . '(32) NOT NULL COMMENT \'uuid\'',
+				'id' => Schema::TYPE_STRING . '(36) NOT NULL COMMENT \'uuid\'',
 				'publish' => Schema::TYPE_TINYINT . '(1) NOT NULL DEFAULT \'1\'',
-				'parent_id' => Schema::TYPE_STRING . '(32) NOT NULL COMMENT \'uuid\'',
+				'parent_id' => Schema::TYPE_STRING . '(36) NOT NULL COMMENT \'uuid\'',
 				'archive_id' => Schema::TYPE_INTEGER . '(11) UNSIGNED',
-				'code' => Schema::TYPE_STRING . '(32) NOT NULL',
-				'title' => Schema::TYPE_TEXT . ' NOT NULL \'redactor\'',
+				'code' => Schema::TYPE_STRING . '(36) NOT NULL',
+				'title' => Schema::TYPE_TEXT . ' NOT NULL',
 				'creation_date' => Schema::TYPE_TIMESTAMP . ' NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT \'trigger\'',
 				'creation_id' => Schema::TYPE_INTEGER . '(11) UNSIGNED',
 				'modified_date' => Schema::TYPE_TIMESTAMP . ' NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT \'trigger,on_update\'',

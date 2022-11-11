@@ -24,11 +24,11 @@ class m221108_215953_archivePengolahan_module_create_table_schema_card extends \
 		$tableName = Yii::$app->db->tablePrefix . '{{%ommu_archive_pengolahan_schema_card}}';
 		if (!Yii::$app->db->getTableSchema($tableName, true)) {
 			$this->createTable($tableName, [
-				'id' => Schema::TYPE_STRING . '(32) NOT NULL COMMENT \'uuid\'',
+				'id' => Schema::TYPE_STRING . '(36) NOT NULL COMMENT \'uuid\'',
 				'publish' => Schema::TYPE_TINYINT . '(1) NOT NULL DEFAULT \'1\' COMMENT \'deleted\'',
-				'card_id' => Schema::TYPE_STRING . '(32) NOT NULL COMMENT \'uuid\'',
-				'fond_schema_id' => Schema::TYPE_STRING . '(32) NOT NULL COMMENT \'uuid\'',
-				'schema_id' => Schema::TYPE_STRING . '(32) NOT NULL COMMENT \'uuid\'',
+				'card_id' => Schema::TYPE_STRING . '(36) NOT NULL COMMENT \'uuid\'',
+				'fond_schema_id' => Schema::TYPE_STRING . '(36) COMMENT \'uuid\'',
+				'schema_id' => Schema::TYPE_STRING . '(36) COMMENT \'uuid\'',
 				'final_id' => Schema::TYPE_INTEGER . '(11) UNSIGNED',
 				'fond_id' => Schema::TYPE_INTEGER . '(11) UNSIGNED',
 				'archive_id' => Schema::TYPE_INTEGER . '(11) UNSIGNED',

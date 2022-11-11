@@ -26,7 +26,7 @@ class m221111_004132_archivePengolahan_module_create_table_penyerahan_card_subje
 			$this->createTable($tableName, [
 				'id' => Schema::TYPE_INTEGER . '(11) UNSIGNED NOT NULL AUTO_INCREMENT',
 				'type' => Schema::TYPE_STRING . ' NOT NULL',
-				'card_id' => Schema::TYPE_STRING . '(32) NOT NULL COMMENT \'uuid\'',
+				'card_id' => Schema::TYPE_STRING . '(36) NOT NULL COMMENT \'uuid\'',
 				'tag_id' => Schema::TYPE_INTEGER . '(11) UNSIGNED',
 				'creation_date' => Schema::TYPE_TIMESTAMP . ' NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT \'trigger\'',
 				'creation_id' => Schema::TYPE_INTEGER . '(11) UNSIGNED',

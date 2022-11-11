@@ -25,7 +25,7 @@ class m221107_091307_archivePengolahan_module_create_table_penyerahan_card_media
 		if (!Yii::$app->db->getTableSchema($tableName, true)) {
 			$this->createTable($tableName, [
 				'id' => Schema::TYPE_INTEGER . '(11) UNSIGNED NOT NULL AUTO_INCREMENT',
-				'card_id' => Schema::TYPE_STRING . '(32) NOT NULL COMMENT \'uuid\'',
+				'card_id' => Schema::TYPE_STRING . '(36) NOT NULL COMMENT \'uuid\'',
 				'media_id' => Schema::TYPE_SMALLINT . '(5) UNSIGNED',
 				'creation_date' => Schema::TYPE_TIMESTAMP . ' NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT \'trigger\'',
 				'creation_id' => Schema::TYPE_INTEGER . '(11) UNSIGNED',

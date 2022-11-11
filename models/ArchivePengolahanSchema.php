@@ -72,7 +72,7 @@ class ArchivePengolahanSchema extends \app\components\ActiveRecord
 			[['publish', 'archive_id', 'creation_id', 'modified_id', 'stayInHere'], 'integer'],
 			[['id', 'parent_id', 'title'], 'string'],
 			[['parent_id', 'archive_id', 'stayInHere'], 'safe'],
-			[['code'], 'string', 'max' => 32],
+			[['id', 'code'], 'string', 'max' => 36],
 			[['id'], 'unique'],
 			[['archive_id'], 'exist', 'skipOnError' => true, 'targetClass' => Archives::className(), 'targetAttribute' => ['archive_id' => 'id']],
 		];

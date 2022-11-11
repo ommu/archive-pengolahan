@@ -24,11 +24,11 @@ class m221103_094234_archivePengolahan_module_create_table_penyerahan_card exten
 		$tableName = Yii::$app->db->tablePrefix . '{{%ommu_archive_pengolahan_penyerahan_card}}';
 		if (!Yii::$app->db->getTableSchema($tableName, true)) {
 			$this->createTable($tableName, [
-				'id' => Schema::TYPE_STRING . '(32) NOT NULL',
+				'id' => Schema::TYPE_STRING . '(36) NOT NULL COMMENT \'uuid\'',
 				'publish' => Schema::TYPE_TINYINT . '(1) NOT NULL DEFAULT \'1\'',
 				'penyerahan_id' => Schema::TYPE_INTEGER . '(11) UNSIGNED',
 				'user_id' => Schema::TYPE_INTEGER . '(11) UNSIGNED',
-				'temporary_number' => Schema::TYPE_STRING . '(32) NOT NULL',
+				'temporary_number' => Schema::TYPE_STRING . '(36) NOT NULL',
 				'archive_description' => Schema::TYPE_TEXT . ' NOT NULL COMMENT \'redactor\'',
 				'archive_type' => Schema::TYPE_STRING,
 				'from_archive_date' => Schema::TYPE_STRING . '(64) NOT NULL',

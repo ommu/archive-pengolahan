@@ -92,7 +92,7 @@ class ArchivePengolahanPenyerahanCard extends \app\components\ActiveRecord
 			[['id', 'archive_description', 'archive_type'], 'string'],
 			//[['archive_date', 'medium_json'], 'json'],
 			[['from_archive_date', 'to_archive_date', 'archive_date', 'medium', 'medium_json', 'stayInHere', 'media', 'subject', 'function'], 'safe'],
-			[['temporary_number'], 'string', 'max' => 32],
+			[['id', 'temporary_number'], 'string', 'max' => 36],
 			[['from_archive_date', 'to_archive_date'], 'string', 'max' => 64],
 			[['medium'], 'string', 'max' => 255],
 			[['id'], 'unique'],
