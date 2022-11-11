@@ -18,26 +18,15 @@ use yii\helpers\Html;
 use yii\helpers\Url;
 use app\components\widgets\ActiveForm;
 use yii\helpers\ArrayHelper;
-use yii\redactor\widgets\Redactor;
 
-\ommu\archive\assets\AciTreeAsset::register($this);
+$parent ? \ommu\archivePengolahan\components\assets\ArchiveTree::register($this) : '';
 
-$treeId = $model->id;
-if ($model->isNewRecord && $parent && !$model->getErrors()) {
-    $model->parent_id = $parent->id;
-    $treeId = $model->parent_id;
-}
-$treeDataUrl = Url::to(['data', 'id' => $treeId]);
+$treeDataUrl = Url::to(['data', 'id' => $model->parent_id]);
 $js = <<<JS
 	var treeDataUrl = '$treeDataUrl';
 	var selectedId = '$model->parent_id';
 JS;
-	$this->registerJs($js, \yii\web\View::POS_HEAD);
-
-$redactorOptions = [
-	'buttons' => ['html', 'format', 'bold', 'italic', 'deleted'],
-	'plugins' => ['fontcolor']
-];
+$parent ? $this->registerJs($js, \yii\web\View::POS_HEAD) : '';
 ?>
 
 <div class="archive-pengolahan-schema-form">
@@ -56,18 +45,18 @@ $redactorOptions = [
 
 <?php //echo $form->errorSummary($model);?>
 
-<?php 
-echo $form->field($model, 'parent_id', ['template' => '{label}{beginWrapper}<div id="tree" class="aciTree"></div>{input}{error}{hint}{endWrapper}'])
-	->hiddenInput()
-	->label($model->getAttributeLabel('parent_id')); ?>
+<?php if ($parent) {
+    echo $form->field($model, 'parent_id', ['template' => '{label}{beginWrapper}<div id="tree" class="aciTree"></div>{input}{error}{hint}{endWrapper}'])
+        ->hiddenInput()
+        ->label($model->getAttributeLabel('parent_id'));
+} ?>
 
 <?php echo $form->field($model, 'code')
 	->textInput(['maxlength' => true])
 	->label($model->getAttributeLabel('code')); ?>
 
 <?php echo $form->field($model, 'title')
-    ->textarea(['rows' => 6, 'cols' => 50])
-    ->widget(Redactor::className(), ['clientOptions' => $redactorOptions])
+    ->textarea(['rows' => 5, 'cols' => 50])
     ->label($model->getAttributeLabel('title')); ?>
 
 <hr/>

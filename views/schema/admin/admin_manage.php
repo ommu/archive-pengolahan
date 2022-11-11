@@ -23,14 +23,22 @@ $context = $this->context;
 if ($context->breadcrumbApp) {
 	$this->params['breadcrumbs'][] = ['label' => $context->breadcrumbAppParam['name'], 'url' => [$context->breadcrumbAppParam['url']]];
 }
-$this->params['breadcrumbs'][] = $this->title;
+if ($parent) {
+    $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Schema'), 'url' => ['index']];
+    $this->params['breadcrumbs'][] = ['label' => $parent::htmlHardDecode($parent->title), 'url' => ['view', 'id' => $parent->id]];
+    $this->params['breadcrumbs'][] = Yii::t('app', 'Childs');
+} else {
+    $this->params['breadcrumbs'][] = $this->title;
+}
 
 $url = ['create'];
+$addTitle = Yii::t('app', 'Add Schema');
 if ($parent) {
     $url = ['create', 'id' => $parent->id];
+    $addTitle = Yii::t('app', 'Add Child');
 }
 $this->params['menu']['content'] = [
-    ['label' => Yii::t('app', 'Add Schema'), 'url' => Url::to($url), 'icon' => 'plus-square', 'htmlOptions' => ['class' => 'btn btn-success']],
+    ['label' => $addTitle, 'url' => Url::to($url), 'icon' => 'plus-square', 'htmlOptions' => ['class' => 'btn btn-success']],
 ];
 $this->params['menu']['option'] = [
 	//['label' => Yii::t('app', 'Search'), 'url' => 'javascript:void(0);'],

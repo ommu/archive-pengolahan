@@ -21,6 +21,10 @@ if ($context->breadcrumbApp) {
 	$this->params['breadcrumbs'][] = ['label' => $context->breadcrumbAppParam['name'], 'url' => [$context->breadcrumbAppParam['url']]];
 }
 $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Schema'), 'url' => ['index']];
+if ($parent) {
+    $this->params['breadcrumbs'][] = ['label' => $parent::htmlHardDecode($parent->title), 'url' => ['view', 'id' => $parent->id]];
+    $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Childs'), 'url' => ['manage', 'parent' => $parent->id]];
+}
 $this->params['breadcrumbs'][] = Yii::t('app', 'Create');
 ?>
 

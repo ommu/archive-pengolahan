@@ -17,7 +17,7 @@ use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\widgets\DetailView;
 
-!$small ? \ommu\archive\assets\AciTreeAsset::register($this) : '';
+!$small && !$model->isFond ? \ommu\archivePengolahan\components\assets\ArchiveTree::register($this) : '';
 
 if (!$small) {
     $context = $this->context;
@@ -36,7 +36,7 @@ $js = <<<JS
 	var treeDataUrl = '$treeDataUrl';
 	var selectedId = '$model->id';
 JS;
-!$small ? $this->registerJs($js, \yii\web\View::POS_HEAD) : '';
+!$small && !$model->isFond ? $this->registerJs($js, \yii\web\View::POS_HEAD) : '';
 
 $attributes = [
 	[
@@ -57,7 +57,7 @@ $attributes = [
             return $model::parseParent($parent);
 		},
 		'format' => 'raw',
-		'visible' => !$small,
+		'visible' => !$small && !$model->isFond ? true : false,
 	],
 	[
 		'attribute' => 'code',
@@ -72,7 +72,7 @@ $attributes = [
 		'value' => function ($model) {
             $archiveTitle = isset($model->archive) ? $model->archive->title : '-';
             if ($archiveTitle != '-') {
-                return Html::a($archiveTitle, ['archive/view', 'id' => $model->archive_id], ['title' => $archiveTitle, 'class' => 'modal-btn']);
+                return Html::a($archiveTitle, ['/archive/admin/view', 'id' => $model->archive_id], ['title' => $archiveTitle, 'class' => 'modal-btn']);
             }
             return $archiveTitle;
 		},

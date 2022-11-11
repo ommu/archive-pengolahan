@@ -17,7 +17,7 @@ use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\widgets\DetailView;
 
-!$small ? \ommu\archive\assets\AciTreeAsset::register($this) : '';
+!$small ? \ommu\archive\assets\ArchiveTree::register($this) : '';
 
 if (!$small) {
     $context = $this->context;

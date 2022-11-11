@@ -113,6 +113,9 @@ class AdminController extends Controller
         }
 
 		$this->view->title = Yii::t('app', 'Schemas');
+        if ($parent) {
+            $this->view->title = Yii::t('app', 'Childs');
+        }
 		$this->view->description = '';
 		$this->view->keywords = '';
 		return $this->render('admin_manage', [
@@ -156,10 +159,13 @@ class AdminController extends Controller
             }
         }
 
-        if (!$parent->isFond) {
+        if ($parent && !$parent->isFond) {
             unset($this->subMenu[1]['tree']);
         }
 		$this->view->title = Yii::t('app', 'Create Schema');
+        if ($parent) {
+            $this->view->title = Yii::t('app', 'Create Child');
+        }
 		$this->view->description = '';
 		$this->view->keywords = '';
 		return $this->render('admin_create', [
@@ -204,7 +210,7 @@ class AdminController extends Controller
 		$this->view->title = Yii::t('app', 'Update Schema: {title}', ['title' => $model::htmlHardDecode($model->title)]);
 		$this->view->description = '';
 		$this->view->keywords = '';
-		return $this->render('admin_update', [
+		return $this->oRender('admin_update', [
 			'model' => $model,
 		]);
 	}
