@@ -180,7 +180,7 @@ class GroupController extends Controller
 		$this->view->title = Yii::t('app', 'Update User Group: {name}', ['name' => $model->name]);
 		$this->view->description = '';
 		$this->view->keywords = '';
-		return $this->render('admin_update', [
+		return $this->oRender('admin_update', [
 			'model' => $model,
 		]);
 	}

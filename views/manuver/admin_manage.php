@@ -50,7 +50,7 @@ array_push($columnData, [
 	},
 	'buttons' => [
 		'card' => function ($url, $model, $key) {
-			return Html::a(Yii::t('app', 'Manuver'), $url, ['title' => Yii::t('app', 'Manuver'), 'class' => 'btn btn-success btn-xs']);
+			return Html::a(Yii::t('app', 'Manuver'), $url, ['title' => Yii::t('app', 'Manuver'), 'class' => 'btn btn-success btn-xs', 'data-pjax' => 0]);
 		},
 	],
 	'template' => '{card}',

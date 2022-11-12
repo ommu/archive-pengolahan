@@ -180,7 +180,7 @@ class TypeController extends Controller
 		$this->view->title = Yii::t('app', 'Update Penyerahan Type: {type-name}', ['type-name' => $model->type_name]);
 		$this->view->description = '';
 		$this->view->keywords = '';
-		return $this->render('admin_update', [
+		return $this->oRender('admin_update', [
 			'model' => $model,
 		]);
 	}

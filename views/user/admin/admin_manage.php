@@ -41,37 +41,6 @@ $this->params['menu']['option'] = [
 
 <?php
 $columnData = $columns;
-// array_push($columnData, [
-// 	'class' => 'app\components\grid\ActionColumn',
-// 	'header' => Yii::t('app', 'Option'),
-// 	'urlCreator' => function($action, $model, $key, $index) {
-//         if ($action == 'view') {
-//             return Url::to(['view', 'id' => $key]);
-//         }
-//         if ($action == 'update') {
-//             return Url::to(['update', 'id' => $key]);
-//         }
-//         if ($action == 'delete') {
-//             return Url::to(['delete', 'id' => $key]);
-//         }
-// 	},
-// 	'buttons' => [
-// 		'view' => function ($url, $model, $key) {
-// 			return Html::a('<span class="glyphicon glyphicon-eye-open"></span>', $url, ['title' => Yii::t('app', 'Detail User')]);
-// 		},
-// 		'update' => function ($url, $model, $key) {
-// 			return Html::a('<span class="glyphicon glyphicon-pencil"></span>', $url, ['title' => Yii::t('app', 'Update User')]);
-// 		},
-// 		'delete' => function ($url, $model, $key) {
-// 			return Html::a('<span class="glyphicon glyphicon-trash"></span>', $url, [
-// 				'title' => Yii::t('app', 'Delete User'),
-// 				'data-confirm' => Yii::t('app', 'Are you sure you want to delete this item?'),
-// 				'data-method'  => 'post',
-// 			]);
-// 		},
-// 	],
-// 	'template' => '{view} {update} {delete}',
-// ]);
 
 echo GridView::widget([
 	'dataProvider' => $dataProvider,

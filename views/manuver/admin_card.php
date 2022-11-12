@@ -35,8 +35,10 @@ $this->params['breadcrumbs'][] = Yii::t('app', 'Manuver');
 
 	<div class="col-md-8 col-sm-7 col-xs-12">
         <?php echo $this->renderWidget('_grid', [
-            'title' => Yii::t('app', 'Cards'),
-            'model' => $model, 
+            'title' => Yii::t('app', 'Description Cards'),
+			'searchModel' => $searchModel,
+			'dataProvider' => $dataProvider,
+			'columns' => $columns,
         ]);?>
     </div>
 </div>

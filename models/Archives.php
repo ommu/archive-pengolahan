@@ -214,7 +214,7 @@ class Archives extends ArchivesModel
 			'filter' => $this->filterYesNo(),
 			'contentOptions' => ['class' => 'text-center'],
 			'format' => 'raw',
-			'visible' => $this->isFond || ($this->isFond && $this->isSchema) ? true : false,
+			'visible' => $this->isFond && $this->isSchema ? true : false,
 		];
 	}
 }
