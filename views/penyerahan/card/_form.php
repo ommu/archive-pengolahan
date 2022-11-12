@@ -183,14 +183,6 @@ echo $form->field($model, 'function', ['options' => ['class' => 'form-group row 
 
 <hr/>
 
-<?php 
-if ($model->isNewRecord && !$model->getErrors()) {
-	$model->publish = 1;
-}
-echo $form->field($model, 'publish')
-	->checkbox()
-	->label($model->getAttributeLabel('publish')); ?>
-
 <?php if (($stayInHere = Yii::$app->request->get('stayInHere')) != null) {
     $model->stayInHere = $stayInHere;
 }

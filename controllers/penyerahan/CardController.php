@@ -14,7 +14,6 @@
  *  View
  *  Delete
  *  RunAction
- *  Publish
  *
  *  findModel
  *
@@ -69,7 +68,6 @@ class CardController extends Controller
                 'class' => VerbFilter::className(),
                 'actions' => [
                     'delete' => ['POST'],
-					'publish' => ['POST'],
                 ],
             ],
         ];
@@ -244,24 +242,6 @@ class CardController extends Controller
 
         if ($model->save(false, ['publish','modified_id'])) {
             Yii::$app->session->setFlash('success', Yii::t('app', 'Penyerahan card success deleted.'));
-            return $this->redirect(Yii::$app->request->referrer ?: ['manage', 'penyerahan' => $model->penyerahan_id]);
-        }
-	}
-
-	/**
-	 * actionPublish an existing ArchivePengolahanPenyerahanCard model.
-	 * If publish is successful, the browser will be redirected to the 'index' page.
-	 * @param string $id
-	 * @return mixed
-	 */
-	public function actionPublish($id)
-	{
-		$model = $this->findModel($id);
-		$replace = $model->publish == 1 ? 0 : 1;
-		$model->publish = $replace;
-
-        if ($model->save(false, ['publish','modified_id'])) {
-            Yii::$app->session->setFlash('success', Yii::t('app', 'Penyerahan card success updated.'));
             return $this->redirect(Yii::$app->request->referrer ?: ['manage', 'penyerahan' => $model->penyerahan_id]);
         }
 	}

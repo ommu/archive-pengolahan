@@ -43,12 +43,6 @@ $attributes = [
 		'visible' => !$small,
 	],
 	[
-		'attribute' => 'publish',
-		'value' => $model->quickAction(Url::to(['publish', 'id' => $model->primaryKey]), $model->publish),
-		'format' => 'raw',
-		'visible' => !$small,
-	],
-	[
 		'attribute' => 'penyerahanTypeId',
 		'value' => function ($model) {
             $penyerahanTypeId = isset($model->type) ? $model->type->type_name : '-';

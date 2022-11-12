@@ -25,7 +25,7 @@ class m221103_094234_archivePengolahan_module_create_table_penyerahan_card exten
 		if (!Yii::$app->db->getTableSchema($tableName, true)) {
 			$this->createTable($tableName, [
 				'id' => Schema::TYPE_STRING . '(36) NOT NULL COMMENT \'uuid\'',
-				'publish' => Schema::TYPE_TINYINT . '(1) NOT NULL DEFAULT \'1\'',
+				'publish' => Schema::TYPE_TINYINT . '(1) NOT NULL DEFAULT \'1\' COMMENT \'deleted\'',
 				'penyerahan_id' => Schema::TYPE_INTEGER . '(11) UNSIGNED',
 				'user_id' => Schema::TYPE_INTEGER . '(11) UNSIGNED',
 				'temporary_number' => Schema::TYPE_STRING . '(36) NOT NULL',
