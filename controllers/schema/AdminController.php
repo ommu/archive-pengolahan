@@ -318,12 +318,19 @@ class AdminController extends Controller
 	{
 		Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
 
+        $manuver = false;
+        if (($action = Yii::$app->request->get('action')) != null) {
+            if ($action == 'run') {
+                $manuver = true;
+            }
+        }
+
 		$model = ArchivePengolahanSchema::findOne($id);
 
         if ($model == null) return [];
 
 		$codes = [];
-		$result[] = $this->getManuver($model);
+		$result[] = $this->getManuver($model, $manuver);
 
 		return $result;
 	}
@@ -339,7 +346,7 @@ class AdminController extends Controller
 			'id' => $model->id,
 			'code' => $model->code,
 			'label' => $model::htmlHardDecode($model->title),
-			'inode' => $model->getChilds(true, 1) ? true : false,
+			'inode' => $model->getChilds(true) ? true : false,
 			'manuver' => false,
 			'menuver-url' => false,
 			'view-url' => Url::to(['view', 'id' => $model->id]),
@@ -370,13 +377,13 @@ class AdminController extends Controller
 			'label' => $model::htmlHardDecode($model->title),
 			'inode' => $model->getChilds(true, 1) ? true : false,
 			'manuver' => $manuver,
-			'menuver-url' => $manuver ? Url::to(['view', 'id' => $model->id]) : false,
+			'menuver-url' => $manuver ? Url::to(['manuver/card', 'id' => $model->id]) : false,
 			'view-url' => $manuver ? false : Url::to(['view', 'id' => $model->id]),
 			'update-url' => $manuver ? false : Url::to(['update', 'id' => $model->id]),
 			'child-url' => $manuver ? false : Url::to(['manage', 'parent' => $model->id]),
 		];
 
-        $childs = $model->getChilds()
+        $childs = $model->getChilds(false, 1)
             ->select(['id', 'parent_id', 'code', 'title'])
             ->orderBy('code ASC')
             ->all();
@@ -385,7 +392,7 @@ class AdminController extends Controller
             $cards = [];
             $i = 0;
             foreach ($childs as $child) {
-                $cards[$i] = $this->getManuver($child);
+                $cards[$i] = $this->getManuver($child, $manuver);
                 $i++;
             }
             $data = ArrayHelper::merge($data, ['open' => true, 'branch' => $cards]);

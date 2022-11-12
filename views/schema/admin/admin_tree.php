@@ -35,7 +35,7 @@ if ($sync) {
 $treeDataUrl = Url::to(['schema/admin/manuver', 'id' => $model->id]);
 $js = <<<JS
 	var treeDataUrl = '$treeDataUrl';
-	var selectedId = '$model->parent_id';
+	var selectedId = '';
 JS;
 $this->registerJs($js, \yii\web\View::POS_HEAD);
 ?>

@@ -38,6 +38,7 @@ use yii\helpers\Html;
 use yii\helpers\Url;
 use app\models\Users;
 use thamtech\uuid\helpers\UuidHelper;
+use yii\helpers\ArrayHelper;
 
 class ArchivePengolahanSchema extends \app\components\ActiveRecord
 {
@@ -152,7 +153,7 @@ class ArchivePengolahanSchema extends \app\components\ActiveRecord
 	/**
 	 * @return \yii\db\ActiveQuery
 	 */
-	public function getChilds($count=false, $publish=1)
+	public function getChilds($count=false, $publish=null)
 	{
         if ($count == false) {
             $model = $this->hasMany(ArchivePengolahanSchema::className(), ['parent_id' => 'id'])
@@ -261,7 +262,6 @@ class ArchivePengolahanSchema extends \app\components\ActiveRecord
 			'value' => function($model, $key, $index, $column) {
 				return $model->code;
 			},
-			'visible' => !$this->isManuver ? true : false,
 		];
 		$this->templateColumns['archiveTitle'] = [
 			'attribute' => 'archiveTitle',
@@ -351,6 +351,27 @@ class ArchivePengolahanSchema extends \app\components\ActiveRecord
             $model = self::findOne($id);
             return $model;
         }
+	}
+
+	/**
+	 * function getReferenceCode
+	 */
+	public function getReferenceCode($result=false)
+	{
+        if ($result == true) {
+            return ArrayHelper::map($this->referenceCode, 'code', 'title');
+        }
+
+		$codes = [];
+        $id = $this->id;
+		$codes[$id]['id'] = $this->id;
+		$codes[$id]['code'] = $this->code;
+		$codes[$id]['title'] = $this->title;
+        if (isset($this->parent)) {
+            $codes = ArrayHelper::merge($this->parent->getReferenceCode(), $codes);
+        }
+
+		return $codes;
 	}
 
 	/**
