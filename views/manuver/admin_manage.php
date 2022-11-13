@@ -56,7 +56,7 @@ array_push($columnData, [
 			return Html::a(Yii::t('app', 'Manuver'), $url, ['title' => Yii::t('app', 'Manuver'), 'class' => 'btn btn-success btn-xs', 'data-pjax' => 0]);
 		},
 		'final' => function ($url, $model, $key) {
-			return Html::a(Yii::t('app', 'Final'), $url, ['title' => Yii::t('app', 'Final'), 'class' => 'btn btn-warning btn-xs', 'data-pjax' => 0]);
+			return Html::a(Yii::t('app', 'Final'), $url, ['title' => Yii::t('app', 'Final'), 'class' => 'btn btn-warning btn-xs modal-btn']);
 		},
 	],
 	'template' => '{card} {final}',

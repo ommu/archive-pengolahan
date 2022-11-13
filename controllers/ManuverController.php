@@ -227,7 +227,7 @@ class ManuverController extends Controller
             // $model->order = $postData['order'] ? $postData['order'] : 0;
 
             if ($model->save()) {
-                ArchivePengolahanSchemaCard::updateAll(['final_id' => $model->id], ['fond_schema_id' => $id]);
+                ArchivePengolahanSchemaCard::updateAll(['final_id' => $model->id], ['and', ['fond_schema_id' => $id], ['is', 'final_id', null]]);
 
                 Yii::$app->session->setFlash('success', Yii::t('app', 'Manuver kartu final success created.'));
                 return $this->redirect(['manage']);
