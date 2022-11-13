@@ -260,6 +260,9 @@ class ArchivePengolahanPenyerahanCard extends \app\components\ActiveRecord
         } else {
             $model->andOnCondition(['IN', sprintf('%s.publish', 'schemas'), [0,1]]);
         }
+        $model->andOnCondition(['is', sprintf('%s.final_id', 'schemas'), null])
+            ->andOnCondition(['is', sprintf('%s.fond_id', 'schemas'), null])
+            ->andOnCondition(['is', sprintf('%s.archive_id', 'schemas'), null]);
 
         return $model;
 	}
@@ -400,32 +403,6 @@ class ArchivePengolahanPenyerahanCard extends \app\components\ActiveRecord
 			},
 			'visible' => !Yii::$app->request->get('user') ? true : false,
 		];
-		$this->templateColumns['oManuver'] = [
-			'attribute' => 'oManuver',
-			'value' => function($model, $key, $index, $column) {
-                $model->schemaId = $this->schemaId;
-                $url = ['manuver/create', 'id' => $model->primaryKey, 'schema' => $model->schemaId];
-                $manuverCard = Html::a(Html::button('<span class="glyphicon glyphicon-plus"></span>', ['class' => 'btn btn-success btn-xs']), $url, [
-                    'title' => Yii::t('app', 'Manuver Description Card'),
-                    'data-confirm' => Yii::t('app', 'Are you sure you want to menuver this card?'),
-                    'data-method'  => 'post',
-                ]);
-                $schemas = $model->schemas;
-                if (is_array($schemas) && !empty($schemas)) {
-                    $url = ['manuver/delete', 'id' => $schemas[0]->id];
-                    $manuverCard = Html::a(Html::button('<span class="glyphicon glyphicon-remove"></span>', ['class' => 'btn btn-danger btn-xs']), $url, [
-                        'title' => Yii::t('app', 'Reset Manuver Card'),
-                        'data-confirm' => Yii::t('app', 'Are you sure you want to reset this menuver card?'),
-                        'data-method'  => 'post',
-                    ]);
-                }
-				return $manuverCard;
-			},
-			'filter' => $this->filterYesNo(),
-			'contentOptions' => ['class' => 'text-center'],
-			'format' => 'raw',
-			'visible' => $this->isMenuver ? true : false,
-		];
 		$this->templateColumns['creation_date'] = [
 			'attribute' => 'creation_date',
 			'value' => function($model, $key, $index, $column) {
@@ -462,6 +439,32 @@ class ArchivePengolahanPenyerahanCard extends \app\components\ActiveRecord
 				return Yii::$app->formatter->asDatetime($model->updated_date, 'medium');
 			},
 			'filter' => $this->filterDatepicker($this, 'updated_date'),
+		];
+		$this->templateColumns['oManuver'] = [
+			'attribute' => 'oManuver',
+			'value' => function($model, $key, $index, $column) {
+                $model->schemaId = $this->schemaId;
+                $url = ['manuver/create', 'id' => $model->primaryKey, 'schema' => $model->schemaId];
+                $manuverCard = Html::a(Html::button('<span class="glyphicon glyphicon-plus"></span>', ['class' => 'btn btn-success btn-xs']), $url, [
+                    'title' => Yii::t('app', 'Manuver Description Card'),
+                    'data-confirm' => Yii::t('app', 'Are you sure you want to menuver this card?'),
+                    'data-method'  => 'post',
+                ]);
+                $schemas = $model->schemas;
+                if (is_array($schemas) && !empty($schemas)) {
+                    $url = ['manuver/delete', 'id' => $schemas[0]->id];
+                    $manuverCard = Html::a(Html::button('<span class="glyphicon glyphicon-remove"></span>', ['class' => 'btn btn-danger btn-xs']), $url, [
+                        'title' => Yii::t('app', 'Reset Manuver Card'),
+                        'data-confirm' => Yii::t('app', 'Are you sure you want to reset this menuver card?'),
+                        'data-method'  => 'post',
+                    ]);
+                }
+				return $manuverCard;
+			},
+			'filter' => $this->filterYesNo(),
+			'contentOptions' => ['class' => 'text-center'],
+			'format' => 'raw',
+			'visible' => $this->isMenuver ? true : false,
 		];
 	}
 

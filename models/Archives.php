@@ -29,15 +29,22 @@ class Archives extends ArchivesModel
 	/**
 	 * @return \yii\db\ActiveQuery
 	 */
-	public function getSchemas($relation=true)
+	public function getSchemas($relation=true, $publish=1)
 	{
         if ($relation == false) {
             return !empty($this->schemas) ? $this->schemas[0] : null;
         }
 
-		return $this->hasMany(ArchivePengolahanSchema::className(), ['archive_id' => 'id'])
-			->alias('schemas')
+        $model = $this->hasMany(ArchivePengolahanSchema::className(), ['archive_id' => 'id'])
+            ->alias('schemas')
             ->select(['id', 'archive_id']);
+        if ($publish != null) {
+            $model->andOnCondition([sprintf('%s.publish', 'schemas') => $publish]);
+        } else {
+            $model->andOnCondition(['IN', sprintf('%s.publish', 'schemas'), [0,1]]);
+        }
+
+        return $model;
 	}
 
 	/**

@@ -55,6 +55,7 @@ class ArchivePengolahanSchema extends \app\components\ActiveRecord
 	public $creationDisplayname;
 	public $modifiedDisplayname;
 	public $oChild;
+	public $oCard;
 
 	/**
 	 * @return string the associated database table name
@@ -103,6 +104,7 @@ class ArchivePengolahanSchema extends \app\components\ActiveRecord
 			'creationDisplayname' => Yii::t('app', 'Creation'),
 			'modifiedDisplayname' => Yii::t('app', 'Modified'),
 			'oChild' => Yii::t('app', 'Childs'),
+			'oCard' => Yii::t('app', 'Cards'),
 		];
 	}
 
@@ -117,11 +119,18 @@ class ArchivePengolahanSchema extends \app\components\ActiveRecord
 	/**
 	 * @return \yii\db\ActiveQuery
 	 */
-	public function getCards($count=false, $publish=1)
+	public function getCards($count=false, $publish=1, $fond=false)
 	{
         if ($count == false) {
-            $model = $this->hasMany(ArchivePengolahanSchemaCard::className(), ['schema_id' => 'id'])
-				->alias('cards');
+            if ($fond) {
+                $model = $this->hasMany(ArchivePengolahanSchemaCard::className(), ['fond_schema_id' => 'id']);
+            } else {
+                $model = $this->hasMany(ArchivePengolahanSchemaCard::className(), ['schema_id' => 'id']);
+            }
+            $model->alias('cards')
+                ->andOnCondition(['is', sprintf('%s.final_id', 'cards'), null])
+                ->andOnCondition(['is', sprintf('%s.fond_id', 'cards'), null])
+                ->andOnCondition(['is', sprintf('%s.archive_id', 'cards'), null]);
             if ($publish != null) {
                 $model->andOnCondition([sprintf('%s.publish', 'cards') => $publish]);
             } else {
@@ -132,8 +141,15 @@ class ArchivePengolahanSchema extends \app\components\ActiveRecord
         }
 
 		$model = ArchivePengolahanSchemaCard::find()
-            ->alias('t')
-            ->where(['t.schema_id' => $this->id]);
+            ->alias('t');
+        if ($fond) {
+            $model->where(['t.fond_schema_id' => $this->id]);
+        } else {
+            $model->where(['t.schema_id' => $this->id]);
+        }
+        $model->andWhere(['is', 't.final_id', null])
+            ->andWhere(['is', 't.fond_id', null])
+            ->andWhere(['is', 't.archive_id', null]);
         if ($publish != null) {
             if ($publish == 0) {
                 $model->unpublish();
@@ -145,6 +161,7 @@ class ArchivePengolahanSchema extends \app\components\ActiveRecord
 		} else {
             $model->andWhere(['IN', 't.publish', [0,1]]);
         }
+
 		$cards = $model->count();
 
 		return $cards ? $cards : 0;
@@ -318,6 +335,16 @@ class ArchivePengolahanSchema extends \app\components\ActiveRecord
             'contentOptions' => ['class' => 'text-center'],
             'format' => 'raw',
 			'visible' => !$this->isManuver ? true : false,
+        ];
+        $this->templateColumns['oCard'] = [
+            'attribute' => 'oCard',
+            'value' => function($model, $key, $index, $column) {
+                return $model->getCards(true, null, true);
+
+            },
+			'filter' => false,
+            'contentOptions' => ['class' => 'text-center'],
+			'visible' => $this->isManuver ? true : false,
         ];
 		$this->templateColumns['publish'] = [
 			'attribute' => 'publish',
