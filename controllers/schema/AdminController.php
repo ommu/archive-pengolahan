@@ -90,7 +90,17 @@ class AdminController extends Controller
 	 */
 	public function actionManage()
 	{
-        $searchModel = new ArchivePengolahanSchemaSearch();
+        $isFond = true;
+        if (($parent = Yii::$app->request->get('parent')) != null) {
+            $this->subMenuParam = $parent;
+            $parent = \ommu\archivePengolahan\models\ArchivePengolahanSchema::findOne($parent);
+            if (!$parent->isFond) {
+                unset($this->subMenu[1]['tree']);
+            }
+            $isFond = false;
+        }
+
+        $searchModel = new ArchivePengolahanSchemaSearch(['isFond' => $isFond]);
         $queryParams = Yii::$app->request->queryParams;
 		$dataProvider = $searchModel->search($queryParams);
 
@@ -104,14 +114,6 @@ class AdminController extends Controller
             }
         }
         $columns = $searchModel->getGridColumn($cols);
-
-        if (($parent = Yii::$app->request->get('parent')) != null) {
-            $this->subMenuParam = $parent;
-            $parent = \ommu\archivePengolahan\models\ArchivePengolahanSchema::findOne($parent);
-            if (!$parent->isFond) {
-                unset($this->subMenu[1]['tree']);
-            }
-        }
 
 		$this->view->title = Yii::t('app', 'Schemas');
         if ($parent) {

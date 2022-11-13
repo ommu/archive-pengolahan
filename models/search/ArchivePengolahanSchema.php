@@ -29,7 +29,7 @@ class ArchivePengolahanSchema extends ArchivePengolahanSchemaModel
 		return [
 			[['id', 'parent_id', 'code', 'title', 'creation_date', 'modified_date', 'updated_date', 
                 'parentTitle', 'archiveTitle', 'creationDisplayname', 'modifiedDisplayname'], 'safe'],
-			[['publish', 'archive_id', 'creation_id', 'modified_id',
+			[['publish', 'archive_id', 'level_id', 'creation_id', 'modified_id',
                 'oChild'], 'integer'],
 		];
 	}
@@ -91,6 +91,10 @@ class ArchivePengolahanSchema extends ArchivePengolahanSchemaModel
         ) {
             $query->joinWith(['modified modified']);
         }
+        if (isset($params['sort']) && in_array($params['sort'], ['level_id', '-level_id']))
+        {
+            $query->joinWith(['levelTitle levelTitle']);
+        }
 
 		$query->groupBy(['id']);
 
@@ -117,10 +121,21 @@ class ArchivePengolahanSchema extends ArchivePengolahanSchemaModel
 			'asc' => ['modified.displayname' => SORT_ASC],
 			'desc' => ['modified.displayname' => SORT_DESC],
 		];
-		$dataProvider->setSort([
-			'attributes' => $attributes,
-			'defaultOrder' => ['creation_date' => SORT_DESC],
-		]);
+		$attributes['level_id'] = [
+			'asc' => ['levelTitle.message' => SORT_ASC],
+			'desc' => ['levelTitle.message' => SORT_DESC],
+		];
+        if ($this->isFond) {
+            $dataProvider->setSort([
+                'attributes' => $attributes,
+                'defaultOrder' => ['creation_date' => SORT_DESC],
+            ]);
+        } else {
+            $dataProvider->setSort([
+                'attributes' => $attributes,
+                'defaultOrder' => ['code' => SORT_DESC],
+            ]);
+        }
 
         if (Yii::$app->request->get('id')) {
             unset($params['id']);
@@ -136,6 +151,7 @@ class ArchivePengolahanSchema extends ArchivePengolahanSchemaModel
 		// grid filtering conditions
         $query->andFilterWhere([
 			't.archive_id' => isset($params['archive']) ? $params['archive'] : $this->archive_id,
+			't.level_id' => isset($params['level']) ? $params['level'] : $this->level_id,
 			'cast(t.creation_date as date)' => $this->creation_date,
 			't.creation_id' => isset($params['creation']) ? $params['creation'] : $this->creation_id,
 			'cast(t.modified_date as date)' => $this->modified_date,

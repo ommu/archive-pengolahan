@@ -155,6 +155,7 @@ class SyncController extends Controller
         $childs = $archive->getArchives()
             ->select(['id', 'parent_id', 'level_id', 'title', 'code'])
             ->andWhere(['<>', 't.level_id', 8])
+            ->orderBy('code ASC')
             ->all();
 
         $data = [];
