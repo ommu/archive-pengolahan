@@ -30,9 +30,25 @@ use yii\filters\VerbFilter;
 use ommu\archivePengolahan\models\ArchivePengolahanPenyerahanJenis;
 use ommu\archivePengolahan\models\search\ArchivePengolahanPenyerahanJenis as ArchivePengolahanPenyerahanJenisSearch;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Inflector;
+use ommu\archivePengolahan\models\ArchivePengolahanSetting;
 
 class JenisController extends Controller
 {
+	/**
+	 * {@inheritdoc}
+	 */
+	public function init()
+	{
+        parent::init();
+
+        $this->subMenu = $this->module->params['setting_submenu'];
+
+        $setting = new ArchivePengolahanSetting(['app' => 'archivePengolahanModule']);
+		$this->breadcrumbApp = $setting->breadcrumb;
+		$this->breadcrumbAppParam = $setting->getBreadcrumbAppParam();
+	}
+
 	/**
 	 * {@inheritdoc}
 	 */
@@ -115,6 +131,34 @@ class JenisController extends Controller
 
 		Yii::$app->session->setFlash('success', Yii::t('app', 'Jenis arsip success deleted.'));
 		return $this->redirect(Yii::$app->request->referrer ?: ['manage']);
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function actionSuggest()
+	{
+		Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+		$term = Yii::$app->request->get('term');
+
+        if ($term == null) return [];
+
+		$model = ArchivePengolahanPenyerahanJenis::find()->alias('t')
+            ->joinWith(['tag tag'])
+			->andWhere(['like', 'tag.body', Inflector::camelize($term)])
+			->groupBy(['t.tag_id'])
+			->limit(15)
+			->all();
+
+		$result = [];
+        foreach ($model as $val) {
+			$result[] = [
+				'id' => $val->tag_id, 
+				'label' => $val->tag->body,
+			];
+		}
+		return $result;
 	}
 
 	/**

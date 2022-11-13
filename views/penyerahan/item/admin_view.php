@@ -18,6 +18,10 @@ use yii\helpers\Url;
 use yii\widgets\DetailView;
 
 if (!$small) {
+    $context = $this->context;
+    if ($context->breadcrumbApp) {
+        $this->params['breadcrumbs'][] = ['label' => $context->breadcrumbAppParam['name'], 'url' => [$context->breadcrumbAppParam['url']]];
+    }
     $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Penyerahan'), 'url' => ['penyerahan/admin/index']];
     $this->params['breadcrumbs'][] = ['label' => $model->type->type_name. ': ' .$model->penyerahan->kode_box, 'url' => ['penyerahan/admin/view', 'id' => $model->penyerahan_id]];
     $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Item'), 'url' => ['manage', 'penyerahan' => $model->penyerahan_id]];
@@ -39,6 +43,12 @@ $attributes = [
 		'visible' => !$small,
 	],
 	[
+		'attribute' => 'publish',
+		'value' => $model->quickAction(Url::to(['publish', 'id' => $model->primaryKey]), $model->publish),
+		'format' => 'raw',
+		'visible' => !$small,
+	],
+	[
 		'attribute' => 'penyerahanTypeId',
 		'value' => function ($model) {
             $penyerahanTypeId = isset($model->type) ? $model->type->type_name : '-';
@@ -52,7 +62,7 @@ $attributes = [
 	[
 		'attribute' => 'penyerahanPenciptaArsip',
 		'value' => function ($model) {
-            return $model::parsePenyerahan($model, true);
+            return $model->penyerahan::parsePenyerahan($model->penyerahan, true);
 		},
 		'format' => 'raw',
 	],
@@ -64,6 +74,7 @@ $attributes = [
 	[
 		'attribute' => 'archive_description',
 		'value' => $model->archive_description ? $model->archive_description : '-',
+		'format' => 'html',
 		'visible' => !$small,
 	],
 	[
@@ -113,7 +124,7 @@ $attributes = [
 	],
 	[
 		'attribute' => '',
-		'value' => Html::a(Yii::t('app', 'Update'), ['update', 'id' => $model->primaryKey], ['title' => Yii::t('app', 'Update'), 'class' => 'btn btn-primary btn-sm modal-btn']),
+		'value' => Html::a(Yii::t('app', 'Update'), ['update', 'id' => $model->primaryKey], ['title' => Yii::t('app', 'Update'), 'class' => 'btn btn-primary btn-sm']),
 		'format' => 'html',
 		'visible' => !$small && Yii::$app->request->isAjax ? true : false,
 	],

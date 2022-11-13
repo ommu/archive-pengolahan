@@ -16,6 +16,10 @@
 
 use yii\helpers\Url;
 
+$context = $this->context;
+if ($context->breadcrumbApp) {
+	$this->params['breadcrumbs'][] = ['label' => $context->breadcrumbAppParam['name'], 'url' => [$context->breadcrumbAppParam['url']]];
+}
 $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Penyerahan'), 'url' => ['penyerahan/admin/index']];
 $this->params['breadcrumbs'][] = ['label' => $model->type->type_name. ': ' .$model->penyerahan->kode_box, 'url' => ['penyerahan/admin/view', 'id' => $model->penyerahan_id]];
 $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Item'), 'url' => ['manage', 'penyerahan' => $model->penyerahan_id]];
@@ -31,6 +35,7 @@ $this->params['menu']['content'] = [
 
 <?php echo $this->render('_form', [
 	'model' => $model,
+    'penyerahan' => $model->penyerahan,
 ]); ?>
 
 </div>

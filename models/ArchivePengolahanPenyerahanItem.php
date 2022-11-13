@@ -20,6 +20,7 @@
  * @property string $volume
  * @property string $code
  * @property string $description
+ * @property integer $import_id
  * @property string $creation_date
  * @property integer $creation_id
  * @property string $modified_date
@@ -46,6 +47,8 @@ class ArchivePengolahanPenyerahanItem extends \app\components\ActiveRecord
 
     public $gridForbiddenColumn = ['description', 'creation_date', 'creationDisplayname', 'modified_date', 'modifiedDisplayname', 'updated_date'];
 
+    public $stayInHere;
+
 	public $penyerahanTypeId;
 	public $penyerahanPenciptaArsip;
 	public $creationDisplayname;
@@ -66,8 +69,9 @@ class ArchivePengolahanPenyerahanItem extends \app\components\ActiveRecord
 	{
 		return [
 			[['penyerahan_id', 'archive_number', 'archive_description', 'year', 'volume', 'code', 'description'], 'required'],
-			[['publish', 'penyerahan_id', 'creation_id', 'modified_id'], 'integer'],
+			[['publish', 'penyerahan_id', 'creation_id', 'modified_id', 'stayInHere'], 'integer'],
 			[['archive_description'], 'string'],
+			[['stayInHere'], 'safe'],
 			[['archive_number', 'volume', 'code'], 'string', 'max' => 16],
 			[['year'], 'string', 'max' => 8],
 			[['description'], 'string', 'max' => 64],
@@ -90,11 +94,13 @@ class ArchivePengolahanPenyerahanItem extends \app\components\ActiveRecord
 			'volume' => Yii::t('app', 'Volume'),
 			'code' => Yii::t('app', 'Code'),
 			'description' => Yii::t('app', 'Description'),
+			'import_id' => Yii::t('app', 'Import'),
 			'creation_date' => Yii::t('app', 'Creation Date'),
 			'creation_id' => Yii::t('app', 'Creation'),
 			'modified_date' => Yii::t('app', 'Modified Date'),
 			'modified_id' => Yii::t('app', 'Modified'),
 			'updated_date' => Yii::t('app', 'Updated Date'),
+			'stayInHere' => Yii::t('app', 'stayInHere'),
 			'penyerahanTypeId' => Yii::t('app', 'Penyerahan Type'),
 			'penyerahanPenciptaArsip' => Yii::t('app', 'Kode Box / Pencipta Arsip'),
 			'creationDisplayname' => Yii::t('app', 'Creation'),
@@ -180,7 +186,7 @@ class ArchivePengolahanPenyerahanItem extends \app\components\ActiveRecord
 		$this->templateColumns['penyerahanPenciptaArsip'] = [
 			'attribute' => 'penyerahanPenciptaArsip',
 			'value' => function($model, $key, $index, $column) {
-				return self::parsePenyerahan($model, false);
+				return $model->penyerahan::parsePenyerahan($model->penyerahan, false);
 				// return $model->penyerahanPenciptaArsip;
 			},
 			'visible' => !Yii::$app->request->get('penyerahan') ? true : false,
@@ -197,6 +203,7 @@ class ArchivePengolahanPenyerahanItem extends \app\components\ActiveRecord
 			'value' => function($model, $key, $index, $column) {
 				return $model->archive_description;
 			},
+            'format' => 'html',
 		];
 		$this->templateColumns['year'] = [
 			'attribute' => 'year',
@@ -259,6 +266,17 @@ class ArchivePengolahanPenyerahanItem extends \app\components\ActiveRecord
 			},
 			'filter' => $this->filterDatepicker($this, 'updated_date'),
 		];
+		$this->templateColumns['publish'] = [
+			'attribute' => 'publish',
+			'value' => function($model, $key, $index, $column) {
+				$url = Url::to(['publish', 'id' => $model->primaryKey]);
+				return $this->quickAction($url, $model->publish);
+			},
+			'filter' => $this->filterYesNo(),
+			'contentOptions' => ['class' => 'text-center'],
+			'format' => 'raw',
+			'visible' => !Yii::$app->request->get('trash') ? true : false,
+		];
 	}
 
 	/**
@@ -280,20 +298,6 @@ class ArchivePengolahanPenyerahanItem extends \app\components\ActiveRecord
             $model = self::findOne($id);
             return $model;
         }
-	}
-
-	/**
-	 * function parsePenyerahan
-	 */
-	public static function parsePenyerahan($model, $urlTitle=true)
-	{
-		$title = $model->penyerahan->pencipta_arsip;
-        $penyerahanTitle = $urlTitle == true ? Html::a($title, ['penyerahan/admin/view', 'id' => $model->penyerahan_id], ['title' => $title, 'class' => 'modal-btn']) : $title ;
-
-        $html = Html::button($model->penyerahan->kode_box, ['class' => 'btn btn-info btn-xs']).'<br/>';
-        $html .= $penyerahanTitle;
-
-		return $html;
 	}
 
 	/**

@@ -63,7 +63,7 @@ class ArchivePengolahanImport extends \app\components\ActiveRecord
 		return [
 			[['type', 'original_filename', 'custom_filename'], 'required'],
 			[['all', 'error', 'rollback', 'creation_id'], 'integer'],
-			[['type', 'original_filename', 'custom_filename', 'log'], 'string'],
+			[['type', 'original_filename', 'custom_filename'], 'string'],
 			//[['log'], 'json'],
 			[['all', 'error', 'log'], 'safe'],
 		];
@@ -235,7 +235,7 @@ class ArchivePengolahanImport extends \app\components\ActiveRecord
 	public static function getType($value=null)
 	{
 		$items = array(
-			'pengolahan' => Yii::t('app', 'Pengolahan'),
+			'penyerahan' => Yii::t('app', 'Penyerahan'),
 			'item' => Yii::t('app', 'Item'),
 		);
 
@@ -312,7 +312,12 @@ class ArchivePengolahanImport extends \app\components\ActiveRecord
         if (!$insert) {
             if (array_key_exists('rollback', $changedAttributes) && $changedAttributes['rollback'] != $this->rollback && $this->rollback == 1) {
                 $items = ArrayHelper::map($this->items, 'id', 'id');
-                ArchivePengolahanPenyerahanItem::updateAll(['publish' => 2], ['IN', 'id', $items]);
+
+                if ($this->type == 'penyerahan') {
+                    ArchivePengolahanPenyerahan::updateAll(['publish' => 2], ['IN', 'id', $items]);
+                } else if ($this->type == 'item') {
+                    ArchivePengolahanPenyerahanItem::updateAll(['publish' => 2], ['IN', 'id', $items]);
+                }
             }
 		}
 	}

@@ -31,9 +31,22 @@ use mdm\admin\components\AccessControl;
 use yii\filters\VerbFilter;
 use ommu\archivePengolahan\models\ArchivePengolahanImport;
 use ommu\archivePengolahan\models\search\ArchivePengolahanImport as ArchivePengolahanImportSearch;
+use ommu\archivePengolahan\models\ArchivePengolahanSetting;
 
 class ImportController extends Controller
 {
+	/**
+	 * {@inheritdoc}
+	 */
+	public function init()
+	{
+        parent::init();
+
+        $setting = new ArchivePengolahanSetting(['app' => 'archivePengolahanModule']);
+		$this->breadcrumbApp = $setting->breadcrumb;
+		$this->breadcrumbAppParam = $setting->getBreadcrumbAppParam();
+	}
+
 	/**
 	 * {@inheritdoc}
 	 */
@@ -67,6 +80,9 @@ class ImportController extends Controller
 	 */
 	public function actionManage()
 	{
+        $id = Yii::$app->request->get('id');
+        $type = Yii::$app->request->get('type');
+
         $searchModel = new ArchivePengolahanImportSearch();
         $queryParams = Yii::$app->request->queryParams;
 		$dataProvider = $searchModel->search($queryParams);
@@ -89,6 +105,8 @@ class ImportController extends Controller
 			'searchModel' => $searchModel,
 			'dataProvider' => $dataProvider,
 			'columns' => $columns,
+			'type' => $type ?? null,
+			'id' => $id ?? null,
 		]);
 	}
 
@@ -121,7 +139,7 @@ class ImportController extends Controller
 		$model = $this->findModel($id);
 		$model->delete();
 
-		Yii::$app->session->setFlash('success', Yii::t('app', 'Archive import success deleted.'));
+		Yii::$app->session->setFlash('success', Yii::t('app', 'Import success deleted.'));
 		return $this->redirect(Yii::$app->request->referrer ?: ['manage']);
 	}
 
@@ -137,7 +155,7 @@ class ImportController extends Controller
 		$model->rollback = 1;
 
         if ($model->save()) {
-            Yii::$app->session->setFlash('success', Yii::t('app', 'Archive import success rollback.'));
+            Yii::$app->session->setFlash('success', Yii::t('app', 'Import success rollback.'));
             return $this->redirect(Yii::$app->request->referrer ?: ['manage', 'type' => $model->type]);
         }
 	}

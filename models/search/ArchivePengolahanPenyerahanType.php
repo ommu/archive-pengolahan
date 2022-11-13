@@ -27,8 +27,10 @@ class ArchivePengolahanPenyerahanType extends ArchivePengolahanPenyerahanTypeMod
 	public function rules()
 	{
 		return [
-			[['id', 'publish', 'creation_id', 'modified_id'], 'integer'],
-			[['type_name', 'type_desc', 'creation_date', 'modified_date', 'updated_date', 'creationDisplayname', 'modifiedDisplayname'], 'safe'],
+			[['id', 'publish', 'creation_id', 'modified_id', 
+                'oPenyerahan'], 'integer'],
+			[['type_name', 'type_desc', 'feature', 'creation_date', 'modified_date', 'updated_date', 
+                'creationDisplayname', 'modifiedDisplayname'], 'safe'],
 		];
 	}
 
@@ -67,9 +69,15 @@ class ArchivePengolahanPenyerahanType extends ArchivePengolahanPenyerahanTypeMod
                 ->select($column);
         }
 		$query->joinWith([
+			// 'grid grid', 
 			// 'creation creation', 
 			// 'modified modified'
 		]);
+        if ((isset($params['sort']) && in_array($params['sort'], ['oPenyerahan', '-oPenyerahan'])) || 
+            (isset($params['oPenyerahan']) && $params['oPenyerahan'] != '')
+        ) {
+            $query->joinWith(['grid grid']);
+        }
         if ((isset($params['sort']) && in_array($params['sort'], ['creationDisplayname', '-creationDisplayname'])) || 
             (isset($params['creationDisplayname']) && $params['creationDisplayname'] != '')
         ) {
@@ -102,6 +110,10 @@ class ArchivePengolahanPenyerahanType extends ArchivePengolahanPenyerahanTypeMod
 			'asc' => ['modified.displayname' => SORT_ASC],
 			'desc' => ['modified.displayname' => SORT_DESC],
 		];
+        $attributes['oPenyerahan'] = [
+            'asc' => ['grid.penyerahan' => SORT_ASC],
+            'desc' => ['grid.penyerahan' => SORT_DESC],
+        ];
 		$dataProvider->setSort([
 			'attributes' => $attributes,
 			'defaultOrder' => ['id' => SORT_DESC],
@@ -128,7 +140,7 @@ class ArchivePengolahanPenyerahanType extends ArchivePengolahanPenyerahanTypeMod
 			'cast(t.updated_date as date)' => $this->updated_date,
 		]);
 
-		if (!isset($params['publish']) || (isset($params['publish']) && $params['publish'] == '')) {
+        if ((!isset($params['publish']) || (isset($params['publish']) && $params['publish'] == '')) && !$this->publish) {
             $query->andFilterWhere(['IN', 't.publish', [0,1]]);
         } else {
             $query->andFilterWhere(['t.publish' => $this->publish]);
@@ -138,8 +150,16 @@ class ArchivePengolahanPenyerahanType extends ArchivePengolahanPenyerahanTypeMod
             $query->andFilterWhere(['NOT IN', 't.publish', [0,1]]);
         }
 
+		if (isset($params['oPenyerahan']) && $params['oPenyerahan'] != '') {
+            if ($this->oPenyerahan == 1) {
+                $query->andWhere(['<>', 'grid.penyerahan', 0]);
+            } else if ($this->oPenyerahan == 0) {
+                $query->andWhere(['=', 'grid.penyerahan', 0]);
+            }
+        }
 		$query->andFilterWhere(['like', 't.type_name', $this->type_name])
 			->andFilterWhere(['like', 't.type_desc', $this->type_desc])
+			->andFilterWhere(['like', 't.feature', $this->feature])
 			->andFilterWhere(['like', 'creation.displayname', $this->creationDisplayname])
 			->andFilterWhere(['like', 'modified.displayname', $this->modifiedDisplayname]);
 

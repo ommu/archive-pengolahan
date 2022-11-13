@@ -44,43 +44,68 @@ echo $form->field($model, 'type_id')
 	->label($model->getAttributeLabel('type_id')); ?>
 
 <?php echo $form->field($model, 'kode_box')
-	->textInput(['maxlength' => true])
+	->textarea(['rows' => 2, 'cols' => 50])
 	->label($model->getAttributeLabel('kode_box')); ?>
+
+<hr/>
+
+<?php
+$creatorSuggestUrl = Url::to(['/archive/setting/creator/suggest']);
+echo $form->field($model, 'creator', ['options' => ['class' => 'form-group row field-item']])
+    ->widget(Selectize::className(), [
+        'cascade' => true,
+        'url' => $creatorSuggestUrl,
+        'queryParam' => 'term',
+        'pluginOptions' => [
+            'valueField' => 'label',
+            'labelField' => 'label',
+            'searchField' => ['label'],
+            'persist' => false,
+            'createOnBlur' => false,
+            'create' => true,
+        ],
+    ])
+    ->label($model->getAttributeLabel('creator'))
+    ->hint(Yii::t('app', 'Record the name of the organization(s) or the individual(s) responsible for the creation, accumulation and maintenance of the records in the unit of description. Search for an existing name in the authority records by typing the first few characters of the name. Alternatively, type a new name to create and link to a new authority record.')); ?>
 
 <?php echo $form->field($model, 'pencipta_arsip')
 	->textarea(['rows' => 3, 'cols' => 50])
 	->label($model->getAttributeLabel('pencipta_arsip')); ?>
+
+<hr/>
 
 <?php echo $form->field($model, 'tahun')
 	->textInput(['maxlength' => true])
 	->label($model->getAttributeLabel('tahun')); ?>
 
 <?php echo $form->field($model, 'nomor_arsip')
-	->textInput(['maxlength' => true])
+	->textarea(['rows' => 2, 'cols' => 50])
 	->label($model->getAttributeLabel('nomor_arsip')); ?>
 
 <?php echo $form->field($model, 'jumlah_arsip')
-	->textInput(['maxlength' => true])
+	->textarea(['rows' => 2, 'cols' => 50])
 	->label($model->getAttributeLabel('jumlah_arsip')); ?>
 
 <?php echo $form->field($model, 'nomor_box')
-	->textInput(['maxlength' => true])
+	->textarea(['rows' => 2, 'cols' => 50])
 	->label($model->getAttributeLabel('nomor_box')); ?>
 
 <?php echo $form->field($model, 'jumlah_box')
-	->textInput(['maxlength' => true])
+	->textarea(['rows' => 2, 'cols' => 50])
 	->label($model->getAttributeLabel('jumlah_box')); ?>
 
 <?php echo $form->field($model, 'nomor_box_urutan')
-	->textInput(['maxlength' => true])
+	->textarea(['rows' => 2, 'cols' => 50])
 	->label($model->getAttributeLabel('nomor_box_urutan')); ?>
 
 <?php echo $form->field($model, 'lokasi')
 	->textarea(['rows' => 2, 'cols' => 50])
 	->label($model->getAttributeLabel('lokasi')); ?>
 
+<hr/>
+
 <?php
-$subjectSuggestUrl = Url::to(['/admin/tag/suggest']);
+$subjectSuggestUrl = Url::to(['setting/jenis/suggest']);
 echo $form->field($model, 'jenisArsip', ['options' => ['class' => 'form-group row field-item']])
 	->widget(Selectize::className(), [
         'cascade' => true,
@@ -97,6 +122,8 @@ echo $form->field($model, 'jenisArsip', ['options' => ['class' => 'form-group ro
 	])
 	->label($model->getAttributeLabel('jenisArsip'));?>
 
+<hr/>
+
 <?php echo $form->field($model, 'color_code')
 	->textInput(['maxlength' => true])
 	->label($model->getAttributeLabel('color_code')); ?>
@@ -106,6 +133,17 @@ echo $form->field($model, 'jenisArsip', ['options' => ['class' => 'form-group ro
 	->label($model->getAttributeLabel('description')); ?>
 
 <hr/>
+
+<?php if (($stayInHere = Yii::$app->request->get('stayInHere')) != null) {
+    $model->stayInHere = $stayInHere;
+}
+if (!Yii::$app->request->isAjax) {
+    echo $form->field($model, 'stayInHere')
+        ->checkbox()
+        ->label(Yii::t('app', 'Stay on this page after I click {message}.', ['message' => $model->isNewRecord ? Yii::t('app', 'Create') : Yii::t('app', 'Update')])); ?>
+
+<hr/>
+<?php }?>
 
 <?php $submitButtonOption = [];
 if (!$model->isNewRecord && Yii::$app->request->isAjax) {

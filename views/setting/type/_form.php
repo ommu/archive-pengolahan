@@ -58,9 +58,18 @@ if ($model->isNewRecord && !$model->getErrors()) {
 }
 echo $form->field($model, 'publish')
 	->checkbox()
-	->label($model->getAttributeLabel('publish')); ?>
+	->label($model->getAttributeLabel('publish'));
+
+if (($stayInHere = Yii::$app->request->get('stayInHere')) != null) {
+    $model->stayInHere = $stayInHere;
+}
+if (!Yii::$app->request->isAjax) {
+    echo $form->field($model, 'stayInHere')
+        ->checkbox()
+        ->label(Yii::t('app', 'Stay on this page after I click {message}.', ['message' => $model->isNewRecord ? Yii::t('app', 'Create') : Yii::t('app', 'Update')])); ?>
 
 <hr/>
+<?php }?>
 
 <?php $submitButtonOption = [];
 if (!$model->isNewRecord && Yii::$app->request->isAjax) {

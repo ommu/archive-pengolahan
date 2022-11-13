@@ -18,6 +18,10 @@ use yii\helpers\Html;
 use yii\helpers\Url;
 use app\components\widgets\ActiveForm;
 
+$context = $this->context;
+if ($context->breadcrumbApp) {
+	$this->params['breadcrumbs'][] = ['label' => $context->breadcrumbAppParam['name'], 'url' => [$context->breadcrumbAppParam['url']]];
+}
 if ($penyerahan) {
     $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Penyerahan'), 'url' => ['penyerahan/admin/index']];
     $this->params['breadcrumbs'][] = ['label' => $penyerahan->type->type_name. ': ' .$penyerahan->kode_box, 'url' => ['penyerahan/admin/view', 'id' => $penyerahan->id]];

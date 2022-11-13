@@ -34,7 +34,7 @@ penyerahan_submenu:
     card:
       label: Description Card
       url:
-        0: 'card/manage'
+        0: 'penyerahan/card/manage'
         penyerahan: $_GET*id
       select: controller
   2:
@@ -42,6 +42,115 @@ penyerahan_submenu:
       label: Delete
       url:
         0: 'admin/delete'
+        id: $_GET*id
+      htmlOptions:
+        data-confirm: Are you sure you want to delete this item?
+        data-method: post
+      select: action
+
+luring_submenu:
+  0:
+    view:
+      label: Detail
+      url:
+        0: 'luring/admin/view'
+        id: $_GET*id
+      select: action
+  1:
+    lurings:
+      label: Document(s)
+      url:
+        0: 'luring/document/manage'
+        archive: $_GET*id
+      select: controller
+    downloads:
+      label: Download(s)
+      url:
+        0: 'luring/download/manage'
+        archive: $_GET*id
+      select: controller
+
+location_submenu:
+  0:
+    view:
+      label: Detail
+      url:
+        0: 'location/view'
+        id: $_GET*id
+      select: action
+    location:
+      label: Storage Location
+      url:
+        0: 'location/set'
+        id: $_GET*id
+      select: action
+
+setting_submenu:
+  0:
+    penyerahanType:
+      label: Tipe Penyerahan
+      url:
+        0: 'setting/type/index'
+      select: controller
+    jenisArsip:
+      label: Jenis Arsip
+      url:
+        0: 'setting/jenis/index'
+      select: controller
+    location:
+      label: Physical Storage
+      url: ['/archive-location/admin/index']
+      select: controller
+  1:
+    users:
+      label: Users
+      url:
+        0: 'user/admin/index'
+      select: controller
+    userGroup:
+      label: User Group
+      url:
+        0: 'user/group/index'
+      select: controller
+  2:
+    setting:
+      label: Settings
+      url:
+        0: 'setting/admin/update'
+      select: controller
+
+schemma_submenu:
+  0:
+    view:
+      label: Detail
+      url:
+        0: 'schema/admin/view'
+        id: $_GET*id
+      select: action
+    update:
+      label: Update
+      url:
+        0: 'schema/admin/update'
+        id: $_GET*id
+      select: action
+  1:
+    tree:
+      label: Tree
+      url:
+        0: 'schema/admin/tree'
+        id: $_GET*id
+      select: action
+    childs:
+      label: Childs
+      url:
+        0: 'schema/admin/manage'
+        parent: $_GET*id
+      select: action
+  2:
+    delete:
+      label: Delete
+      url:
+        0: 'fond/delete'
         id: $_GET*id
       htmlOptions:
         data-confirm: Are you sure you want to delete this item?

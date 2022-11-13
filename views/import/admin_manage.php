@@ -19,6 +19,16 @@ use yii\helpers\Url;
 use app\components\grid\GridView;
 use yii\widgets\Pjax;
 
+$context = $this->context;
+if ($context->breadcrumbApp) {
+	$this->params['breadcrumbs'][] = ['label' => $context->breadcrumbAppParam['name'], 'url' => [$context->breadcrumbAppParam['url']]];
+}
+if ($type == 'item') {
+    $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Penyerahan'), 'url' => ['penyerahan/admin/index']];
+    $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Item'), 'url' => ['penyerahan/item/manage', 'penyerahan' => $id]];
+} else if ($type == 'penyerahan') {
+    $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Penyerahan'), 'url' => ['penyerahan/admin/index']];
+}
 $this->params['breadcrumbs'][] = $this->title;
 
 $this->params['menu']['option'] = [

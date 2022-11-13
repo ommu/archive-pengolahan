@@ -18,6 +18,10 @@ use yii\helpers\Url;
 use yii\widgets\DetailView;
 
 if (!$small) {
+    $context = $this->context;
+    if ($context->breadcrumbApp) {
+        $this->params['breadcrumbs'][] = ['label' => $context->breadcrumbAppParam['name'], 'url' => [$context->breadcrumbAppParam['url']]];
+    }
     $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Penyerahan'), 'url' => ['index']];
     $this->params['breadcrumbs'][] = $model->type->type_name. ': ' .$model->kode_box;
 } ?>
@@ -45,10 +49,20 @@ $attributes = [
 	[
 		'attribute' => 'kode_box',
 		'value' => $model->kode_box ? $model->kode_box : '-',
+		'format' => 'html',
+	],
+	[
+        'attribute' => 'creator',
+		'value' => function ($model) {
+            return implode(', ', $model->getCreators(true, 'title'));
+		},
+		'format' => 'html',
+		'visible' => !$small,
 	],
 	[
 		'attribute' => 'pencipta_arsip',
 		'value' => $model->pencipta_arsip ? $model->pencipta_arsip : '-',
+		'format' => 'html',
 	],
 	[
 		'attribute' => 'tahun',
@@ -57,31 +71,37 @@ $attributes = [
 	[
 		'attribute' => 'nomor_arsip',
 		'value' => $model->nomor_arsip ? $model->nomor_arsip : '-',
+		'format' => 'html',
 		'visible' => !$small,
 	],
 	[
 		'attribute' => 'jumlah_arsip',
 		'value' => $model->jumlah_arsip ? $model->jumlah_arsip : '-',
+		'format' => 'html',
 		'visible' => !$small,
 	],
 	[
 		'attribute' => 'nomor_box',
 		'value' => $model->nomor_box ? $model->nomor_box : '-',
+		'format' => 'html',
 		'visible' => !$small,
 	],
 	[
 		'attribute' => 'jumlah_box',
 		'value' => $model->jumlah_box ? $model->jumlah_box : '-',
+		'format' => 'html',
 		'visible' => !$small,
 	],
 	[
 		'attribute' => 'nomor_box_urutan',
 		'value' => $model->nomor_box_urutan ? $model->nomor_box_urutan : '-',
+		'format' => 'html',
 		'visible' => !$small,
 	],
 	[
 		'attribute' => 'lokasi',
 		'value' => $model->lokasi ? $model->lokasi : '-',
+		'format' => 'html',
 		'visible' => !$small,
 	],
 	[
@@ -98,16 +118,7 @@ $attributes = [
 	[
 		'attribute' => 'description',
 		'value' => $model->description ? $model->description : '-',
-		'visible' => !$small,
-	],
-	[
-		'attribute' => 'oItem',
-		'value' => function ($model) {
-            $items = $model->getItems(true);
-            // $items = $model->grid->item;
-            return Html::a($items, ['penyerahan/item/manage', 'penyerahan' => $model->primaryKey, 'publish' => 1], ['title' => Yii::t('app', '{count} items', ['count' => $items]), 'data-pjax' => 0]);
-		},
-		'format' => 'raw',
+		'format' => 'html',
 		'visible' => !$small,
 	],
 	[
@@ -117,7 +128,7 @@ $attributes = [
 			return $model->publication_file ? Html::a($model->publication_file, Url::to(join('/', ['@webpublic', $uploadPath, $model->publication_file])), ['alt' => $model->publication_file, 'target' => '_blank']): '-';
 		},
 		'format' => 'raw',
-		'visible' => !$small,
+		'visible' => !$small && (!empty($model->type->feature) && in_array('publication', $model->type->feature)) ? true : false,
 	],
 	[
 		'attribute' => 'pengolahan_status',
@@ -127,6 +138,24 @@ $attributes = [
 	[
 		'attribute' => 'pengolahan_tahun',
 		'value' => $model->pengolahan_tahun ? $model->pengolahan_tahun : '-',
+		'visible' => !$small,
+	],
+	[
+		'attribute' => 'oItem',
+		'value' => function ($model) {
+            $items = $model->grid->item ?? 0;
+            return Html::a($items, ['penyerahan/item/manage', 'penyerahan' => $model->primaryKey], ['title' => Yii::t('app', '{count} items', ['count' => $items]), 'data-pjax' => 0]);
+		},
+		'format' => 'raw',
+		'visible' => !$small && (!empty($model->type->feature) && in_array('item', $model->type->feature)) ? true : false,
+	],
+	[
+		'attribute' => 'oCard',
+		'value' => function ($model) {
+            $cards = $model->grid->card ?? 0;
+            return Html::a($cards, ['penyerahan/card/manage', 'penyerahan' => $model->primaryKey], ['title' => Yii::t('app', '{count} cards', ['count' => $cards]), 'data-pjax' => 0]);
+		},
+		'format' => 'raw',
 		'visible' => !$small,
 	],
 	[
@@ -156,7 +185,7 @@ $attributes = [
 	],
 	[
 		'attribute' => '',
-		'value' => Html::a(Yii::t('app', 'Update'), ['update', 'id' => $model->primaryKey], ['title' => Yii::t('app', 'Update'), 'class' => 'btn btn-primary btn-sm modal-btn']),
+		'value' => Html::a(Yii::t('app', 'Update'), ['update', 'id' => $model->primaryKey], ['title' => Yii::t('app', 'Update'), 'class' => 'btn btn-primary btn-sm']),
 		'format' => 'html',
 		'visible' => !$small && Yii::$app->request->isAjax ? true : false,
 	],

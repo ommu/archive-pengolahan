@@ -78,7 +78,7 @@ class ArchivePengolahanPenyerahanJenis extends \app\components\ActiveRecord
 			'penyerahanArsip' => Yii::t('app', 'Penyerahan'),
 			'creationDisplayname' => Yii::t('app', 'Creation'),
 			'penyerahanTypeId' => Yii::t('app', 'Tipe Penyerahan'),
-			'penyerahans' => Yii::t('app', 'Jumlah Penyerahan'),
+			'penyerahans' => Yii::t('app', 'Penyerahan'),
 		];
 	}
 
@@ -267,7 +267,7 @@ class ArchivePengolahanPenyerahanJenis extends \app\components\ActiveRecord
 	{
         if (parent::beforeSave($insert)) {
             if ($insert) {
-                $tagBody = Inflector::slug($this->tagBody);
+                $tagBody = Inflector::camelize($this->tagBody);
                 if ($this->tag_id == 0) {
                     $tag = CoreTags::find()
                         ->select(['tag_id'])

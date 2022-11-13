@@ -19,7 +19,12 @@ use yii\widgets\DetailView;
 use yii\helpers\Json;
 
 if (!$small) {
-    $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Penyerahan Types'), 'url' => ['index']];
+    $context = $this->context;
+    if ($context->breadcrumbApp) {
+        $this->params['breadcrumbs'][] = ['label' => $context->breadcrumbAppParam['name'], 'url' => [$context->breadcrumbAppParam['url']]];
+    }
+    $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Setting'), 'url' => ['setting/admin/index']];
+    $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Penyerahan Type'), 'url' => ['index']];
     $this->params['breadcrumbs'][] = $model->type_name;
 
     $this->params['menu']['content'] = [
@@ -60,6 +65,15 @@ $attributes = [
             }
             return Json::encode($model->feature);
 		},
+		'visible' => !$small,
+	],
+	[
+		'attribute' => 'oPenyerahan',
+		'value' => function ($model) {
+			$penyerahans = $model->grid->penyerahan;
+			return Html::a($penyerahans, ['penyerahan/admin/manage', 'type' => $model->primaryKey], ['title' => Yii::t('app', '{count} penyerahans', ['count' => $penyerahans])]);
+		},
+		'format' => 'html',
 		'visible' => !$small,
 	],
 	[

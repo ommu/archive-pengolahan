@@ -34,9 +34,24 @@ use mdm\admin\components\AccessControl;
 use yii\filters\VerbFilter;
 use ommu\archivePengolahan\models\ArchivePengolahanPenyerahanType;
 use ommu\archivePengolahan\models\search\ArchivePengolahanPenyerahanType as ArchivePengolahanPenyerahanTypeSearch;
+use ommu\archivePengolahan\models\ArchivePengolahanSetting;
 
 class TypeController extends Controller
 {
+	/**
+	 * {@inheritdoc}
+	 */
+	public function init()
+	{
+        parent::init();
+
+        $this->subMenu = $this->module->params['setting_submenu'];
+
+        $setting = new ArchivePengolahanSetting(['app' => 'archivePengolahanModule']);
+		$this->breadcrumbApp = $setting->breadcrumb;
+		$this->breadcrumbAppParam = $setting->getBreadcrumbAppParam();
+	}
+
 	/**
 	 * {@inheritdoc}
 	 */
@@ -111,9 +126,11 @@ class TypeController extends Controller
             // $model->order = $postData['order'] ? $postData['order'] : 0;
 
             if ($model->save()) {
-                Yii::$app->session->setFlash('success', Yii::t('app', 'Archive penyerahan type success created.'));
+                Yii::$app->session->setFlash('success', Yii::t('app', 'Penyerahan type success created.'));
+                if ($model->stayInHere) {
+                    return $this->redirect(['create', 'stayInHere' => $model->stayInHere]);
+                }
                 return $this->redirect(['manage']);
-                //return $this->redirect(['view', 'id' => $model->id]);
 
             } else {
                 if (Yii::$app->request->isAjax) {
@@ -147,7 +164,10 @@ class TypeController extends Controller
             // $model->order = $postData['order'] ? $postData['order'] : 0;
 
             if ($model->save()) {
-                Yii::$app->session->setFlash('success', Yii::t('app', 'Archive penyerahan type success updated.'));
+                Yii::$app->session->setFlash('success', Yii::t('app', 'Penyerahan type success updated.'));
+                if ($model->stayInHere) {
+                    return $this->redirect(['update', 'id' => $model->id, 'stayInHere' => $model->stayInHere]);
+                }
                 return $this->redirect(['manage']);
 
             } else {
@@ -160,7 +180,7 @@ class TypeController extends Controller
 		$this->view->title = Yii::t('app', 'Update Penyerahan Type: {type-name}', ['type-name' => $model->type_name]);
 		$this->view->description = '';
 		$this->view->keywords = '';
-		return $this->render('admin_update', [
+		return $this->oRender('admin_update', [
 			'model' => $model,
 		]);
 	}
@@ -195,7 +215,7 @@ class TypeController extends Controller
 		$model->publish = 2;
 
         if ($model->save(false, ['publish','modified_id'])) {
-            Yii::$app->session->setFlash('success', Yii::t('app', 'Archive penyerahan type success deleted.'));
+            Yii::$app->session->setFlash('success', Yii::t('app', 'Penyerahan type success deleted.'));
             return $this->redirect(Yii::$app->request->referrer ?: ['manage']);
         }
 	}
@@ -213,7 +233,7 @@ class TypeController extends Controller
 		$model->publish = $replace;
 
         if ($model->save(false, ['publish','modified_id'])) {
-            Yii::$app->session->setFlash('success', Yii::t('app', 'Archive penyerahan type success updated.'));
+            Yii::$app->session->setFlash('success', Yii::t('app', 'Penyerahan type success updated.'));
             return $this->redirect(Yii::$app->request->referrer ?: ['manage']);
         }
 	}

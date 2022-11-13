@@ -28,6 +28,7 @@
  * @property string $publication_file
  * @property integer $pengolahan_status
  * @property string $pengolahan_tahun
+ * @property integer $import_id
  * @property string $creation_date
  * @property integer $creation_id
  * @property string $modified_date
@@ -36,6 +37,8 @@
  *
  * The followings are the available model relations:
  * @property ArchivePengolahanPenyerahanType $type
+ * @property ArchivePengolahanPenyerahanCard[] $cards
+ * @property ArchivePengolahanPenyerahanGrid $grid
  * @property ArchivePengolahanPenyerahanItem[] $items
  * @property ArchivePengolahanPenyerahanJenis[] $jenis
  * @property Users $creation
@@ -59,8 +62,10 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 	use \ommu\traits\FileTrait;
 
     public $gridForbiddenColumn = ['jumlah_arsip', 'jumlah_box', 'nomor_box_urutan', 'lokasi', 'color_code', 'description', 'pengolahan_tahun', 'creation_date', 'modified_date', 'updated_date', 
-        'jenisArsip', 'typeName', 'creationDisplayname', 'modifiedDisplayname'];
+        'jenisArsip', 'typeName', 'creationDisplayname', 'modifiedDisplayname', 'creator'];
 
+    public $stayInHere;
+	public $creator;
 	public $jenisArsip;
 	public $old_publication_file;
 
@@ -69,6 +74,7 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 	public $modifiedDisplayname;
 	public $jenisId;
 	public $oPublication;
+	public $oCard;
     public $oItem;
 
 	const SCENARIO_PENGOLAHAN_STATUS = 'pengolahanStatusForm';
@@ -91,12 +97,11 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 		return [
 			[['type_id', 'kode_box', 'pencipta_arsip'], 'required'],
 			[['pengolahan_status', 'pengolahan_tahun'], 'required', 'on' => self::SCENARIO_PENGOLAHAN_STATUS],
-			[['publish', 'type_id', 'pengolahan_status', 'creation_id', 'modified_id'], 'integer'],
-			[['pencipta_arsip', 'lokasi', 'description'], 'string'],
-			[['tahun', 'nomor_arsip', 'jumlah_arsip', 'nomor_box', 'jumlah_box', 'nomor_box_urutan', 'lokasi', 'color_code', 'description', 'publication_file', 'pengolahan_status', 'pengolahan_tahun', 'jenisArsip'], 'safe'],
+			[['publish', 'type_id', 'pengolahan_status', 'creation_id', 'modified_id', 'stayInHere'], 'integer'],
+			[['kode_box', 'pencipta_arsip', 'nomor_arsip', 'jumlah_arsip', 'nomor_box', 'jumlah_box', 'nomor_box_urutan', 'lokasi', 'description'], 'string'],
+			[['tahun', 'nomor_arsip', 'jumlah_arsip', 'nomor_box', 'jumlah_box', 'nomor_box_urutan', 'lokasi', 'color_code', 'description', 'publication_file', 'pengolahan_status', 'pengolahan_tahun', 'stayInHere', 'jenisArsip', 'creator'], 'safe'],
 			[['kode_box'], 'string', 'max' => 64],
-			[['tahun', 'pengolahan_tahun'], 'string', 'max' => 16],
-			[['nomor_arsip', 'jumlah_arsip', 'nomor_box', 'jumlah_box', 'nomor_box_urutan', 'color_code'], 'string', 'max' => 32],
+			[['tahun', 'pengolahan_tahun', 'color_code'], 'string', 'max' => 32],
 			[['type_id'], 'exist', 'skipOnError' => true, 'targetClass' => ArchivePengolahanPenyerahanType::className(), 'targetAttribute' => ['type_id' => 'id']],
 		];
 	}
@@ -124,18 +129,22 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 			'color_code' => Yii::t('app', 'Color Code'),
 			'description' => Yii::t('app', 'Description'),
 			'publication_file' => Yii::t('app', 'Publication File'),
+			'import_id' => Yii::t('app', 'Import'),
 			'creation_date' => Yii::t('app', 'Creation Date'),
 			'creation_id' => Yii::t('app', 'Creation'),
 			'modified_date' => Yii::t('app', 'Modified Date'),
 			'modified_id' => Yii::t('app', 'Modified'),
 			'updated_date' => Yii::t('app', 'Updated Date'),
+			'stayInHere' => Yii::t('app', 'stayInHere'),
+			'creator' => Yii::t('app', 'Name of creator(s)'),
 			'jenisArsip' => Yii::t('app', 'Jenis Arsip'),
 			'old_publication_file' => Yii::t('app', 'Old Publication File'),
 			'typeName' => Yii::t('app', 'Type'),
 			'creationDisplayname' => Yii::t('app', 'Creation'),
 			'modifiedDisplayname' => Yii::t('app', 'Modified'),
 			'oPublication' => Yii::t('app', 'Publication File'),
-            'oItem' => Yii::t('app', 'Items'),
+			'oCard' => Yii::t('app', 'Cards'),
+			'oItem' => Yii::t('app', 'Items'),
 		];
 	}
 
@@ -145,8 +154,8 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 	public function scenarios()
 	{
 		$scenarios = parent::scenarios();
-		$scenarios[self::SCENARIO_PENGOLAHAN_STATUS] = ['publish', 'type_id', 'kode_box', 'pencipta_arsip', 'tahun', 'nomor_arsip', 'jumlah_arsip', 'nomor_box', 'jumlah_box', 'nomor_box_urutan', 'lokasi', 'color_code', 'description', 'pengolahan_status', 'pengolahan_tahun'];
-		$scenarios[self::SCENARIO_PUBLICATION] = ['publish', 'type_id', 'kode_box', 'pencipta_arsip', 'tahun', 'nomor_arsip', 'jumlah_arsip', 'nomor_box', 'jumlah_box', 'nomor_box_urutan', 'lokasi', 'color_code', 'description', 'publication_file', 'pengolahan_status', 'pengolahan_tahun'];
+		$scenarios[self::SCENARIO_PENGOLAHAN_STATUS] = ['publish', 'type_id', 'kode_box', 'pencipta_arsip', 'tahun', 'nomor_arsip', 'jumlah_arsip', 'nomor_box', 'jumlah_box', 'nomor_box_urutan', 'lokasi', 'color_code', 'description', 'pengolahan_status', 'pengolahan_tahun', 'stayInHere'];
+		$scenarios[self::SCENARIO_PUBLICATION] = ['publish', 'type_id', 'kode_box', 'pencipta_arsip', 'tahun', 'nomor_arsip', 'jumlah_arsip', 'nomor_box', 'jumlah_box', 'nomor_box_urutan', 'lokasi', 'color_code', 'description', 'publication_file', 'pengolahan_status', 'pengolahan_tahun', 'stayInHere'];
 		return $scenarios;
 	}
 
@@ -159,26 +168,80 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
             ->select(['id', 'type_name', 'feature']);
 	}
 
+	/**
+	 * @return \yii\db\ActiveQuery
+	 */
+	public function getCards($count=false, $publish=1)
+	{
+        if ($count == false) {
+            $model = $this->hasMany(ArchivePengolahanPenyerahanCard::className(), ['penyerahan_id' => 'id'])
+				->alias('cards');
+            if ($publish != null) {
+                $model->andOnCondition([sprintf('%s.publish', 'cards') => $publish]);
+            } else {
+                $model->andOnCondition(['IN', sprintf('%s.publish', 'cards'), [0,1]]);
+            }
+
+            return $model;
+        }
+
+		$model = ArchivePengolahanPenyerahanCard::find()
+            ->alias('t')
+            ->where(['t.penyerahan_id' => $this->id]);
+        if ($publish != null) {
+            if ($publish == 0) {
+                $model->unpublish();
+            } else if ($publish == 1) {
+                $model->published();
+            } else if ($publish == 2) {
+                $model->deleted();
+            }
+		} else {
+            $model->andWhere(['IN', 't.publish', [0,1]]);
+        }
+		$cards = $model->count();
+
+		return $cards ? $cards : 0;
+	}
+
+	/**
+	 * @return \yii\db\ActiveQuery
+	 */
+	public function getGrid()
+	{
+		return $this->hasOne(ArchivePengolahanPenyerahanGrid::className(), ['id' => 'id']);
+	}
+
     /**
      * @return \yii\db\ActiveQuery
      */
     public function getItems($count=false, $publish=1)
     {
         if ($count == false) {
-            return $this->hasMany(ArchivePengolahanPenyerahanItem::className(), ['penyerahan_id' => 'id'])
-                ->alias('items')
-                ->andOnCondition([sprintf('%s.publish', 'items') => $publish]);
+            $model = $this->hasMany(ArchivePengolahanPenyerahanItem::className(), ['penyerahan_id' => 'id'])
+				->alias('items');
+            if ($publish != null) {
+                $model->andOnCondition([sprintf('%s.publish', 'items') => $publish]);
+            } else {
+                $model->andOnCondition(['IN', sprintf('%s.publish', 'items'), [0,1]]);
+            }
+
+            return $model;
         }
 
         $model = ArchivePengolahanPenyerahanItem::find()
             ->alias('t')
             ->where(['t.penyerahan_id' => $this->id]);
-        if ($publish == 0) {
-            $model->unpublish();
-        } else if ($publish == 1) {
-            $model->published();
-        } else if ($publish == 2) {
-            $model->deleted();
+        if ($publish != null) {
+            if ($publish == 0) {
+                $model->unpublish();
+            } else if ($publish == 1) {
+                $model->published();
+            } else if ($publish == 2) {
+                $model->deleted();
+            }
+		} else {
+            $model->andWhere(['IN', 't.publish', [0,1]]);
         }
         $items = $model->count();
 
@@ -214,6 +277,19 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 	{
 		return $this->hasOne(Users::className(), ['user_id' => 'modified_id'])
             ->select(['user_id', 'displayname']);
+	}
+
+	/**
+	 * @return \yii\db\ActiveQuery
+	 */
+	public function getCreators($result=false, $val='id')
+	{
+        if ($result == true) {
+            return \yii\helpers\ArrayHelper::map($this->creators, 'creator_id', $val=='id' ? 'id' : 'creator.creator_name');
+        }
+
+		return $this->hasMany(ArchivePengolahanPenyerahanCreator::className(), ['penyerahan_id' => 'id'])
+            ->select(['id', 'penyerahan_id', 'creator_id']);
 	}
 
 	/**
@@ -257,14 +333,24 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 		$this->templateColumns['kode_box'] = [
 			'attribute' => 'kode_box',
 			'value' => function($model, $key, $index, $column) {
-				return $model->kode_box;
+				return nl2br($model->kode_box);
 			},
+			'format' => 'html',
+		];
+		$this->templateColumns['creator'] = [
+			'attribute' => 'creator',
+			'label' => Yii::t('app', 'Creator'),
+			'value' => function($model, $key, $index, $column) {
+				return implode(', ', $model->getCreators(true, 'title'));
+			},
+			'format' => 'html',
 		];
 		$this->templateColumns['pencipta_arsip'] = [
 			'attribute' => 'pencipta_arsip',
 			'value' => function($model, $key, $index, $column) {
-				return $model->pencipta_arsip;
+				return nl2br($model->pencipta_arsip);
 			},
+			'format' => 'html',
 		];
 		$this->templateColumns['tahun'] = [
 			'attribute' => 'tahun',
@@ -275,38 +361,44 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 		$this->templateColumns['nomor_arsip'] = [
 			'attribute' => 'nomor_arsip',
 			'value' => function($model, $key, $index, $column) {
-				return $model->nomor_arsip;
+				return nl2br($model->nomor_arsip);
 			},
+			'format' => 'html',
 		];
 		$this->templateColumns['jumlah_arsip'] = [
 			'attribute' => 'jumlah_arsip',
 			'value' => function($model, $key, $index, $column) {
-				return $model->jumlah_arsip;
+				return nl2br($model->jumlah_arsip);
 			},
+			'format' => 'html',
 		];
 		$this->templateColumns['nomor_box'] = [
 			'attribute' => 'nomor_box',
 			'value' => function($model, $key, $index, $column) {
-				return $model->nomor_box;
+				return nl2br($model->nomor_box);
 			},
+			'format' => 'html',
 		];
 		$this->templateColumns['jumlah_box'] = [
 			'attribute' => 'jumlah_box',
 			'value' => function($model, $key, $index, $column) {
-				return $model->jumlah_box;
+				return nl2br($model->jumlah_box);
 			},
+			'format' => 'html',
 		];
 		$this->templateColumns['nomor_box_urutan'] = [
 			'attribute' => 'nomor_box_urutan',
 			'value' => function($model, $key, $index, $column) {
-				return $model->nomor_box_urutan;
+				return nl2br($model->nomor_box_urutan);
 			},
+			'format' => 'html',
 		];
 		$this->templateColumns['lokasi'] = [
 			'attribute' => 'lokasi',
 			'value' => function($model, $key, $index, $column) {
-				return $model->lokasi;
+				return nl2br($model->lokasi);
 			},
+			'format' => 'html',
 		];
 		$this->templateColumns['jenisArsip'] = [
 			'attribute' => 'jenisArsip',
@@ -324,8 +416,9 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 		$this->templateColumns['description'] = [
 			'attribute' => 'description',
 			'value' => function($model, $key, $index, $column) {
-				return $model->description;
+				return nl2br($model->description);
 			},
+			'format' => 'html',
 		];
 		$this->templateColumns['pengolahan_tahun'] = [
 			'attribute' => 'pengolahan_tahun',
@@ -370,17 +463,6 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 			},
 			'filter' => $this->filterDatepicker($this, 'updated_date'),
 		];
-        $this->templateColumns['oItem'] = [
-            'attribute' => 'oItem',
-            'value' => function($model, $key, $index, $column) {
-                $items = $model->getItems(true);
-                // $items = $model->grid->item;
-                return Html::a($items, ['penyerahan/item/manage', 'penyerahan' => $model->primaryKey], ['title' => Yii::t('app', '{count} items', ['count' => $items]), 'data-pjax' => 0]);
-            },
-            'filter' => false,
-            'contentOptions' => ['class' => 'text-center'],
-            'format' => 'raw',
-        ];
 		$this->templateColumns['oPublication'] = [
 			'attribute' => 'oPublication',
 			'value' => function($model, $key, $index, $column) {
@@ -402,6 +484,31 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 			'filter' => $this->filterYesNo(),
 			'contentOptions' => ['class' => 'text-center'],
 			'format' => 'html',
+		];
+		$this->templateColumns['oItem'] = [
+			'attribute' => 'oItem',
+			'value' => function($model, $key, $index, $column) {
+                if (!empty($model->type->feature) && in_array('item', $model->type->feature)) {
+                    // $items = $model->getItems(true);
+                    $items = $model->grid->item ?? 0;
+                    return Html::a($items, ['penyerahan/item/manage', 'penyerahan' => $model->primaryKey], ['title' => Yii::t('app', '{count} items', ['count' => $items]), 'data-pjax' => 0]);
+                }
+				return '-';
+			},
+			'filter' => $this->filterYesNo(),
+			'contentOptions' => ['class' => 'text-center'],
+			'format' => 'raw',
+		];
+		$this->templateColumns['oCard'] = [
+			'attribute' => 'oCard',
+			'value' => function($model, $key, $index, $column) {
+				// $cards = $model->getCards(true);
+				$cards = $model->grid->card ?? 0;
+				return Html::a($cards, ['penyerahan/card/manage', 'penyerahan' => $model->primaryKey], ['title' => Yii::t('app', '{count} cards', ['count' => $cards]), 'data-pjax' => 0]);
+			},
+			'filter' => $this->filterYesNo(),
+			'contentOptions' => ['class' => 'text-center'],
+			'format' => 'raw',
 		];
 	}
 
@@ -450,6 +557,20 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 	}
 
 	/**
+	 * function parsePenyerahan
+	 */
+	public static function parsePenyerahan($model, $urlTitle=true)
+	{
+		$title = $model->pencipta_arsip;
+        $penyerahanTitle = $urlTitle == true ? Html::a($title, ['penyerahan/admin/view', 'id' => $model->id], ['title' => $title, 'class' => 'modal-btn']) : $title ;
+
+        $html = Html::button($model->kode_box, ['class' => 'btn btn-info btn-xs']).'<br/>';
+        $html .= $penyerahanTitle;
+
+		return $html;
+	}
+
+	/**
 	 * @param returnAlias set true jika ingin kembaliannya path alias atau false jika ingin string
 	 * relative path. default true.
 	 */
@@ -470,9 +591,13 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 		// $this->typeName = isset($this->type) ? $this->type->type_name : '-';
 		// $this->creationDisplayname = isset($this->creation) ? $this->creation->displayname : '-';
 		// $this->modifiedDisplayname = isset($this->modified) ? $this->modified->displayname : '-';
+		// $this->card = $this->getCards(true) ? 1 : 0;
         // $this->item = $this->getItems(true) ? 1 : 0;
 		// $this->jenisArsip = $this->getJenis(true) ? 1 : 0;
         $this->pengolahan_status = $this->pengolahan_status != '' && $this->pengolahan_status == 1 ? $this->pengolahan_status : 0;
+		// $this->oCard = isset($this->grid) ? $this->grid->card : 0;
+		// $this->oItem = isset($this->grid) ? $this->grid->item : 0;
+		// $this->creator = implode(',', $this->getCreators(true, 'title'));
 	}
 
 	/**

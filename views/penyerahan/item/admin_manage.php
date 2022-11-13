@@ -19,6 +19,10 @@ use yii\helpers\Url;
 use app\components\grid\GridView;
 use yii\widgets\Pjax;
 
+$context = $this->context;
+if ($context->breadcrumbApp) {
+	$this->params['breadcrumbs'][] = ['label' => $context->breadcrumbAppParam['name'], 'url' => [$context->breadcrumbAppParam['url']]];
+}
 if ($penyerahan) {
     $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Penyerahan'), 'url' => ['penyerahan/admin/index']];
     $this->params['breadcrumbs'][] = ['label' => $penyerahan->type->type_name. ': ' .$penyerahan->kode_box, 'url' => ['penyerahan/admin/view', 'id' => $penyerahan->id]];
@@ -27,7 +31,9 @@ if ($penyerahan) {
     $this->params['breadcrumbs'][] = $this->title;
 }
 
+$importHistoryUrl = ['import/manage', 'type' => 'item'];
 if ($penyerahan) {
+    $importHistoryUrl = ['import/manage', 'type' => 'item', 'id' => $penyerahan->id];
     $this->params['menu']['content'] = [
         ['label' => Yii::t('app', 'Add Item'), 'url' => Url::to(['create', 'id' => $penyerahan->id]), 'icon' => 'plus-square', 'htmlOptions' => ['class' => 'btn btn-success']],
         ['label' => Yii::t('app', 'Import Item'), 'url' => Url::to(['import', 'id' => $penyerahan->id]), 'icon' => 'plus-square', 'htmlOptions' => ['class' => 'btn btn-dark']],
@@ -36,7 +42,7 @@ if ($penyerahan) {
 $this->params['menu']['option'] = [
 	//['label' => Yii::t('app', 'Search'), 'url' => 'javascript:void(0);'],
 	['label' => Yii::t('app', 'Grid Option'), 'url' => 'javascript:void(0);'],
-	['label' => Yii::t('app', 'Import Histories'), 'url' => Url::to(['import/manage', 'type' => 'item'])],
+	['label' => Yii::t('app', 'Import Histories'), 'url' => Url::to($importHistoryUrl)],
 ];
 ?>
 
@@ -69,10 +75,10 @@ array_push($columnData, [
 	},
 	'buttons' => [
 		'view' => function ($url, $model, $key) {
-			return Html::a('<span class="glyphicon glyphicon-eye-open"></span>', $url, ['title' => Yii::t('app', 'Detail Penyerahan Item')]);
+			return Html::a('<span class="glyphicon glyphicon-eye-open"></span>', $url, ['title' => Yii::t('app', 'Detail Penyerahan Item'), 'class' => 'modal-btn']);
 		},
 		'update' => function ($url, $model, $key) {
-			return Html::a('<span class="glyphicon glyphicon-pencil"></span>', $url, ['title' => Yii::t('app', 'Update Penyerahan Item')]);
+			return Html::a('<span class="glyphicon glyphicon-pencil"></span>', $url, ['title' => Yii::t('app', 'Update Penyerahan Item'), 'data-pjax' => 0]);
 		},
 		'delete' => function ($url, $model, $key) {
 			return Html::a('<span class="glyphicon glyphicon-trash"></span>', $url, [

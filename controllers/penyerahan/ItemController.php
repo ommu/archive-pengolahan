@@ -13,6 +13,8 @@
  *  Update
  *  View
  *  Delete
+ *  RunAction
+ *  Publish
  *	Import
  *
  *  findModel
@@ -38,6 +40,8 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use yii\helpers\Inflector;
 use thamtech\uuid\helpers\UuidHelper;
 use ommu\archivePengolahan\models\ArchivePengolahanImport;
+use ommu\archivePengolahan\models\ArchivePengolahanSetting;
+use ommu\archivePengolahan\models\ArchivePengolahanPenyerahan;
 
 class ItemController extends Controller
 {
@@ -54,12 +58,9 @@ class ItemController extends Controller
             $this->subMenu = $this->module->params['penyerahan_submenu'];
         }
 
-		// $setting = ArchiveSetting::find()
-		// 	->select(['breadcrumb_param'])
-		// 	->where(['id' => 1])
-		// 	->one();
-		// $this->breadcrumbApp = $setting->breadcrumb;
-		// $this->breadcrumbAppParam = $setting->getBreadcrumbAppParam();
+        $setting = new ArchivePengolahanSetting(['app' => 'archivePengolahanModule']);
+		$this->breadcrumbApp = $setting->breadcrumb;
+		$this->breadcrumbAppParam = $setting->getBreadcrumbAppParam();
 	}
 
 	/**
@@ -75,6 +76,7 @@ class ItemController extends Controller
                 'class' => VerbFilter::className(),
                 'actions' => [
                     'delete' => ['POST'],
+					'publish' => ['POST'],
                 ],
             ],
         ];
@@ -111,7 +113,7 @@ class ItemController extends Controller
 
         if (($penyerahan = Yii::$app->request->get('penyerahan')) != null) {
             $this->subMenuParam = $penyerahan;
-            $penyerahan = \ommu\archivePengolahan\models\ArchivePengolahanPenyerahan::findOne($penyerahan);
+            $penyerahan = ArchivePengolahanPenyerahan::findOne($penyerahan);
         }
 
 		$this->view->title = Yii::t('app', 'Penyerahan Items');
@@ -136,7 +138,7 @@ class ItemController extends Controller
 			throw new \yii\web\ForbiddenHttpException(Yii::t('app', 'The requested page does not exist.'));
         }
 
-        $penyerahan = \ommu\archivePengolahan\models\ArchivePengolahanPenyerahan::findOne($id);
+        $penyerahan = ArchivePengolahanPenyerahan::findOne($id);
         $model = new ArchivePengolahanPenyerahanItem(['penyerahan_id' => $id]);
 
         if (Yii::$app->request->isPost) {
@@ -146,7 +148,10 @@ class ItemController extends Controller
             // $model->order = $postData['order'] ? $postData['order'] : 0;
 
             if ($model->save()) {
-                Yii::$app->session->setFlash('success', Yii::t('app', 'Archive penyerahan item success created.'));
+                Yii::$app->session->setFlash('success', Yii::t('app', 'Penyerahan item success created.'));
+                if ($model->stayInHere) {
+                    return $this->redirect(['create', 'id' => $model->penyerahan_id, 'stayInHere' => $model->stayInHere]);
+                }
                 return $this->redirect(['manage', 'penyerahan' => $model->penyerahan_id]);
                 //return $this->redirect(['view', 'id' => $model->id]);
 
@@ -184,8 +189,11 @@ class ItemController extends Controller
             // $model->order = $postData['order'] ? $postData['order'] : 0;
 
             if ($model->save()) {
-                Yii::$app->session->setFlash('success', Yii::t('app', 'Archive penyerahan item success updated.'));
-                return $this->redirect(['manage']);
+                Yii::$app->session->setFlash('success', Yii::t('app', 'Penyerahan item success updated.'));
+                if ($model->stayInHere) {
+                    return $this->redirect(['update', 'id' => $model->id, 'stayInHere' => $model->stayInHere]);
+                }
+                return $this->redirect(['manage', 'penyerahan' => $model->penyerahan_id]);
 
             } else {
                 if (Yii::$app->request->isAjax) {
@@ -195,7 +203,7 @@ class ItemController extends Controller
         }
 
         $this->subMenuParam = $model->penyerahan_id;
-		$this->view->title = Yii::t('app', 'Update Penyerahan Item: {penyerahan-id}', ['penyerahan-id' => $model->penyerahan->type->type_name]);
+		$this->view->title = Yii::t('app', 'Update Penyerahan Item: {penyerahan-tipeId} {penyerahan-kodeBox}', ['penyerahan-tipeId' => $model->type->type_name, 'penyerahan-kodeBox' => $model->penyerahan->kode_box]);
 		$this->view->description = '';
 		$this->view->keywords = '';
 		return $this->render('admin_update', [
@@ -213,13 +221,48 @@ class ItemController extends Controller
         $model = $this->findModel($id);
 
         $this->subMenuParam = $model->penyerahan_id;
-		$this->view->title = Yii::t('app', 'Detail Penyerahan Item: {penyerahan-id}', ['penyerahan-id' => $model->penyerahan->type->type_name]);
+		$this->view->title = Yii::t('app', 'Detail Penyerahan Item: {penyerahan-tipeId} {penyerahan-kodeBox}', ['penyerahan-tipeId' => $model->type->type_name, 'penyerahan-kodeBox' => $model->penyerahan->kode_box]);
 		$this->view->description = '';
 		$this->view->keywords = '';
 		return $this->oRender('admin_view', [
 			'model' => $model,
 			'small' => false,
 		]);
+	}
+
+	/**
+	 * Deletes an existing ArchivePengolahanPenyerahanItem model.
+	 * If deletion is successful, the browser will be redirected to the 'index' page.
+	 * @param integer $id
+	 * @return mixed
+	 */
+	public function actionDelete($id)
+	{
+		$model = $this->findModel($id);
+		$model->publish = 2;
+
+        if ($model->save(false, ['publish','modified_id'])) {
+            Yii::$app->session->setFlash('success', Yii::t('app', 'Penyerahan item success deleted.'));
+            return $this->redirect(Yii::$app->request->referrer ?: ['manage', 'penyerahan' => $model->penyerahan_id]);
+        }
+	}
+
+	/**
+	 * actionPublish an existing ArchivePengolahanPenyerahanType model.
+	 * If publish is successful, the browser will be redirected to the 'index' page.
+	 * @param integer $id
+	 * @return mixed
+	 */
+	public function actionPublish($id)
+	{
+		$model = $this->findModel($id);
+		$replace = $model->publish == 1 ? 0 : 1;
+		$model->publish = $replace;
+
+        if ($model->save(false, ['publish','modified_id'])) {
+            Yii::$app->session->setFlash('success', Yii::t('app', 'Penyerahan item success updated.'));
+            return $this->redirect(Yii::$app->request->referrer ?: ['manage', 'penyerahan' => $model->penyerahan_id]);
+        }
 	}
 
 	/**
@@ -298,7 +341,7 @@ class ItemController extends Controller
                                     $errors['row#'.$key] = $model->getErrors();
                                 }
 							}
-							Yii::$app->session->setFlash('success', Yii::t('app', 'Archive penyerahan item success imported.'));
+							Yii::$app->session->setFlash('success', Yii::t('app', 'Penyerahan item success imported.'));
 						} catch (\Exception $e) {
 							throw $e;
 						} catch (\Throwable $e) {
@@ -324,47 +367,22 @@ class ItemController extends Controller
 				Yii::$app->session->setFlash('error', Yii::t('app', 'Import file cannot be blank.'));
             }
 
-            if (!empty($errors)) {
-				$obligationImportErrorFile = join('/', [$itemImportPath, $fileName.'.json']);
-                if (!file_exists($obligationImportErrorFile)) {
-					file_put_contents($obligationImportErrorFile, Json::encode($errors));
-                }
-			}
-
             if (!Yii::$app->request->isAjax) {
 				return $this->redirect(['import', 'id' => $id]);
             }
 			return $this->redirect(Yii::$app->request->referrer ?: ['import', 'id' => $id]);
 		}
 
-		$this->view->title = Yii::t('app', 'Import Penyerahan Item: {penyerahan-id}', ['penyerahan-id' => $model->penyerahan->type->type_name]);
+		$this->view->title = Yii::t('app', 'Import Penyerahan Item: {penyerahan-tipeId} {penyerahan-kodeBox}', ['penyerahan-tipeId' => $model->type->type_name, 'penyerahan-kodeBox' => $model->penyerahan->kode_box]);
 		$this->view->description = '';
         if (Yii::$app->request->isAjax) {
 			$this->view->description = Yii::t('app', 'Are you sure you want to import penyerahan item data?');
         }
 		$this->view->keywords = '';
 		return $this->oRender('admin_import', [
-			'model' => $model,
 			'template' => $template,
 			'penyerahan' => $penyerahan,
 		]);
-	}
-
-	/**
-	 * Deletes an existing ArchivePengolahanPenyerahanItem model.
-	 * If deletion is successful, the browser will be redirected to the 'index' page.
-	 * @param integer $id
-	 * @return mixed
-	 */
-	public function actionDelete($id)
-	{
-		$model = $this->findModel($id);
-		$model->publish = 2;
-
-        if ($model->save(false, ['publish','modified_id'])) {
-            Yii::$app->session->setFlash('success', Yii::t('app', 'Archive penyerahan item success deleted.'));
-            return $this->redirect(Yii::$app->request->referrer ?: ['manage', 'penyerahan' => $model->penyerahan_id]);
-        }
 	}
 
 	/**
