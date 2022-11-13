@@ -26,8 +26,9 @@ class m221108_220025_archivePengolahan_module_create_table_final extends \yii\db
 			$this->createTable($tableName, [
 				'id' => Schema::TYPE_INTEGER . '(11) UNSIGNED NOT NULL AUTO_INCREMENT',
 				'publish' => Schema::TYPE_TINYINT . '(1) NOT NULL DEFAULT \'0\' COMMENT \'deleted\'',
-				'fond_name' => Schema::TYPE_STRING . '(64) NOT NULL',
+				'fond_name' => Schema::TYPE_TEXT . ' NOT NULL',
 				'archive_start_from' => Schema::TYPE_INTEGER . '(11) NOT NULL',
+				'fond_schema_id' => Schema::TYPE_STRING . '(36) COMMENT \'uuid\'',
 				'creation_date' => Schema::TYPE_TIMESTAMP . ' NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT \'trigger\'',
 				'creation_id' => Schema::TYPE_INTEGER . '(10) UNSIGNED',
 				'updated_date' => Schema::TYPE_DATETIME . ' NOT NULL DEFAULT \'0000-00-00 00:00:00\' COMMENT \'trigger\'',

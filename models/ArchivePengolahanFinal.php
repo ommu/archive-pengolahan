@@ -15,6 +15,7 @@
  * @property integer $publish
  * @property string $fond_name
  * @property integer $archive_start_from
+ * @property string $fond_schema_id
  * @property string $creation_date
  * @property integer $creation_id
  * @property string $updated_date
@@ -36,11 +37,12 @@ class ArchivePengolahanFinal extends \app\components\ActiveRecord
 {
 	use \ommu\traits\UtilityTrait;
 
-    public $gridForbiddenColumn = ['creationDisplayname'];
+    public $gridForbiddenColumn = ['updated_date'];
 
     public $stayInHere;
 
 	public $creationDisplayname;
+    public $oCard;
 
 	/**
 	 * @return string the associated database table name
@@ -58,8 +60,10 @@ class ArchivePengolahanFinal extends \app\components\ActiveRecord
 		return [
 			[['fond_name', 'archive_start_from'], 'required'],
 			[['publish', 'archive_start_from', 'creation_id', 'stayInHere'], 'integer'],
-			[['stayInHere'], 'safe'],
-			[['fond_name'], 'string', 'max' => 64],
+			[['fond_name'], 'string'],
+			[['fond_schema_id'], 'string', 'max' => 36],
+			[['fond_schema_id', 'stayInHere'], 'safe'],
+			[['fond_schema_id'], 'exist', 'skipOnError' => true, 'targetClass' => ArchivePengolahanSchema::className(), 'targetAttribute' => ['fond_schema_id' => 'id']],
 		];
 	}
 
@@ -70,14 +74,16 @@ class ArchivePengolahanFinal extends \app\components\ActiveRecord
 	{
 		return [
 			'id' => Yii::t('app', 'ID'),
-			'publish' => Yii::t('app', 'Publish'),
-			'fond_name' => Yii::t('app', 'Fond Name'),
+			'publish' => Yii::t('app', 'Status'),
+			'fond_name' => Yii::t('app', 'Senarai Name'),
 			'archive_start_from' => Yii::t('app', 'Archive Start From'),
+			'fond_schema_id' => Yii::t('app', 'From Schema'),
 			'creation_date' => Yii::t('app', 'Creation Date'),
 			'creation_id' => Yii::t('app', 'Creation'),
 			'updated_date' => Yii::t('app', 'Updated Date'),
 			'stayInHere' => Yii::t('app', 'stayInHere'),
 			'creationDisplayname' => Yii::t('app', 'Creation'),
+            'oCard' => Yii::t('app', 'Cards'),
 		];
 	}
 
@@ -124,6 +130,15 @@ class ArchivePengolahanFinal extends \app\components\ActiveRecord
 	{
 		return $this->hasOne(Users::className(), ['user_id' => 'creation_id'])
             ->select(['user_id', 'displayname']);
+	}
+
+	/**
+	 * @return \yii\db\ActiveQuery
+	 */
+	public function getSchema()
+	{
+		return $this->hasOne(ArchivePengolahanSchema::className(), ['id' => 'fond_schema_id'])
+            ->select(['id', 'code', 'title']);
 	}
 
 	/**
@@ -189,14 +204,35 @@ class ArchivePengolahanFinal extends \app\components\ActiveRecord
 			},
 			'filter' => $this->filterDatepicker($this, 'updated_date'),
 		];
+        $this->templateColumns['oCard'] = [
+            'attribute' => 'oCard',
+            'value' => function($model, $key, $index, $column) {
+                return $model->getCards(true);
+            },
+            'filter' => false,
+            'contentOptions' => ['class' => 'text-center'],
+            'format' => 'raw',
+        ];
 		$this->templateColumns['publish'] = [
 			'attribute' => 'publish',
 			'value' => function($model, $key, $index, $column) {
-				$url = Url::to(['publish', 'id' => $model->primaryKey]);
-				return $this->quickAction($url, $model->publish, 'deleted');
+                $published = Html::button('<span class="glyphicon glyphicon-ok"></span> '.Yii::t('app', 'Published'), ['class' => 'btn btn-success active btn-xs', 'role' => 'button']);
+                if ($model->publish != 1) {
+                    $publish = Html::a(Html::button('<span class="glyphicon glyphicon-upload"></span> '.Yii::t('app', 'Publish to Layanan'), ['class' => 'btn btn-warning btn-xs']), ['publish', 'id' => $model->primaryKey], [
+                        'title' => Yii::t('app', 'Publish to Layanan'),
+                        'data-confirm' => Yii::t('app', 'Are you sure you want to publish to layanan?'),
+                        'data-method'  => 'post',
+                    ]);
+                    $reset = Html::a(Html::button('<span class="glyphicon glyphicon-remove"></span> '.Yii::t('app', 'Reset Finalisasi'), ['class' => 'btn btn-danger btn-xs']), ['delete', 'id' => $model->primaryKey], [
+                        'title' => Yii::t('app', 'Reset Finalisasi'),
+                        'data-confirm' => Yii::t('app', 'Are you sure you want to reset this finalisasi?'),
+                        'data-method'  => 'post',
+                    ]);
+                    return $publish.$reset;
+                }
+				return $published;
 			},
 			'filter' => $this->filterYesNo(),
-			'contentOptions' => ['class' => 'text-center'],
 			'format' => 'raw',
 			'visible' => !Yii::$app->request->get('trash') ? true : false,
 		];
