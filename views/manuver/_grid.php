@@ -25,21 +25,6 @@ use yii\widgets\Pjax;
 
 <?php
 $columnData = $columns;
-array_push($columnData, [
-	'class' => 'app\components\grid\ActionColumn',
-	'header' => Yii::t('app', 'Option'),
-	'urlCreator' => function($action, $model, $key, $index) {
-        if ($action == 'view') {
-            return Url::to(['penyerahan/card/view', 'id' => $key]);
-        }
-	},
-	'buttons' => [
-		'view' => function ($url, $model, $key) {
-			return Html::a('<span class="glyphicon glyphicon-eye-open"></span>', $url, ['title' => Yii::t('app', 'Detail Description Card'), 'class' => 'modal-btn']);
-		},
-	],
-	'template' => '{view}',
-]);
 
 echo GridView::widget([
 	'dataProvider' => $dataProvider,

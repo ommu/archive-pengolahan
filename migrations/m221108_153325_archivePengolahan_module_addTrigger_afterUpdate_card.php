@@ -24,6 +24,7 @@ class m221108_153325_archivePengolahan_module_addTrigger_afterUpdate_card extend
 CREATE
     TRIGGER `archivePengolahanAfterInsertPenyerahanCard` AFTER INSERT ON `ommu_archive_pengolahan_penyerahan_card` 
     FOR EACH ROW BEGIN
+	UPDATE `ommu_archive_pengolahan_penyerahan_grid` SET `card` = `card` + 1 WHERE `id` = NEW.penyerahan_id;
 	UPDATE `ommu_archive_pengolahan_users` SET `archives` = `archives` + 1 WHERE `id` = NEW.user_id;
     END;
 SQL;
@@ -33,5 +34,15 @@ SQL;
 	public function down()
 	{
         $this->execute('DROP TRIGGER IF EXISTS `archivePengolahanAfterInsertPenyerahanCard`');
+
+        // create trigger archivePengolahanAfterInsertPenyerahanCard
+        $archivePengolahanAfterInsertPenyerahanCard = <<< SQL
+CREATE
+    TRIGGER `archivePengolahanAfterInsertPenyerahanCard` AFTER INSERT ON `ommu_archive_pengolahan_penyerahan_card` 
+    FOR EACH ROW BEGIN
+	UPDATE `ommu_archive_pengolahan_penyerahan_grid` SET `card` = `card` + 1 WHERE `id` = NEW.penyerahan_id;
+    END;
+SQL;
+        $this->execute($archivePengolahanAfterInsertPenyerahanCard);
     }
 }

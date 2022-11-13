@@ -28,9 +28,9 @@ class ArchivePengolahanPenyerahanCard extends ArchivePengolahanPenyerahanCardMod
 	{
 		return [
 			[['id', 'temporary_number', 'archive_description', 'archive_type', 'from_archive_date', 'to_archive_date', 'archive_date', 'medium', 'creation_date', 'modified_date', 'updated_date', 
-                'userDisplayname', 'creationDisplayname', 'modifiedDisplayname', 'penyerahanPenciptaArsip', 'subject', 'function'], 'safe'],
+                'userDisplayname', 'creationDisplayname', 'modifiedDisplayname', 'penyerahanPenciptaArsip', 'subject', 'function', 'subjectId', 'functionId', 'schemaId'], 'safe'],
 			[['publish', 'penyerahan_id', 'user_id', 'creation_id', 'modified_id', 
-                'media', 'penyerahanTypeId', 'subjectId', 'functionId'], 'integer'],
+                'media', 'penyerahanTypeId', 'oManuver'], 'integer'],
 		];
 	}
 
@@ -118,6 +118,12 @@ class ArchivePengolahanPenyerahanCard extends ArchivePengolahanPenyerahanCardMod
         ) {
             $query->joinWith(['functions.tag function']);
         }
+        if ((isset($params['oManuver']) && $params['oManuver'] != '') || 
+            (isset($params['schemaId']) && $params['schemaId'] != '') || 
+            $this->schemaId)
+        {
+            $query->joinWith(['schemas schemas']);
+        }
 
 		$query->groupBy(['id']);
 
@@ -154,7 +160,7 @@ class ArchivePengolahanPenyerahanCard extends ArchivePengolahanPenyerahanCardMod
 		];
 		$dataProvider->setSort([
 			'attributes' => $attributes,
-			'defaultOrder' => ['id' => SORT_DESC],
+			'defaultOrder' => ['creation_date' => SORT_DESC],
 		]);
 
         if (Yii::$app->request->get('id')) {
@@ -195,9 +201,40 @@ class ArchivePengolahanPenyerahanCard extends ArchivePengolahanPenyerahanCardMod
             $query->andFilterWhere(['NOT IN', 't.publish', [0,1]]);
         }
 
+        if (!$this->isMenuver) {
+            $query->andFilterWhere(['like', 't.temporary_number', $this->temporary_number])
+                ->andFilterWhere(['like', 't.archive_description', $this->archive_description]);
+        } else {
+            $query->andFilterWhere(['like', 't.temporary_number', $this->temporary_number])
+                ->andFilterWhere(['or',
+                    ['like', 't.temporary_number', $this->archive_description],
+                    ['like', 't.archive_description', $this->archive_description]
+                ]);
+
+            if ($this->schemaId) {
+                if ($this->isFond) {
+                    $query->andWhere(['or', 
+                        ['schemas.fond_schema_id' => $this->schemaId],
+                        ['is', 'schemas.id', null],
+                    ]);
+                } else {
+                    $query->andWhere(['or', 
+                        ['schemas.schema_id' => $this->schemaId],
+                        ['is', 'schemas.id', null],
+                    ]);
+                }
+            }
+        }
+
+        if (isset($params['oManuver']) && $params['oManuver'] != '') {
+            if ($this->oManuver == 1) {
+                $query->andWhere(['is not', 'schemas.id', null]);
+            } else if ($this->oManuver == 0) {
+                $query->andWhere(['is', 'schemas.id', null]);
+            }
+        }
+
 		$query->andFilterWhere(['like', 't.id', $this->id])
-			->andFilterWhere(['like', 't.temporary_number', $this->temporary_number])
-			->andFilterWhere(['like', 't.archive_description', $this->archive_description])
 			->andFilterWhere(['like', 't.from_archive_date', $this->from_archive_date])
 			->andFilterWhere(['like', 't.to_archive_date', $this->to_archive_date])
 			->andFilterWhere(['like', 't.archive_date', $this->archive_date])

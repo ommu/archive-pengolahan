@@ -50,6 +50,7 @@ use app\models\Users;
 use thamtech\uuid\helpers\UuidHelper;
 use ommu\archive\models\ArchiveMedia;
 use yii\base\Event;
+use yii\helpers\ArrayHelper;
 
 class ArchivePengolahanPenyerahanCard extends \app\components\ActiveRecord
 {
@@ -58,6 +59,9 @@ class ArchivePengolahanPenyerahanCard extends \app\components\ActiveRecord
     public $gridForbiddenColumn = ['creation_date', 'modified_date', 'updated_date', 'media', 'subject', 'function', 'userDisplayname', 'creationDisplayname', 'modifiedDisplayname'];
 
     public $stayInHere;
+    public $isMenuver = false;
+    public $isFond = false;
+    public $schemaId;
 
     public $media;
     public $subject;
@@ -70,6 +74,7 @@ class ArchivePengolahanPenyerahanCard extends \app\components\ActiveRecord
 	public $modifiedDisplayname;
     public $subjectId;
     public $functionId;
+    public $oManuver;
 
 	const EVENT_BEFORE_SAVE_PENYERAHAN_CARD = 'BeforeSavePenyerahanCard';
 
@@ -139,6 +144,7 @@ class ArchivePengolahanPenyerahanCard extends \app\components\ActiveRecord
 			'total' => Yii::t('app', 'Total'),
 			'unit' => Yii::t('app', 'Unit'),
 			'condition' => Yii::t('app', 'Condition'),
+			'oManuver' => Yii::t('app', 'Manuver'),
 		];
 	}
 
@@ -242,6 +248,15 @@ class ArchivePengolahanPenyerahanCard extends \app\components\ActiveRecord
 	}
 
 	/**
+	 * @return \yii\db\ActiveQuery
+	 */
+	public function getSchemas()
+	{
+		return $this->hasMany(ArchivePengolahanSchemaCard::className(), ['card_id' => 'id'])
+            ->select(['id', 'card_id', 'fond_schema_id', 'schema_id']);
+	}
+
+	/**
 	 * {@inheritdoc}
 	 * @return \ommu\archivePengolahan\models\query\ArchivePengolahanPenyerahanCard the active query used by this AR class.
 	 */
@@ -288,23 +303,22 @@ class ArchivePengolahanPenyerahanCard extends \app\components\ActiveRecord
 			'visible' => !Yii::$app->request->get('penyerahan') ? true : false,
             'format' => 'raw',
 		];
-		$this->templateColumns['userDisplayname'] = [
-			'attribute' => 'userDisplayname',
-			'value' => function($model, $key, $index, $column) {
-                return $model->user ? $model->user::parseUser($model->user) : '-';
-				// return $model->userDisplayname;
-			},
-			'visible' => !Yii::$app->request->get('user') ? true : false,
-		];
 		$this->templateColumns['temporary_number'] = [
 			'attribute' => 'temporary_number',
 			'value' => function($model, $key, $index, $column) {
-				return $model->temporary_number;
+                return $model->temporary_number;
 			},
+			'visible' => !$this->isMenuver ? true : false,
 		];
 		$this->templateColumns['archive_description'] = [
 			'attribute' => 'archive_description',
+            'label' => $this->isMenuver ? $this->getAttributeLabel('temporary_number').' / '.$this->getAttributeLabel('archive_description') : $this->getAttributeLabel('archive_description'),
 			'value' => function($model, $key, $index, $column) {
+                if ($this->isMenuver) {
+                    $model->isMenuver = $this->isMenuver;
+                    $model->isFond = $this->isFond;
+                    return $model::parseCard($model);
+                }
 				return $model->archive_description;
 			},
 			'format' => 'raw',
@@ -315,6 +329,7 @@ class ArchivePengolahanPenyerahanCard extends \app\components\ActiveRecord
 			'value' => function($model, $key, $index, $column) {
 				return $model->from_archive_date;
 			},
+			'visible' => !$this->isMenuver ? true : false,
 		];
 		$this->templateColumns['to_archive_date'] = [
 			'attribute' => 'to_archive_date',
@@ -322,6 +337,7 @@ class ArchivePengolahanPenyerahanCard extends \app\components\ActiveRecord
 			'value' => function($model, $key, $index, $column) {
 				return $model->to_archive_date;
 			},
+			'visible' => !$this->isMenuver ? true : false,
 		];
 		$this->templateColumns['archive_type'] = [
 			'attribute' => 'archive_type',
@@ -333,6 +349,7 @@ class ArchivePengolahanPenyerahanCard extends \app\components\ActiveRecord
                 return '-';
 			},
 			'filter' => self::getArchiveType(),
+			'visible' => !$this->isMenuver ? true : false,
 		];
 		$this->templateColumns['media'] = [
 			'attribute' => 'media',
@@ -342,12 +359,14 @@ class ArchivePengolahanPenyerahanCard extends \app\components\ActiveRecord
 			},
 			'filter' => ArchiveMedia::getMedia(),
 			'format' => 'html',
+			'visible' => !$this->isMenuver ? true : false,
 		];
 		$this->templateColumns['medium'] = [
 			'attribute' => 'medium',
 			'value' => function($model, $key, $index, $column) {
 				return $model->medium;
 			},
+			'visible' => !$this->isMenuver ? true : false,
 		];
 		$this->templateColumns['subject'] = [
 			'attribute' => 'subject',
@@ -355,6 +374,7 @@ class ArchivePengolahanPenyerahanCard extends \app\components\ActiveRecord
 				return self::parseFilter($model->getSubjects(true, 'title'), 'subjectId', ', ');
 			},
 			'format' => 'html',
+			'visible' => !$this->isMenuver ? true : false,
 		];
 		$this->templateColumns['function'] = [
 			'attribute' => 'function',
@@ -362,6 +382,40 @@ class ArchivePengolahanPenyerahanCard extends \app\components\ActiveRecord
 				return self::parseFilter($model->getFunctions(true, 'title'), 'functionId', ', ');
 			},
 			'format' => 'html',
+			'visible' => !$this->isMenuver ? true : false,
+		];
+		$this->templateColumns['userDisplayname'] = [
+			'attribute' => 'userDisplayname',
+			'value' => function($model, $key, $index, $column) {
+                return $model->user ? $model->user::parseUser($model->user) : '-';
+				// return $model->userDisplayname;
+			},
+			'visible' => !Yii::$app->request->get('user') ? true : false,
+		];
+		$this->templateColumns['oManuver'] = [
+			'attribute' => 'oManuver',
+			'value' => function($model, $key, $index, $column) {
+                $model->schemaId = $this->schemaId;
+                $url = ['manuver/create', 'id' => $model->primaryKey, 'schema' => $model->schemaId];
+                $manuverCard = Html::a('<span class="glyphicon glyphicon-plus"></span>', $url, [
+                    'title' => Yii::t('app', 'Manuver Description Card'),
+                    'data-confirm' => Yii::t('app', 'Are you sure you want to menuver this card?'),
+                    'data-method'  => 'post',
+                ]);
+                $schemas = $model->schemas;
+                if (is_array($schemas) && !empty($schemas)) {
+                    $url = ['manuver/delete', 'id' => $schemas[0]->id];
+                    $manuverCard = Html::a('<span class="glyphicon glyphicon-remove"></span>', $url, [
+                        'title' => Yii::t('app', 'Manuver Description Card'),
+                        'data-confirm' => Yii::t('app', 'Are you sure you want to reset this menuver card?'),
+                        'data-method'  => 'post',
+                    ]);
+                }
+				return $manuverCard;
+			},
+			'format' => 'raw',
+			'contentOptions' => ['class' => 'text-center'],
+			'visible' => $this->isMenuver ? true : false,
 		];
 		$this->templateColumns['creation_date'] = [
 			'attribute' => 'creation_date',
@@ -438,6 +492,26 @@ class ArchivePengolahanPenyerahanCard extends \app\components\ActiveRecord
         } else {
             return $items;
         }
+	}
+
+	/**
+	 * function parseCard
+	 */
+	public static function parseCard($model, $urlTitle=true)
+	{
+        $data[] = $model->getAttributeLabel('temporary_number').': '.$model->temporary_number;
+
+        if ($model->isMenuver && $model->isFond) {
+            if (is_array($model->schemas) && !empty($model->schemas)) {
+                $referenceCode = $model->schemas[0]->schema->referenceCode;
+                $data[] = Yii::t('app', 'Recommendation Number').': '.implode(' - ', ArrayHelper::map($referenceCode, 'id', 'code'));
+            }
+        }
+
+		$title = $model::htmlHardDecode($model->archive_description);
+        $data[] = $urlTitle == true ? Html::a($title, ['penyerahan/card/view', 'id' => $model->id], ['title' => $title, 'class' => 'modal-btn d-block mt-3 pt-3 border-top']) : $title ;
+
+		return Html::ul($data, ['encode' => false, 'class' => 'list-boxed']);
 	}
 
 	/**

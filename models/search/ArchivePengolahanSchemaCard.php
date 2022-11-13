@@ -154,7 +154,7 @@ class ArchivePengolahanSchemaCard extends ArchivePengolahanSchemaCardModel
 		];
 		$dataProvider->setSort([
 			'attributes' => $attributes,
-			'defaultOrder' => ['id' => SORT_DESC],
+			'defaultOrder' => ['creation_date' => SORT_DESC],
 		]);
 
         if (Yii::$app->request->get('id')) {

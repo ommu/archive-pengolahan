@@ -25,15 +25,16 @@ $this->params['breadcrumbs'][] = Yii::t('app', 'Manuver');
 ?>
 
 <div class="row">
-    <div class="col-md-4 col-sm-5 col-xs-12">
+    <div class="col-md-4 col-sm-12">
         <?php echo $this->renderWidget('_schema', [
             'title' => Yii::t('app', 'Schema'),
+            'alert' => false,
             'model' => $model, 
 			'fondId' => $fondId,
         ]);?>
     </div>
 
-	<div class="col-md-8 col-sm-7 col-xs-12">
+	<div class="col-md-8 col-sm-12">
         <?php echo $this->renderWidget('_grid', [
             'title' => Yii::t('app', 'Description Cards'),
 			'searchModel' => $searchModel,

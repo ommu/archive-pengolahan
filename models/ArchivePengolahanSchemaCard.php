@@ -73,10 +73,10 @@ class ArchivePengolahanSchemaCard extends \app\components\ActiveRecord
 	public function rules()
 	{
 		return [
-			[['id', 'card_id', 'fond_schema_id', 'schema_id', 'final_id', 'fond_id', 'archive_id'], 'required'],
+			[['id', 'card_id', 'schema_id'], 'required'],
 			[['publish', 'final_id', 'fond_id', 'archive_id', 'creation_id', 'modified_id', 'stayInHere'], 'integer'],
-			[['stayInHere'], 'safe'],
-			[['id', 'card_id', 'fond_schema_id', 'schema_id'], 'string'],
+			[['fond_schema_id', 'final_id', 'fond_id', 'archive_id', 'stayInHere'], 'safe'],
+			[['id', 'card_id', 'fond_schema_id', 'schema_id'], 'string', 'max' => 36],
 			[['id'], 'unique'],
 			[['fond_schema_id', 'schema_id'], 'exist', 'skipOnError' => true, 'targetClass' => ArchivePengolahanSchema::className(), 'targetAttribute' => ['schema_id' => 'id']],
 			[['card_id'], 'exist', 'skipOnError' => true, 'targetClass' => ArchivePengolahanPenyerahanCard::className(), 'targetAttribute' => ['card_id' => 'id']],

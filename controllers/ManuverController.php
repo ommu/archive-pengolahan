@@ -10,6 +10,7 @@
  *  Index
  *  Manage
  *  Card
+ *  Create
  *
  *  findModel
  *
@@ -31,6 +32,10 @@ use ommu\archivePengolahan\models\ArchivePengolahanSchema;
 use ommu\archivePengolahan\models\search\ArchivePengolahanSchema as ArchivePengolahanSchemaSearch;
 use ommu\archivePengolahan\models\ArchivePengolahanSetting;
 use yii\helpers\ArrayHelper;
+use ommu\archivePengolahan\models\ArchivePengolahanPenyerahanCard;
+use ommu\archivePengolahan\models\search\ArchivePengolahanPenyerahanCard as ArchivePengolahanPenyerahanCardSearch;
+use ommu\archivePengolahan\models\ArchivePengolahanSchemaCard;
+use thamtech\uuid\helpers\UuidHelper;
 
 class ManuverController extends Controller
 {
@@ -58,8 +63,7 @@ class ManuverController extends Controller
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
-                    'delete' => ['POST'],
-					'publish' => ['POST'],
+					'create' => ['POST'],
                 ],
             ],
         ];
@@ -112,8 +116,30 @@ class ManuverController extends Controller
 	public function actionCard($id)
 	{
 		$model = $this->findModel($id);
+
         $referenceCode = $model->referenceCode;
         $fondId = array_key_first($model->referenceCode);
+
+        $query = ['isMenuver' => true, 'schemaId' => $id];
+        if ($fondId == $model->id) {
+            $query = ArrayHelper::merge($query, ['isFond' => true]);
+        }
+
+        $searchModel = new ArchivePengolahanPenyerahanCardSearch($query);
+        $queryParams = Yii::$app->request->queryParams;
+		$dataProvider = $searchModel->search($queryParams);
+
+        $gridColumn = Yii::$app->request->get('GridColumn', null);
+        $cols = [];
+        if ($gridColumn != null && count($gridColumn) > 0) {
+            foreach ($gridColumn as $key => $val) {
+                if ($gridColumn[$key] == 1) {
+                    $cols[] = $key;
+                }
+            }
+        }
+        $columns = $searchModel->getGridColumn($cols);
+
         $title = $model->title;
         $code = $model->code;
         if (!$model->isFond) {
@@ -128,7 +154,36 @@ class ManuverController extends Controller
 		return $this->render('admin_card', [
 			'model' => $model,
 			'fondId' => $fondId,
+			'searchModel' => $searchModel,
+			'dataProvider' => $dataProvider,
+			'columns' => $columns,
 		]);
+	}
+
+	/**
+	 * actionPublish an existing ArchivePengolahanSchemaCard model.
+	 * If publish is successful, the browser will be redirected to the 'index' page.
+	 * @param string $id
+	 * @return mixed
+	 */
+	public function actionCreate($id, $schema)
+	{
+        if (($card = ArchivePengolahanPenyerahanCard::findOne($id)) === null) {
+            // throw new \yii\web\NotFoundHttpException(Yii::t('app', 'The requested page does not exist.'));
+        }
+        $schema = $this->findModel($schema);
+        $fondSchemaId = array_key_first($schema->referenceCode);
+
+        $model = new ArchivePengolahanSchemaCard();
+        $model->id = UuidHelper::uuid();
+		$model->card_id = $card->id;
+		$model->fond_schema_id = $fondSchemaId;
+		$model->schema_id = $schema->id;
+
+        if ($model->save(false, ['id', 'fond_schema_id', 'card_id', 'schema_id'])) {
+            Yii::$app->session->setFlash('success', Yii::t('app', 'Manuver kartu success created.'));
+            return $this->redirect(Yii::$app->request->referrer ?: ['card', 'id' => $schema]);
+        }
 	}
 
 	/**
