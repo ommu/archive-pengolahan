@@ -47,13 +47,19 @@ array_push($columnData, [
         if ($action == 'card') {
             return Url::to(['card', 'id' => $key]);
         }
+        if ($action == 'final') {
+            return Url::to(['final', 'id' => $key]);
+        }
 	},
 	'buttons' => [
 		'card' => function ($url, $model, $key) {
 			return Html::a(Yii::t('app', 'Manuver'), $url, ['title' => Yii::t('app', 'Manuver'), 'class' => 'btn btn-success btn-xs', 'data-pjax' => 0]);
 		},
+		'final' => function ($url, $model, $key) {
+			return Html::a(Yii::t('app', 'Final'), $url, ['title' => Yii::t('app', 'Final'), 'class' => 'btn btn-warning btn-xs', 'data-pjax' => 0]);
+		},
 	],
-	'template' => '{card}',
+	'template' => '{card} {final}',
 ]);
 
 echo GridView::widget([
