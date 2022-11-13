@@ -60,6 +60,13 @@ $attributes = [
 		'visible' => !$small && !$model->isFond ? true : false,
 	],
 	[
+        'attribute' => 'level_id',
+		'value' => function ($model) {
+			return isset($model->levelTitle) ? $model->levelTitle->message : '-';
+		},
+		'format' => 'html',
+	],
+	[
 		'attribute' => 'code',
 		'value' => $model->code ? $model->code : '-',
 	],

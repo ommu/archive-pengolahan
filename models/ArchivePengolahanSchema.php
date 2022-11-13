@@ -15,6 +15,7 @@
  * @property integer $publish
  * @property string $parent_id
  * @property integer $archive_id
+ * @property integer $level_id
  * @property string $code
  * @property string $title
  * @property string $creation_date
@@ -39,6 +40,8 @@ use yii\helpers\Url;
 use app\models\Users;
 use thamtech\uuid\helpers\UuidHelper;
 use yii\helpers\ArrayHelper;
+use ommu\archive\models\ArchiveLevel;
+use app\models\SourceMessage;
 
 class ArchivePengolahanSchema extends \app\components\ActiveRecord
 {
@@ -71,13 +74,14 @@ class ArchivePengolahanSchema extends \app\components\ActiveRecord
 	public function rules()
 	{
 		return [
-			[['id', 'code', 'title'], 'required'],
-			[['publish', 'archive_id', 'creation_id', 'modified_id', 'stayInHere'], 'integer'],
+			[['id', 'level_id', 'code', 'title'], 'required'],
+			[['publish', 'archive_id', 'level_id', 'creation_id', 'modified_id', 'stayInHere'], 'integer'],
 			[['id', 'parent_id', 'title'], 'string'],
 			[['parent_id', 'archive_id', 'stayInHere'], 'safe'],
 			[['id', 'code'], 'string', 'max' => 36],
 			[['id'], 'unique'],
 			[['archive_id'], 'exist', 'skipOnError' => true, 'targetClass' => Archives::className(), 'targetAttribute' => ['archive_id' => 'id']],
+			[['level_id'], 'exist', 'skipOnError' => true, 'targetClass' => ArchiveLevel::className(), 'targetAttribute' => ['level_id' => 'id']],
 		];
 	}
 
@@ -91,6 +95,7 @@ class ArchivePengolahanSchema extends \app\components\ActiveRecord
 			'publish' => Yii::t('app', 'Publish'),
 			'parent_id' => Yii::t('app', 'Parent'),
 			'archive_id' => Yii::t('app', 'Archive'),
+			'level_id' => Yii::t('app', 'Level of Description'),
 			'code' => Yii::t('app', 'Code'),
 			'title' => Yii::t('app', 'Title'),
 			'creation_date' => Yii::t('app', 'Creation Date'),
@@ -106,6 +111,25 @@ class ArchivePengolahanSchema extends \app\components\ActiveRecord
 			'oChild' => Yii::t('app', 'Childs'),
 			'oCard' => Yii::t('app', 'Cards'),
 		];
+	}
+
+	/**
+	 * @return \yii\db\ActiveQuery
+	 */
+	public function getLevel()
+	{
+		return $this->hasOne(ArchiveLevel::className(), ['id' => 'level_id'])
+            ->select(['id', 'level_name']);
+	}
+
+	/**
+	 * @return \yii\db\ActiveQuery
+	 */
+	public function getLevelTitle()
+	{
+		return $this->hasOne(SourceMessage::className(), ['id' => 'level_name'])
+            ->select(['id', 'message'])
+            ->via('level');
 	}
 
 	/**
@@ -227,7 +251,7 @@ class ArchivePengolahanSchema extends \app\components\ActiveRecord
 	public function getParent()
 	{
 		return $this->hasOne(ArchivePengolahanSchema::className(), ['id' => 'parent_id'])
-            ->select(['id', 'parent_id', 'archive_id', 'code', 'title']);
+            ->select(['id', 'parent_id', 'archive_id', 'level_id', 'code', 'title']);
 	}
 
 	/**
@@ -266,6 +290,14 @@ class ArchivePengolahanSchema extends \app\components\ActiveRecord
 			},
 			'format' => 'raw',
 			'visible' => !Yii::$app->request->get('parent') ? true : false,
+		];
+		$this->templateColumns['level_id'] = [
+			'attribute' => 'level_id',
+			'label' => Yii::t('app', 'Level'),
+			'value' => function($model, $key, $index, $column) {
+				return isset($model->levelTitle) ? $model->levelTitle->message : '-';
+			},
+			'filter' => ArchiveLevel::getLevel(),
 		];
 		$this->templateColumns['title'] = [
 			'attribute' => 'title',

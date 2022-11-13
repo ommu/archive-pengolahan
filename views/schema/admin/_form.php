@@ -18,6 +18,7 @@ use yii\helpers\Html;
 use yii\helpers\Url;
 use app\components\widgets\ActiveForm;
 use yii\helpers\ArrayHelper;
+use ommu\archive\models\ArchiveLevel;
 
 $parent ? \ommu\archivePengolahan\components\assets\ArchiveTree::register($this) : '';
 
@@ -50,6 +51,11 @@ $parent ? $this->registerJs($js, \yii\web\View::POS_HEAD) : '';
         ->hiddenInput()
         ->label($model->getAttributeLabel('parent_id'));
 } ?>
+
+<?php $level = ArchiveLevel::getLevel();
+echo $form->field($model, 'level_id')
+    ->dropDownList($level, ['prompt' => ''])
+    ->label($model->getAttributeLabel('level_id'));?>
 
 <?php echo $form->field($model, 'code')
 	->textInput(['maxlength' => true])

@@ -131,6 +131,7 @@ class SyncController extends Controller
             foreach ($data as $row) {
                 $model = new ArchivePengolahanSchema();
                 $model->archive_id = $row['id'];
+                $model->level_id = $row['level_id'];
                 $model->code = $row['shortCode'];
                 $model->title = $row['title'];
                 if ($model->save()) {
@@ -183,6 +184,7 @@ class SyncController extends Controller
             $model = new ArchivePengolahanSchema();
             $model->parent_id = $parentId;
             $model->archive_id = $row['id'];
+            $model->level_id = $row['level_id'];
             $model->code = $row['shortCode'];
             $model->title = $row['title'];
             if ($model->save()) {

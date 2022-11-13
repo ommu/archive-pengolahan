@@ -37,6 +37,7 @@ use ommu\archivePengolahan\models\search\ArchivePengolahanSchema as ArchivePengo
 use ommu\archivePengolahan\models\ArchivePengolahanSetting;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
+use ommu\archivePengolahan\models\Archives;
 
 class AdminController extends Controller
 {
@@ -248,6 +249,10 @@ class AdminController extends Controller
 		$model->publish = 2;
 
         if ($model->save(false, ['publish','modified_id'])) {
+            if ($model->archive_id) {
+                Archives::updateAll(['sync_schema' => 0], ['id' => $model->archive_id]);
+            }
+
             Yii::$app->session->setFlash('success', Yii::t('app', 'Schema success deleted.'));
             return $this->redirect(Yii::$app->request->referrer ?: ['manage', 'parent' => $model->parent_id]);
         }
@@ -344,6 +349,7 @@ class AdminController extends Controller
 	{
 		$data = [
 			'id' => $model->id,
+			'level_id' => $model->level_id,
 			'code' => $model->code,
 			'label' => $model::htmlHardDecode($model->title),
 			'inode' => $model->getChilds(true) ? true : false,
@@ -373,6 +379,7 @@ class AdminController extends Controller
 	{
 		$data = [
 			'id' => $model->id,
+			'level_id' => $model->level_id,
 			'code' => $model->code,
 			'label' => $model::htmlHardDecode($model->title),
 			'inode' => $model->getChilds(true, 1) ? true : false,
@@ -384,7 +391,7 @@ class AdminController extends Controller
 		];
 
         $childs = $model->getChilds(false, 1)
-            ->select(['id', 'parent_id', 'code', 'title'])
+            ->select(['id', 'parent_id', 'level_id', 'code', 'title'])
             ->orderBy('code ASC')
             ->all();
 
