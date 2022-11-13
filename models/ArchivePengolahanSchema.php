@@ -122,13 +122,13 @@ class ArchivePengolahanSchema extends \app\components\ActiveRecord
         if ($count == false) {
             $model = $this->hasMany(ArchivePengolahanSchemaCard::className(), ['schema_id' => 'id'])
 				->alias('cards');
-                if ($publish != null) {
-                    $model->andOnCondition([sprintf('%s.publish', 'cards') => $publish]);
-                } else {
-                    $model->andOnCondition(['IN', sprintf('%s.publish', 'cards'), [0,1]]);
-                }
-    
-                return $model;
+            if ($publish != null) {
+                $model->andOnCondition([sprintf('%s.publish', 'cards') => $publish]);
+            } else {
+                $model->andOnCondition(['IN', sprintf('%s.publish', 'cards'), [0,1]]);
+            }
+
+            return $model;
         }
 
 		$model = ArchivePengolahanSchemaCard::find()

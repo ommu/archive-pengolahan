@@ -174,20 +174,30 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 	public function getCards($count=false, $publish=1)
 	{
         if ($count == false) {
-            return $this->hasMany(ArchivePengolahanPenyerahanCard::className(), ['penyerahan_id' => 'id'])
-				->alias('cards')
-				->andOnCondition([sprintf('%s.publish', 'cards') => $publish]);
+            $model = $this->hasMany(ArchivePengolahanPenyerahanCard::className(), ['penyerahan_id' => 'id'])
+				->alias('cards');
+            if ($publish != null) {
+                $model->andOnCondition([sprintf('%s.publish', 'cards') => $publish]);
+            } else {
+                $model->andOnCondition(['IN', sprintf('%s.publish', 'cards'), [0,1]]);
+            }
+
+            return $model;
         }
 
 		$model = ArchivePengolahanPenyerahanCard::find()
             ->alias('t')
             ->where(['t.penyerahan_id' => $this->id]);
-        if ($publish == 0) {
-            $model->unpublish();
-        } else if ($publish == 1) {
-            $model->published();
-        } else if ($publish == 2) {
-            $model->deleted();
+        if ($publish != null) {
+            if ($publish == 0) {
+                $model->unpublish();
+            } else if ($publish == 1) {
+                $model->published();
+            } else if ($publish == 2) {
+                $model->deleted();
+            }
+		} else {
+            $model->andWhere(['IN', 't.publish', [0,1]]);
         }
 		$cards = $model->count();
 
@@ -208,20 +218,30 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
     public function getItems($count=false, $publish=1)
     {
         if ($count == false) {
-            return $this->hasMany(ArchivePengolahanPenyerahanItem::className(), ['penyerahan_id' => 'id'])
-                ->alias('items')
-                ->andOnCondition([sprintf('%s.publish', 'items') => $publish]);
+            $model = $this->hasMany(ArchivePengolahanPenyerahanItem::className(), ['penyerahan_id' => 'id'])
+				->alias('items');
+            if ($publish != null) {
+                $model->andOnCondition([sprintf('%s.publish', 'items') => $publish]);
+            } else {
+                $model->andOnCondition(['IN', sprintf('%s.publish', 'items'), [0,1]]);
+            }
+
+            return $model;
         }
 
         $model = ArchivePengolahanPenyerahanItem::find()
             ->alias('t')
             ->where(['t.penyerahan_id' => $this->id]);
-        if ($publish == 0) {
-            $model->unpublish();
-        } else if ($publish == 1) {
-            $model->published();
-        } else if ($publish == 2) {
-            $model->deleted();
+        if ($publish != null) {
+            if ($publish == 0) {
+                $model->unpublish();
+            } else if ($publish == 1) {
+                $model->published();
+            } else if ($publish == 2) {
+                $model->deleted();
+            }
+		} else {
+            $model->andWhere(['IN', 't.publish', [0,1]]);
         }
         $items = $model->count();
 

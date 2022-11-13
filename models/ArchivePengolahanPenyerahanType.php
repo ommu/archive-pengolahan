@@ -102,20 +102,30 @@ class ArchivePengolahanPenyerahanType extends \app\components\ActiveRecord
 	public function getPenyerahans($count=false, $publish=1)
 	{
         if ($count == false) {
-            return $this->hasMany(ArchivePengolahanPenyerahan::className(), ['type_id' => 'id'])
-				->alias('penyerahans')
-				->andOnCondition([sprintf('%s.publish', 'penyerahans') => $publish]);
+            $model = $this->hasMany(ArchivePengolahanPenyerahan::className(), ['type_id' => 'id'])
+				->alias('penyerahans');
+            if ($publish != null) {
+                $model->andOnCondition([sprintf('%s.publish', 'penyerahans') => $publish]);
+            } else {
+                $model->andOnCondition(['IN', sprintf('%s.publish', 'penyerahans'), [0,1]]);
+            }
+
+            return $model;
         }
 
 		$model = ArchivePengolahanPenyerahan::find()
             ->alias('t')
             ->where(['t.type_id' => $this->id]);
-        if ($publish == 0) {
-            $model->unpublish();
-        } else if ($publish == 1) {
-            $model->published();
-        } else if ($publish == 2) {
-            $model->deleted();
+        if ($publish != null) {
+            if ($publish == 0) {
+                $model->unpublish();
+            } else if ($publish == 1) {
+                $model->published();
+            } else if ($publish == 2) {
+                $model->deleted();
+            }
+		} else {
+            $model->andWhere(['IN', 't.publish', [0,1]]);
         }
 		$penyerahans = $model->count();
 
