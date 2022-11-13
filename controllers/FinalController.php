@@ -51,7 +51,7 @@ class FinalController extends Controller
                 'class' => VerbFilter::className(),
                 'actions' => [
                     'delete' => ['POST'],
-					'publish' => ['POST'],
+					// 'publish' => ['POST'],
                 ],
             ],
         ];
@@ -182,7 +182,7 @@ class FinalController extends Controller
 		$model = $this->findModel($id);
 
         $cards = $model->cards;
-        // echo '<pre>';
+        echo '<pre>';
         $codes = [];
         if (is_array($cards) && !empty($cards)) {
             $i = $model->archive_start_from;
@@ -195,16 +195,19 @@ class FinalController extends Controller
                 ]]));
             }
         }
+        // $price = array_column($codes, 'code');
+        // array_multisort($price, SORT_DESC, $codes);
+        array_multisort(array_column($codes, 'code'), SORT_ASC, $codes);
 
-        // print_r($codes);
-        // echo '</pre>';
+        print_r($codes);
+        echo '</pre>';
 
-		$model->publish = 1;
+		// $model->publish = 1;
 
-        if ($model->save(false, ['publish'])) {
-            Yii::$app->session->setFlash('success', Yii::t('app', 'Finalisasi success published.'));
-            return $this->redirect(Yii::$app->request->referrer ?: ['manage']);
-        }
+        // if ($model->save(false, ['publish'])) {
+        //     Yii::$app->session->setFlash('success', Yii::t('app', 'Finalisasi success published.'));
+        //     return $this->redirect(Yii::$app->request->referrer ?: ['manage']);
+        // }
 	}
 
 	/**
