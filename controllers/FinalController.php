@@ -34,6 +34,7 @@ use yii\filters\VerbFilter;
 use ommu\archivePengolahan\models\ArchivePengolahanFinal;
 use ommu\archivePengolahan\models\search\ArchivePengolahanFinal as ArchivePengolahanFinalSearch;
 use ommu\archivePengolahan\models\ArchivePengolahanSchemaCard;
+use yii\helpers\ArrayHelper;
 
 class FinalController extends Controller
 {
@@ -179,12 +180,54 @@ class FinalController extends Controller
 	public function actionPublish($id)
 	{
 		$model = $this->findModel($id);
+
+        $cards = $model->cards;
+        // echo '<pre>';
+        $codes = [];
+        if (is_array($cards) && !empty($cards)) {
+            $i = $model->archive_start_from;
+            foreach ($cards as $card) {
+                $i++;
+                $codes = ArrayHelper::merge($codes, $this->getData($card->schema, [$i => [
+                    'id' => $card->card_id,
+                    'code' => $i,
+                    'label' => $card->card->archive_description,
+                ]]));
+            }
+        }
+
+        // print_r($codes);
+        // echo '</pre>';
+
 		$model->publish = 1;
 
         if ($model->save(false, ['publish'])) {
-            Yii::$app->session->setFlash('success', Yii::t('app', 'Finalisasi success updated.'));
+            Yii::$app->session->setFlash('success', Yii::t('app', 'Finalisasi success published.'));
             return $this->redirect(Yii::$app->request->referrer ?: ['manage']);
         }
+	}
+
+	/**
+	 * Displays a single Archives model.
+	 * @param integer $id
+	 * @return mixed
+	 */
+	public function getData($model, $codes)
+	{
+		$data[$model->id] = [
+			'id' => $model->id,
+			'code' => $model->code,
+			'label' => $model->title,
+		];
+        if (!empty($codes)) {
+			$data[$model->id] = ArrayHelper::merge($data[$model->id], ['childs' => $codes]);
+        }
+		
+        if (isset($model->parent)) {
+			$data = $this->getData($model->parent, $data);
+        }
+
+		return $data;
 	}
 
 	/**

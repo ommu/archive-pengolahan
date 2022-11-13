@@ -217,15 +217,15 @@ class ManuverController extends Controller
         $schema = $this->findModel($id);
 
         $referenceCode = $schema->referenceCode;
-        $fondId = array_key_first($schema->referenceCode);
-
-        if ($fondId != $id) {
+        if (array_key_first($schema->referenceCode) != $id) {
             throw new \yii\web\NotFoundHttpException(Yii::t('app', 'The requested page does not exist.'));
         }
+
         $model = new ArchivePengolahanFinal();
 
         if (Yii::$app->request->isPost) {
             $model->load(Yii::$app->request->post());
+            $model->fond_schema_id = $id;
             // $postData = Yii::$app->request->post();
             // $model->load($postData);
             // $model->order = $postData['order'] ? $postData['order'] : 0;
