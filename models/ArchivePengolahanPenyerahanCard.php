@@ -260,9 +260,6 @@ class ArchivePengolahanPenyerahanCard extends \app\components\ActiveRecord
         } else {
             $model->andOnCondition(['IN', sprintf('%s.publish', 'schemas'), [0,1]]);
         }
-        $model->andOnCondition(['is', sprintf('%s.final_id', 'schemas'), null])
-            ->andOnCondition(['is', sprintf('%s.fond_id', 'schemas'), null])
-            ->andOnCondition(['is', sprintf('%s.archive_id', 'schemas'), null]);
 
         return $model;
 	}

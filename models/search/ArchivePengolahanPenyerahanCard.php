@@ -214,12 +214,18 @@ class ArchivePengolahanPenyerahanCard extends ArchivePengolahanPenyerahanCardMod
             if ($this->schemaId) {
                 if ($this->isFond) {
                     $query->andWhere(['or', 
-                        ['schemas.fond_schema_id' => $this->schemaId],
+                        ['and', 
+                            ['schemas.fond_schema_id' => $this->schemaId],
+                            ['is', 'schemas.final_id', null],
+                        ],
                         ['is', 'schemas.id', null],
                     ]);
                 } else {
                     $query->andWhere(['or', 
-                        ['schemas.schema_id' => $this->schemaId],
+                        ['and',
+                            ['schemas.schema_id' => $this->schemaId],
+                            ['is', 'schemas.final_id', null],
+                        ],
                         ['is', 'schemas.id', null],
                     ]);
                 }

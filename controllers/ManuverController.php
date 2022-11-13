@@ -36,6 +36,7 @@ use ommu\archivePengolahan\models\ArchivePengolahanPenyerahanCard;
 use ommu\archivePengolahan\models\search\ArchivePengolahanPenyerahanCard as ArchivePengolahanPenyerahanCardSearch;
 use ommu\archivePengolahan\models\ArchivePengolahanSchemaCard;
 use thamtech\uuid\helpers\UuidHelper;
+use ommu\archivePengolahan\models\ArchivePengolahanFinal;
 
 class ManuverController extends Controller
 {
@@ -64,6 +65,7 @@ class ManuverController extends Controller
                 'class' => VerbFilter::className(),
                 'actions' => [
 					'create' => ['POST'],
+					'delete' => ['POST'],
                 ],
             ],
         ];
@@ -200,9 +202,49 @@ class ManuverController extends Controller
 		$model->publish = 2;
 
         if ($model->save(false, ['publish','modified_id'])) {
-            Yii::$app->session->setFlash('success', Yii::t('app', 'Penyerahan item success updated.'));
+            Yii::$app->session->setFlash('success', Yii::t('app', 'Manuver kartu success deleted.'));
             return $this->redirect(Yii::$app->request->referrer ?: ['card', 'id' => $model->schema_id]);
         }
+	}
+
+	/**
+	 * Creates a new ArchivePengolahanFinal model.
+	 * If creation is successful, the browser will be redirected to the 'view' page.
+	 * @return mixed
+	 */
+	public function actionFinal($id)
+	{
+        $schema = $this->findModel($id);
+        if (array_key_first($schema->referenceCode) != $id) {
+            throw new \yii\web\NotFoundHttpException(Yii::t('app', 'The requested page does not exist.'));
+        }
+        $model = new ArchivePengolahanFinal();
+
+        if (Yii::$app->request->isPost) {
+            $model->load(Yii::$app->request->post());
+            // $postData = Yii::$app->request->post();
+            // $model->load($postData);
+            // $model->order = $postData['order'] ? $postData['order'] : 0;
+
+            if ($model->save()) {
+                ArchivePengolahanSchemaCard::updateAll(['final_id' => $model->id], ['fond_schema_id' => $id]);
+
+                Yii::$app->session->setFlash('success', Yii::t('app', 'Manuver kartu final success created.'));
+                return $this->redirect(['manage']);
+
+            } else {
+                if (Yii::$app->request->isAjax) {
+                    return \yii\helpers\Json::encode(\app\components\widgets\ActiveForm::validate($model));
+                }
+            }
+        }
+
+		$this->view->title = Yii::t('app', 'Create Manuver Final');
+		$this->view->description = '';
+		$this->view->keywords = '';
+		return $this->oRender('admin_final', [
+			'model' => $model,
+		]);
 	}
 
 	/**
