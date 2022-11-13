@@ -16,8 +16,12 @@
 
 use yii\helpers\Url;
 
-$this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Pengolahan Finals'), 'url' => ['index']];
-$this->params['breadcrumbs'][] = Yii::t('app', 'Create');
+$context = $this->context;
+if ($context->breadcrumbApp) {
+	$this->params['breadcrumbs'][] = ['label' => $context->breadcrumbAppParam['name'], 'url' => [$context->breadcrumbAppParam['url']]];
+}
+$this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Manuver Kartu'), 'url' => ['index']];
+$this->params['breadcrumbs'][] = Yii::t('app', 'Final');
 ?>
 
 <div class="archive-pengolahan-final-create">

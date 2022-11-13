@@ -215,7 +215,11 @@ class ManuverController extends Controller
 	public function actionFinal($id)
 	{
         $schema = $this->findModel($id);
-        if (array_key_first($schema->referenceCode) != $id) {
+
+        $referenceCode = $schema->referenceCode;
+        $fondId = array_key_first($schema->referenceCode);
+
+        if ($fondId != $id) {
             throw new \yii\web\NotFoundHttpException(Yii::t('app', 'The requested page does not exist.'));
         }
         $model = new ArchivePengolahanFinal();
@@ -239,7 +243,14 @@ class ManuverController extends Controller
             }
         }
 
-		$this->view->title = Yii::t('app', 'Create Manuver Final');
+        $title = $schema->title;
+        $code = $schema->code;
+        if (!$schema->isFond) {
+            $code = implode('.', ArrayHelper::map($referenceCode, 'id', 'code'));
+        }
+        $schemaTitle = join(' ', [$code, $title]);
+
+		$this->view->title = Yii::t('app', 'Manuver Final: {schema}', ['schema' => $schemaTitle]);
 		$this->view->description = '';
 		$this->view->keywords = '';
 		return $this->oRender('admin_final', [

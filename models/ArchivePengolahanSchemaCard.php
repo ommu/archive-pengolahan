@@ -47,12 +47,13 @@ class ArchivePengolahanSchemaCard extends \app\components\ActiveRecord
 {
 	use \ommu\traits\UtilityTrait;
 
-    public $gridForbiddenColumn = ['schemaTitle', 'cardPenyerahanId', 'finalFondName', 'fondTitle', 'archiveTitle', 'creationDisplayname', 'modifiedDisplayname'];
+    public $gridForbiddenColumn = ['schemaTitle', 'cardArchiveDescription', 'finalFondName', 'fondTitle', 'archiveTitle', 'creationDisplayname', 'modifiedDisplayname'];
 
     public $stayInHere;
 
+	public $fondSchemaTitle;
 	public $schemaTitle;
-	public $cardPenyerahanId;
+	public $cardArchiveDescription;
 	public $finalFondName;
 	public $fondTitle;
 	public $archiveTitle;
@@ -78,7 +79,8 @@ class ArchivePengolahanSchemaCard extends \app\components\ActiveRecord
 			[['fond_schema_id', 'final_id', 'fond_id', 'archive_id', 'stayInHere'], 'safe'],
 			[['id', 'card_id', 'fond_schema_id', 'schema_id'], 'string', 'max' => 36],
 			[['id'], 'unique'],
-			[['fond_schema_id', 'schema_id'], 'exist', 'skipOnError' => true, 'targetClass' => ArchivePengolahanSchema::className(), 'targetAttribute' => ['schema_id' => 'id']],
+			[['fond_schema_id'], 'exist', 'skipOnError' => true, 'targetClass' => ArchivePengolahanSchema::className(), 'targetAttribute' => ['fond_schema_id' => 'id']],
+			[['schema_id'], 'exist', 'skipOnError' => true, 'targetClass' => ArchivePengolahanSchema::className(), 'targetAttribute' => ['schema_id' => 'id']],
 			[['card_id'], 'exist', 'skipOnError' => true, 'targetClass' => ArchivePengolahanPenyerahanCard::className(), 'targetAttribute' => ['card_id' => 'id']],
 			[['fond_id'], 'exist', 'skipOnError' => true, 'targetClass' => Archives::className(), 'targetAttribute' => ['fond_id' => 'id']],
 			[['archive_id'], 'exist', 'skipOnError' => true, 'targetClass' => Archives::className(), 'targetAttribute' => ['archive_id' => 'id']],
@@ -106,8 +108,9 @@ class ArchivePengolahanSchemaCard extends \app\components\ActiveRecord
 			'modified_id' => Yii::t('app', 'Modified'),
 			'updated_date' => Yii::t('app', 'Updated Date'),
 			'stayInHere' => Yii::t('app', 'stayInHere'),
+			'fondSchemaTitle' => Yii::t('app', 'Fond Schema'),
 			'schemaTitle' => Yii::t('app', 'Schema'),
-			'cardPenyerahanId' => Yii::t('app', 'Card'),
+			'cardArchiveDescription' => Yii::t('app', 'Card'),
 			'finalFondName' => Yii::t('app', 'Final'),
 			'fondTitle' => Yii::t('app', 'Fond'),
 			'archiveTitle' => Yii::t('app', 'Archive'),
@@ -213,19 +216,19 @@ class ArchivePengolahanSchemaCard extends \app\components\ActiveRecord
 			'class' => 'app\components\grid\SerialColumn',
 			'contentOptions' => ['class' => 'text-center'],
 		];
-		$this->templateColumns['cardPenyerahanId'] = [
-			'attribute' => 'cardPenyerahanId',
+		$this->templateColumns['cardArchiveDescription'] = [
+			'attribute' => 'cardArchiveDescription',
 			'value' => function($model, $key, $index, $column) {
 				return isset($model->card) ? $model->card->penyerahan->type->type_name : '-';
-				// return $model->cardPenyerahanId;
+				// return $model->cardArchiveDescription;
 			},
 			'visible' => !Yii::$app->request->get('card') ? true : false,
 		];
-		$this->templateColumns['parentSchemaTitle'] = [
-			'attribute' => 'parentSchemaTitle',
+		$this->templateColumns['fondSchemaTitle'] = [
+			'attribute' => 'fondSchemaTitle',
 			'value' => function($model, $key, $index, $column) {
-				return isset($model->parentSchema) ? $model->parentSchema->title : '-';
-				// return $model->parentSchemaTitle;
+				return isset($model->fondSchema) ? $model->fondSchema->title : '-';
+				// return $model->fondSchemaTitle;
 			},
 			'visible' => !Yii::$app->request->get('schema') ? true : false,
 		];
@@ -339,8 +342,8 @@ class ArchivePengolahanSchemaCard extends \app\components\ActiveRecord
 	{
 		parent::afterFind();
 
-		// $this->cardPenyerahanId = isset($this->card) ? $this->card->penyerahan->type->type_name : '-';
-		// $this->parentSchemaTitle = isset($this->parentSchema) ? $this->parentSchema->title : '-';
+		// $this->cardArchiveDescription = isset($this->card) ? $this->card->archive_description : '-';
+		// $this->fondSchemaTitle = isset($this->fondSchema) ? $this->fondSchema->title : '-';
 		// $this->schemaTitle = isset($this->schema) ? $this->schema->title : '-';
 		// $this->finalFondName = isset($this->final) ? $this->final->fond_name : '-';
 		// $this->fondTitle = isset($this->fond) ? $this->fond->title : '-';

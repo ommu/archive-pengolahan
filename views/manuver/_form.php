@@ -43,12 +43,7 @@ use yii\helpers\ArrayHelper;
 	->textInput(['type' => 'number', 'min' => '1'])
 	->label($model->getAttributeLabel('archive_start_from')); ?>
 
-<?php $submitButtonOption = [];
-if (!$model->isNewRecord && Yii::$app->request->isAjax) {
-    $submitButtonOption = ArrayHelper::merge($submitButtonOption, [
-        'backTo' => Html::a(Html::tag('span', '&laquo;', ['class' => 'mr-1']).Yii::t('app', 'Back to detail'), ['view', 'id' => $model->primaryKey], ['title' => Yii::t('app', 'Detail Pengolahan Final'), 'class' => 'ml-4 modal-btn']),
-    ]);
-}
+<?php $submitButtonOption = ['button' => Html::submitButton(Yii::t('app', 'Final Manuver'), ['class' => 'btn btn-warning'])];
 echo $form->field($model, 'submitButton')
 	->submitButton($submitButtonOption); ?>
 
