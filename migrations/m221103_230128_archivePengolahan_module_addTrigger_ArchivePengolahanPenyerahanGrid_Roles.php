@@ -39,7 +39,7 @@ SQL;
 CREATE
     TRIGGER `archivePengolahanAfterDeletePenyerahanJenis` AFTER DELETE ON `ommu_archive_pengolahan_penyerahan_jenis` 
     FOR EACH ROW BEGIN
-	UPDATE `ommu_archive_pengolahan_penyerahan_grid` SET `jenis` = `jenis` + 1 WHERE `id` = OLD.penyerahan_id;
+	UPDATE `ommu_archive_pengolahan_penyerahan_grid` SET `jenis` = `jenis` - 1 WHERE `id` = OLD.penyerahan_id;
     END;
 SQL;
         $this->execute($archivePengolahanAfterDeletePenyerahanJenis);

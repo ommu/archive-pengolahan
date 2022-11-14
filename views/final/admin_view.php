@@ -43,6 +43,10 @@ $attributes = [
 		'visible' => !$small,
 	],
 	[
+		'attribute' => 'fond_number',
+		'value' => $model->fond_number ? $model->fond_number : '-',
+	],
+	[
 		'attribute' => 'fond_name',
 		'value' => $model->fond_name ? $model->fond_name : '-',
 	],

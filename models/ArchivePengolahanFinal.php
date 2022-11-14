@@ -13,6 +13,7 @@
  * The followings are the available columns in table "ommu_archive_pengolahan_final":
  * @property integer $id
  * @property integer $publish
+ * @property string $fond_number
  * @property string $fond_name
  * @property integer $archive_start_from
  * @property string $fond_schema_id
@@ -58,9 +59,10 @@ class ArchivePengolahanFinal extends \app\components\ActiveRecord
 	public function rules()
 	{
 		return [
-			[['fond_name', 'archive_start_from'], 'required'],
+			[['fond_number', 'fond_name', 'archive_start_from'], 'required'],
 			[['publish', 'archive_start_from', 'creation_id', 'stayInHere'], 'integer'],
 			[['fond_name'], 'string'],
+			[['fond_number'], 'string', 'max' => 255],
 			[['fond_schema_id'], 'string', 'max' => 36],
 			[['fond_schema_id', 'stayInHere'], 'safe'],
 			[['fond_schema_id'], 'exist', 'skipOnError' => true, 'targetClass' => ArchivePengolahanSchema::className(), 'targetAttribute' => ['fond_schema_id' => 'id']],
@@ -75,6 +77,7 @@ class ArchivePengolahanFinal extends \app\components\ActiveRecord
 		return [
 			'id' => Yii::t('app', 'ID'),
 			'publish' => Yii::t('app', 'Status'),
+			'fond_number' => Yii::t('app', 'Senarai Number'),
 			'fond_name' => Yii::t('app', 'Senarai Name'),
 			'archive_start_from' => Yii::t('app', 'Archive Start From'),
 			'fond_schema_id' => Yii::t('app', 'From Schema'),
@@ -169,6 +172,12 @@ class ArchivePengolahanFinal extends \app\components\ActiveRecord
 			'header' => '#',
 			'class' => 'app\components\grid\SerialColumn',
 			'contentOptions' => ['class' => 'text-center'],
+		];
+		$this->templateColumns['fond_number'] = [
+			'attribute' => 'fond_number',
+			'value' => function($model, $key, $index, $column) {
+				return $model->fond_number;
+			},
 		];
 		$this->templateColumns['fond_name'] = [
 			'attribute' => 'fond_name',

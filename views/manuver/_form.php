@@ -35,6 +35,10 @@ use yii\helpers\ArrayHelper;
 
 <?php //echo $form->errorSummary($model);?>
 
+<?php echo $form->field($model, 'fond_number')
+	->textInput(['maxlength' => true])
+	->label($model->getAttributeLabel('fond_number')); ?>
+
 <?php echo $form->field($model, 'fond_name')
     ->textarea(['rows' => 3, 'cols' => 50])
     ->label($model->getAttributeLabel('fond_name')); ?>

@@ -28,6 +28,8 @@ use yii\widgets\ActiveForm;
 		],
 	]); ?>
 
+		<?php echo $form->field($model, 'fond_number');?>
+
 		<?php echo $form->field($model, 'fond_name');?>
 
 		<?php echo $form->field($model, 'archive_start_from');?>

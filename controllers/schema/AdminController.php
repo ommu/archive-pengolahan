@@ -93,11 +93,11 @@ class AdminController extends Controller
         $isFond = true;
         if (($parent = Yii::$app->request->get('parent')) != null) {
             $this->subMenuParam = $parent;
-            $parent = \ommu\archivePengolahan\models\ArchivePengolahanSchema::findOne($parent);
+            $parent = $this->findModel($parent);
             if (!$parent->isFond) {
                 unset($this->subMenu[1]['tree']);
+                $isFond = false;
             }
-            $isFond = false;
         }
 
         $searchModel = new ArchivePengolahanSchemaSearch(['isFond' => $isFond]);
@@ -306,7 +306,7 @@ class AdminController extends Controller
 	{
 		Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
 
-		$model = ArchivePengolahanSchema::findOne($id);
+        $model = $this->findModel($id);
 
         if ($model == null) return [];
 
@@ -332,7 +332,7 @@ class AdminController extends Controller
             }
         }
 
-		$model = ArchivePengolahanSchema::findOne($id);
+        $model = $this->findModel($id);
 
         if ($model == null) return [];
 

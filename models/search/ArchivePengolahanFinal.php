@@ -28,7 +28,7 @@ class ArchivePengolahanFinal extends ArchivePengolahanFinalModel
 	{
 		return [
 			[['id', 'publish', 'archive_start_from', 'creation_id'], 'integer'],
-			[['fond_name', 'creation_date', 'updated_date', 'creationDisplayname'], 'safe'],
+			[['fond_number', 'fond_name', 'creation_date', 'updated_date', 'creationDisplayname'], 'safe'],
 		];
 	}
 
@@ -127,7 +127,8 @@ class ArchivePengolahanFinal extends ArchivePengolahanFinalModel
             $query->andFilterWhere(['NOT IN', 't.publish', [0,1]]);
         }
 
-		$query->andFilterWhere(['like', 't.fond_name', $this->fond_name])
+		$query->andFilterWhere(['like', 't.fond_number', $this->fond_number])
+            ->andFilterWhere(['like', 't.fond_name', $this->fond_name])
 			->andFilterWhere(['like', 'creation.displayname', $this->creationDisplayname]);
 
 		return $dataProvider;

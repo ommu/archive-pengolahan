@@ -302,7 +302,8 @@ class ArchivePengolahanSchema extends \app\components\ActiveRecord
 		$this->templateColumns['title'] = [
 			'attribute' => 'title',
 			'value' => function($model, $key, $index, $column) {
-				return $model->title;
+                $sync = $model->archive_id ? Html::button(strtolower(Yii::t('app', 'Sync')), ['class' => 'btn btn-info btn-xs']) : '';
+				return $sync.$model->title;
 			},
 			'format' => 'raw',
 		];
