@@ -135,9 +135,9 @@ class SyncController extends Controller
                 $model->code = $row['shortCode'];
                 $model->title = $row['title'];
                 if ($model->save()) {
-					Archives::updateAll(['sync_schema' => 1], ['id' => $row['id']]);
+					Archives::updateAll(['sync_schema' => 1, 'fond_schema_id' => $model->id], ['id' => $row['id']]);
                     if (!empty($row['childs'])) {
-                        $this->getInsert($row['childs'], $model->id);
+                        $this->getInsert($row['childs'], $model->id, $model->id);
                     }
                 }
             }
@@ -168,8 +168,8 @@ class SyncController extends Controller
                 $data[$child->id]['code'] = $child->code;
                 $data[$child->id]['shortCode'] = $child->shortCode;
 
-                $archive = $this->getData($child);
-                $data[$child->id] = ArrayHelper::merge($data[$child->id], ['childs' => $archive]);
+                $archives = $this->getData($child);
+                $data[$child->id] = ArrayHelper::merge($data[$child->id], ['childs' => $archives]);
             }
         }
 
@@ -179,7 +179,7 @@ class SyncController extends Controller
 	/**
 	 * {@inheritdoc}
 	 */
-	public function getInsert($childs, $parentId)
+	public function getInsert($childs, $parentId, $frontSchemaId)
 	{
         foreach ($childs as $row) {
             $model = new ArchivePengolahanSchema();
@@ -189,9 +189,9 @@ class SyncController extends Controller
             $model->code = $row['shortCode'];
             $model->title = $row['title'];
             if ($model->save()) {
-                Archives::updateAll(['sync_schema' => 1], ['id' => $row['id']]);
+                Archives::updateAll(['sync_schema' => 1, 'fond_schema_id' => $frontSchemaId], ['id' => $row['id']]);
                 if (!empty($row['childs'])) {
-                    $this->getInsert($row['childs'], $model->id);
+                    $this->getInsert($row['childs'], $model->id, $frontSchemaId);
                 }
             }
         }

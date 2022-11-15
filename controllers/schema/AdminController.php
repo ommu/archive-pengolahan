@@ -252,7 +252,16 @@ class AdminController extends Controller
 
         if ($model->save(false, ['publish','modified_id'])) {
             if ($model->archive_id) {
-                Archives::updateAll(['sync_schema' => 0], ['id' => $model->archive_id]);
+                $archives = Archives::find()
+                    ->select(['id'])
+                    ->andWhere(['fond_schema_id' => $model->id])
+                    ->all();
+
+                Archives::updateAll(['sync_schema' => 0, 'fond_schema_id' => ''], ['fond_schema_id' => $model->id]);
+                if (!empty($archives)) {
+                    ArchivePengolahanSchema::updateAll(['publish' => 2], ['archive_id' => ArrayHelper::map($archives, 'id', 'id')]);
+
+                }
             }
 
             Yii::$app->session->setFlash('success', Yii::t('app', 'Schema success deleted.'));
@@ -288,7 +297,7 @@ class AdminController extends Controller
 		$model = $this->findModel($id);
         $sync = Yii::$app->request->get('sync');
 
-		$this->view->title = Yii::t('app', 'Tree Schema');
+		$this->view->title = Yii::t('app', 'Schema Tree');
 		$this->view->description = '';
 		$this->view->keywords = '';
 		return $this->render('admin_tree', [
