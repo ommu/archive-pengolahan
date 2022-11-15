@@ -63,7 +63,8 @@ $attributes = [
 	[
 		'attribute' => 'userDisplayname',
 		'value' => function ($model) {
-            return $model->user::parseUser($model->user, true);
+            $user = $model->user;
+            return $user ? $user::parseUser($user, true) : '-';
 		},
 		'visible' => !$small,
 	],
