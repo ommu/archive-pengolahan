@@ -47,7 +47,7 @@ class m221113_200708_archivePengolahan_module_insert_role extends \yii\db\Migrat
 		$tableName = Yii::$app->db->tablePrefix . $authManager->itemChildTable;
         if (Yii::$app->db->getTableSchema($tableName, true)) {
 			$this->batchInsert($tableName, ['parent', 'child'], [
-				['archivePengolahanModLevelModerator', '/archive-pengolahan/final/*'],
+				['archivePengolahan', '/archive-pengolahan/final/*'],
 			]);
 		}
 	}

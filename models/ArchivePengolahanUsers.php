@@ -38,6 +38,7 @@ use yii\helpers\Json;
 use app\models\Users;
 use yii\base\InvalidConfigException;
 use yii\rbac\DbManager;
+use mdm\admin\models\Assignment;
 
 class ArchivePengolahanUsers extends \app\components\ActiveRecord
 {
@@ -242,71 +243,8 @@ class ArchivePengolahanUsers extends \app\components\ActiveRecord
         }
 	}
 
-    /**
-     * @throws yii\base\InvalidConfigException
-     * @return DbManager
-     */
-    protected function getAuthManager()
-    {
-        $authManager = Yii::$app->getAuthManager();
-        if (!$authManager instanceof DbManager) {
-            throw new InvalidConfigException('You should configure "authManager" component to use database before executing this migration.');
-        }
-
-        return $authManager;
-    }
-
 	/**
-	 * function setPermission
-	 */
-	public static function setPermission($tableName, $itemName, $userId) 
-	{
-        $validate = Yii::$app->db->createCommand("select * from {$tableName} where item_name=:itemName and user_id=:userId")
-            ->bindValues([
-                ':itemName' => $itemName,
-                ':userId' => $userId
-            ])
-            ->queryOne();
-
-        if (!$validate) {
-            Yii::$app->db->createCommand()
-                ->insert($tableName, [
-                    'item_name' => $itemName, 
-                    'user_id' => $userId, 
-                    'created_at' => time()  
-                ])
-                ->execute();
-        }
-
-        return true;
-	}
-
-	/**
-	 * function deletePermission
-	 */
-	public static function deletePermission($tableName, $itemName, $userId) 
-	{
-        $validate = Yii::$app->db->createCommand("select * from {$tableName} where item_name=:itemName and user_id=:userId")
-            ->bindValues([
-                ':itemName' => $itemName,
-                ':userId' => $userId
-            ])
-            ->queryOne();
-
-        if (is_array($validate) && !empty($validate)) {
-            Yii::$app->db->createCommand()
-                ->delete($tableName, [
-                    'item_name' => $itemName, 
-                    'user_id' => $userId
-                ])
-                ->execute();
-        }
-
-        return true;
-	}
-
-	/**
-	 * function deletePermission
+	 * function parseUser
 	 */
 	public static function parseUser($user, $userCode=true) 
 	{
@@ -385,16 +323,12 @@ class ArchivePengolahanUsers extends \app\components\ActiveRecord
 	{
         parent::afterSave($insert, $changedAttributes);
 
-        $authManager = $this->getAuthManager();
-        $tableName = Yii::$app->db->tablePrefix . $authManager->assignmentTable;
-
         $groups = Json::decode($this->groups);
 
         if ($insert) {
             if (!empty($groups)) {
-                foreach ($groups as $group) {
-                    self::setPermission($tableName, $group, $this->user_id);
-                }
+                $model = new Assignment($this->user_id);
+                $model->assign($groups);
             }
 
 		} else {
@@ -404,20 +338,20 @@ class ArchivePengolahanUsers extends \app\components\ActiveRecord
                     $oldGroups = [];
                 }
 
+                $model = new Assignment($this->user_id);
+
                 if (!empty($groups)) {
                     foreach ($groups as $group) {
                         if (in_array($group, $oldGroups)) {
                             unset($oldGroups[array_keys($oldGroups, $group)[0]]);
                             continue;
                         }
-                        self::setPermission($tableName, $group, $this->user_id);
+                        $model->assign([$group]);
                     }
                 }
 
                 if (!empty($oldGroups)) {
-                    foreach ($oldGroups as $group) {
-                        self::deletePermission($tableName, $group, $this->user_id);
-                    }
+                    $model->revoke($oldGroups);
                 }
             }
         }

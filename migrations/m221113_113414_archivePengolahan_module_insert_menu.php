@@ -23,8 +23,8 @@ class m221113_113414_archivePengolahan_module_insert_menu extends \yii\db\Migrat
 
         if (Yii::$app->db->getTableSchema($tableName, true)) {
 			$this->batchInsert($tableName, ['name', 'module', 'icon', 'parent', 'route', 'order', 'data'], [
-				['Schema', 'archive-pengolahan', null, Menu::getParentId('SIKS (Pelestarian)#archive-pengolahan'), '/archive-pengolahan/schema/admin/index', null, null],
-				['Manuver Kartu', 'archive-pengolahan', null, Menu::getParentId('SIKS (Pelestarian)#archive-pengolahan'), '/archive-pengolahan/manuver/index', null, null],
+				['Schema', 'archive-pengolahan', null, Menu::getParentId('SIKS (Pengolahan)#archive-pengolahan'), '/archive-pengolahan/schema/admin/index', null, null],
+				['Manuver Kartu', 'archive-pengolahan', null, Menu::getParentId('SIKS (Pengolahan)#archive-pengolahan'), '/archive-pengolahan/manuver/index', null, null],
 			]);
 		}
 	}

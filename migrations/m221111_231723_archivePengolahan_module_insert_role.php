@@ -53,7 +53,7 @@ class m221111_231723_archivePengolahan_module_insert_role extends \yii\db\Migrat
 		$tableName = Yii::$app->db->tablePrefix . $authManager->itemChildTable;
         if (Yii::$app->db->getTableSchema($tableName, true)) {
 			$this->batchInsert($tableName, ['parent', 'child'], [
-				['archivePelestarian', '/archive-pengolahan/penyerahan/card/*'],
+				['archivePengolahan', '/archive-pengolahan/penyerahan/card/*'],
 				['archiveArsiparis', '/archive-pengolahan/schema/admin/*'],
 				['archiveArsiparis', '/archive-pengolahan/schema/sync/*'],
 				['archiveArsiparis', '/archive-pengolahan/manuver/*'],

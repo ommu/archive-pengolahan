@@ -74,7 +74,7 @@ class m221106_105401_archivePengolahan_module_insert_role extends \yii\db\Migrat
 		$tableName = Yii::$app->db->tablePrefix . 'ommu_archive_pengolahan_user_group';
 		if (Yii::$app->db->getTableSchema($tableName, true)) {
 			$this->batchInsert($tableName, ['publish', 'name', 'permission', 'creation_id'], [
-				['1', 'Pelestarian', 'archivePelestarian', Yii::$app->user->id],
+				['1', 'Pengolahan', 'archivePengolahan', Yii::$app->user->id],
 				['1', 'Arsiparis', 'archiveArsiparis', Yii::$app->user->id],
 			]);
 		}
@@ -82,7 +82,7 @@ class m221106_105401_archivePengolahan_module_insert_role extends \yii\db\Migrat
 		$tableName = Yii::$app->db->tablePrefix . $authManager->itemTable;
         if (Yii::$app->db->getTableSchema($tableName, true)) {
 			$this->batchInsert($tableName, ['name', 'type', 'data', 'created_at'], [
-				['archivePelestarian', '2', '', time()],
+				['archivePengolahan', '2', '', time()],
 				['archiveArsiparis', '2', '', time()],
 			]);
 		}
@@ -90,7 +90,7 @@ class m221106_105401_archivePengolahan_module_insert_role extends \yii\db\Migrat
 		// $tableName = Yii::$app->db->tablePrefix . $authManager->itemChildTable;
         // if (Yii::$app->db->getTableSchema($tableName, true)) {
 		// 	$this->batchInsert($tableName, ['parent', 'child'], [
-		// 		['archivePengolahanModLevelAdmin', 'archivePelestarian'],
+		// 		['archivePengolahanModLevelAdmin', 'archivePengolahan'],
 		// 		['archivePengolahanModLevelAdmin', 'archiveArsiparis'],
 		// 	]);
 		// }
@@ -116,12 +116,12 @@ class m221106_105401_archivePengolahan_module_insert_role extends \yii\db\Migrat
 		$tableName = Yii::$app->db->tablePrefix . $authManager->itemChildTable;
         if (Yii::$app->db->getTableSchema($tableName, true)) {
 			$this->batchInsert($tableName, ['parent', 'child'], [
-				['archivePelestarian', '/archive-pengolahan/location/*'],
-				['archivePelestarian', '/archive-pengolahan/luring/admin/*'],
-				['archivePelestarian', '/archive-pengolahan/luring/document/*'],
-				['archivePelestarian', '/archive-pengolahan/luring/download/*'],
-				['archivePelestarian', '/archive-pengolahan/penyerahan/admin/*'],
-				['archivePelestarian', '/archive-pengolahan/penyerahan/item/*'],
+				['archivePengolahan', '/archive-pengolahan/location/*'],
+				['archivePengolahan', '/archive-pengolahan/luring/admin/*'],
+				['archivePengolahan', '/archive-pengolahan/luring/document/*'],
+				['archivePengolahan', '/archive-pengolahan/luring/download/*'],
+				['archivePengolahan', '/archive-pengolahan/penyerahan/admin/*'],
+				['archivePengolahan', '/archive-pengolahan/penyerahan/item/*'],
 			]);
 		}
 	}
