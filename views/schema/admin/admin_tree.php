@@ -16,7 +16,7 @@
 
 use yii\helpers\Url;
 
-\ommu\archivePengolahan\components\assets\ArchiveTree::register($this);
+\ommu\archivePengolahan\components\assets\SchemaTree::register($this);
 
 $context = $this->context;
 if ($context->breadcrumbApp) {

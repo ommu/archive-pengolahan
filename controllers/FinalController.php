@@ -35,9 +35,28 @@ use ommu\archivePengolahan\models\ArchivePengolahanFinal;
 use ommu\archivePengolahan\models\search\ArchivePengolahanFinal as ArchivePengolahanFinalSearch;
 use ommu\archivePengolahan\models\ArchivePengolahanSchemaCard;
 use yii\helpers\ArrayHelper;
+use ommu\archivePengolahan\models\ArchivePengolahanSetting;
+use yii\helpers\Json;
+use ommu\archive\models\Archives;
 
 class FinalController extends Controller
 {
+	/**
+	 * {@inheritdoc}
+	 */
+	public function init()
+	{
+        parent::init();
+
+        if (Yii::$app->request->get('id') || Yii::$app->request->get('parent')) {
+            $this->subMenu = $this->module->params['final_submenu'];
+        }
+
+        $setting = new ArchivePengolahanSetting(['app' => 'archivePengolahanModule']);
+		$this->breadcrumbApp = $setting->breadcrumb;
+		$this->breadcrumbAppParam = $setting->getBreadcrumbAppParam();
+	}
+
 	/**
 	 * {@inheritdoc}
 	 */
@@ -51,7 +70,7 @@ class FinalController extends Controller
                 'class' => VerbFilter::className(),
                 'actions' => [
                     'delete' => ['POST'],
-					// 'publish' => ['POST'],
+					'publish' => ['POST'],
                 ],
             ],
         ];
@@ -126,6 +145,10 @@ class FinalController extends Controller
             }
         }
 
+        if ($model->publish == 1) {
+            unset($this->subMenu[1]['publish']);
+            unset($this->subMenu[1]['delete']);
+        }
 		$this->view->title = Yii::t('app', 'Update Finalisasi: {fond-name}', ['fond-name' => $model->fond_name]);
 		$this->view->description = '';
 		$this->view->keywords = '';
@@ -143,6 +166,10 @@ class FinalController extends Controller
 	{
         $model = $this->findModel($id);
 
+        if ($model->publish == 1) {
+            unset($this->subMenu[1]['publish']);
+            unset($this->subMenu[1]['delete']);
+        }
 		$this->view->title = Yii::t('app', 'Detail Finalisasi: {fond-name}', ['fond-name' => $model->fond_name]);
 		$this->view->description = '';
 		$this->view->keywords = '';
@@ -167,7 +194,7 @@ class FinalController extends Controller
             ArchivePengolahanSchemaCard::updateAll(['final_id' => null], ['final_id' => $id]);
 
             Yii::$app->session->setFlash('success', Yii::t('app', 'Finalisasi success reset.'));
-            return $this->redirect(Yii::$app->request->referrer ?: ['manage']);
+            return $this->redirect(['manage']);
         }
 	}
 
@@ -180,57 +207,139 @@ class FinalController extends Controller
 	public function actionPublish($id)
 	{
 		$model = $this->findModel($id);
+		$model->publish = 1;
 
-        $cards = $model->cards;
-        echo '<pre>';
-        $codes = [];
-        if (is_array($cards) && !empty($cards)) {
-            $i = $model->archive_start_from;
-            foreach ($cards as $card) {
-                $i++;
-                $codes = ArrayHelper::merge($codes, $this->getData($card->schema, [$i => [
-                    'id' => $card->card_id,
-                    'code' => $i,
-                    'label' => $card->card->archive_description,
-                ]]));
+        $archives = Json::decode($model->archive_json);
+        $archives[$model->fond_schema_id]['code'] = $model->fond_number;
+        $archives[$model->fond_schema_id]['label'] = $model->fond_name;
+        $startFrom = $model->archive_start_from;
+
+        if ($model->save(false, ['publish'])) {
+            if (is_array($archives) && !empty($archives)) {
+                foreach ($archives as $archive) {
+                    $model = new Archives();
+                    $model->level_id = $archive['level_id'];
+                    $model->shortCode = $archive['level_id'] == 8 ? strval($startFrom) : $archive['code'];
+                    $model->title = $archive['label'];
+                    $model->sync_schema = 1;
+                    $model->publish = 0;
+                    if ($archive['level_id'] == 8) {
+                        $manuver = ArchivePengolahanSchemaCard::find()
+                            ->select(['id', 'publish', 'card_id'])
+                            ->where(['publish' => 1, 'card_id' => $archive['id']])
+                            ->one();
+                        $card = $manuver->card;
+                        $media = array_flip($card->getMedias(true));
+                        $subject = implode(',', $card->getSubjects(true, 'title'));
+                        $function = implode(',', $card->getFunctions(true, 'title'));
+                        $model->medium = $card->medium;
+                        $model->archive_date = join(' - ', [$card->from_archive_date, $card->to_archive_date]);
+                        $model->archive_type = $card->archive_type ?? null;
+                        $model->media = $media;
+                        $model->subject =  $subject;
+                        $model->function = $function;
+                    }
+                    if($model->save()) {
+                        if ($archive['level_id'] == 8) {
+                            ArchivePengolahanSchemaCard::updateAll(['fond_id' => $model->id, 'archive_id' => $model->id], ['id' => $manuver->id]);
+                            $startFrom++;
+                        }
+                        $branchs = $archive['branch'] ?? [];
+                        if (!empty($branchs)) {
+                            $this->getInsert($branchs, $model->id, $model->id, $startFrom);
+                        }
+                    }
+                }
             }
+
+            Yii::$app->session->setFlash('success', Yii::t('app', 'Finalisasi success published.'));
+            return $this->redirect(['manage']);
         }
-        // $price = array_column($codes, 'code');
-        // array_multisort($price, SORT_DESC, $codes);
-        array_multisort(array_column($codes, 'code'), SORT_ASC, $codes);
-
-        print_r($codes);
-        echo '</pre>';
-
-		// $model->publish = 1;
-
-        // if ($model->save(false, ['publish'])) {
-        //     Yii::$app->session->setFlash('success', Yii::t('app', 'Finalisasi success published.'));
-        //     return $this->redirect(Yii::$app->request->referrer ?: ['manage']);
-        // }
 	}
 
 	/**
-	 * Displays a single Archives model.
+	 * {@inheritdoc}
+	 */
+	public function getInsert($branchs, $parentId, $fondId, $startFrom)
+	{
+        foreach ($branchs as $archive) {
+            $model = new Archives();
+            $model->parent_id = $parentId;
+            $model->level_id = $archive['level_id'];
+            $model->shortCode = $archive['level_id'] == 8 ? strval($startFrom) : $archive['code'];
+            $model->title = $archive['label'];
+            $model->sync_schema = 1;
+            $model->publish = 0;
+            if ($archive['level_id'] == 8) {
+				$manuver = ArchivePengolahanSchemaCard::find()
+					->select(['id', 'publish', 'card_id'])
+					->where(['publish' => 1, 'card_id' => $archive['id']])
+					->one();
+                $card = $manuver->card;
+                $media = array_flip($card->getMedias(true));
+                $subject = implode(',', $card->getSubjects(true, 'title'));
+                $function = implode(',', $card->getFunctions(true, 'title'));
+                $model->medium = $card->medium;
+                $model->archive_date = join(' - ', [$card->from_archive_date, $card->to_archive_date]);
+                $model->archive_type = $card->archive_type ?? null;
+                $model->media = $media;
+                $model->subject = $subject;
+                $model->function = $function;
+            }
+            if($model->save()) {
+                if ($archive['level_id'] == 8) {
+                    ArchivePengolahanSchemaCard::updateAll(['fond_id' => $fondId, 'archive_id' => $model->id], ['id' => $manuver->id]);
+                    $startFrom++;
+                }
+                $branchs = $archive['branch'] ?? [];
+                if (!empty($branchs)) {
+                    $this->getInsert($branchs, $model->id, $fondId, $startFrom);
+                }
+            }
+        }
+
+        return;
+    }
+
+	/**
+	 * Displays a single ArchivePengolahanFinal model.
 	 * @param integer $id
 	 * @return mixed
 	 */
-	public function getData($model, $codes)
+	public function actionTree($id)
 	{
-		$data[$model->id] = [
-			'id' => $model->id,
-			'code' => $model->code,
-			'label' => $model->title,
-		];
-        if (!empty($codes)) {
-			$data[$model->id] = ArrayHelper::merge($data[$model->id], ['childs' => $codes]);
-        }
-		
-        if (isset($model->parent)) {
-			$data = $this->getData($model->parent, $data);
-        }
+        $model = $this->findModel($id);
 
-		return $data;
+        if ($model->publish == 1) {
+            unset($this->subMenu[1]['publish']);
+            unset($this->subMenu[1]['delete']);
+        }
+		$this->view->title = Yii::t('app', 'Tree Finalisasi: {fond-name}', ['fond-name' => $model->fond_name]);
+		$this->view->description = '';
+		$this->view->keywords = '';
+		return $this->oRender('admin_tree', [
+			'model' => $model,
+		]);
+	}
+
+	/**
+	 * actionPublish an existing ArchivePengolahanFinal model.
+	 * If publish is successful, the browser will be redirected to the 'index' page.
+	 * @param integer $id
+	 * @return mixed
+	 */
+	public function actionArchive($id)
+	{
+		Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+		$model = $this->findModel($id);
+        $archiveJson = Json::decode($model->archive_json);
+        $archiveJson[$model->fond_schema_id]['code'] = $model->fond_number;
+        $archiveJson[$model->fond_schema_id]['label'] = $model->fond_name;
+
+        $data = $model->arrayReset($archiveJson);
+
+        return $data;
 	}
 
 	/**

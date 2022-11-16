@@ -39,7 +39,7 @@ class m221106_114535_archivePengolahan_module_insert_menu extends \yii\db\Migrat
 				['Physical Storage', 'archive-location', null, Menu::getParentId('Archive Settings#archive-pengolahan'), '/archive-location/admin/index', 3, null],
 				['User Group', 'archive-pengolahan', null, Menu::getParentId('Archive Settings#archive-pengolahan'), '/archive-pengolahan/user/group/index', 4, null],
 				['Users', 'archive-pengolahan', null, Menu::getParentId('Archive Settings#archive-pengolahan'), '/archive-pengolahan/user/admin/index', 5, null],
-				['Archive Settings', 'archive-pengolahan', null, Menu::getParentId('Archive Settings#archive-pengolahan'), '/archive-pengolahan/setting/admin/update', 6, null],
+				['Pengolahan Settings', 'archive-pengolahan', null, Menu::getParentId('Archive Settings#archive-pengolahan'), '/archive-pengolahan/setting/admin/update', 6, null],
 			]);
 		}
 	}

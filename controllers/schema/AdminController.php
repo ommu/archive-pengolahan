@@ -95,7 +95,7 @@ class AdminController extends Controller
             $this->subMenuParam = $parent;
             $parent = $this->findModel($parent);
             if (!$parent->isFond) {
-                unset($this->subMenu[1]['tree']);
+                unset($this->subMenu[0]['tree']);
                 $isFond = false;
             }
         }
@@ -163,7 +163,7 @@ class AdminController extends Controller
         }
 
         if ($parent && !$parent->isFond) {
-            unset($this->subMenu[1]['tree']);
+            unset($this->subMenu[0]['tree']);
         }
 		$this->view->title = Yii::t('app', 'Create Schema');
         if ($parent) {
@@ -208,7 +208,7 @@ class AdminController extends Controller
         }
 
         if (!$model->isFond) {
-            unset($this->subMenu[1]['tree']);
+            unset($this->subMenu[0]['tree']);
         }
 		$this->view->title = Yii::t('app', 'Update Schema: {title}', ['title' => $model::htmlHardDecode($model->title)]);
 		$this->view->description = '';
@@ -228,7 +228,7 @@ class AdminController extends Controller
         $model = $this->findModel($id);
 
         if (!$model->isFond) {
-            unset($this->subMenu[1]['tree']);
+            unset($this->subMenu[0]['tree']);
         }
 		$this->view->title = Yii::t('app', 'Detail Schema: {title}', ['title' => $model::htmlHardDecode($model->title)]);
 		$this->view->description = '';
@@ -360,7 +360,7 @@ class AdminController extends Controller
 	{
 		$data = [
 			'id' => $model->id,
-			'level_id' => $model->level_id,
+			'level' => $model->levelTitle->message,
 			'code' => $model->code,
 			'label' => $model::htmlHardDecode($model->title),
 			'inode' => $model->getChilds(true) ? true : false,
@@ -390,7 +390,7 @@ class AdminController extends Controller
 	{
 		$data = [
 			'id' => $model->id,
-			'level_id' => $model->level_id,
+			'level' => $model->levelTitle->message,
 			'code' => $model->code,
 			'label' => $model::htmlHardDecode($model->title),
 			'inode' => $model->getChilds(true, 1) ? true : false,
@@ -402,9 +402,18 @@ class AdminController extends Controller
 		];
 
         $childs = $model->getChilds(false, 1)
-            ->select(['id', 'parent_id', 'level_id', 'code', 'title'])
+            ->select(['id', 'level_id', 'code', 'title'])
             ->orderBy('code ASC')
             ->all();
+
+        if (is_array($childs) && !empty($childs)) {
+            if ($childs[0]->code == 1) {
+                $childs = $model->getChilds(false, 1)
+                    ->select(['id', 'level_id', 'code', 'title'])
+                    ->orderBy(['cast(code as int)' => SORT_ASC])
+                    ->all();
+            }
+        }
 
         if ($childs) {
             $cards = [];

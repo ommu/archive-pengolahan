@@ -215,6 +215,9 @@ class ManuverController extends Controller
 	public function actionFinal($id)
 	{
         $schema = $this->findModel($id);
+        $cards = $schema->getCards(false, 1, true)
+            ->select(['id'])
+            ->all();
 
         $referenceCode = $schema->referenceCode;
         if (array_key_first($schema->referenceCode) != $id) {
@@ -226,6 +229,7 @@ class ManuverController extends Controller
         if (Yii::$app->request->isPost) {
             $model->load(Yii::$app->request->post());
             $model->fond_schema_id = $id;
+            $model->cardsId = ArrayHelper::map($cards, 'id', 'id');
             // $postData = Yii::$app->request->post();
             // $model->load($postData);
             // $model->order = $postData['order'] ? $postData['order'] : 0;

@@ -1,6 +1,6 @@
 <?php
 /**
- * ArchiveTree
+ * SchemaTree
  *
  * @author Putra Sudaryanto <putra@ommu.id>
  * @contact (+62)856-299-4114
@@ -12,7 +12,7 @@
 
 namespace ommu\archivePengolahan\components\assets;
 
-class ArchiveTree extends \yii\web\AssetBundle
+class SchemaTree extends \yii\web\AssetBundle
 {
 	public $sourcePath = '@ommu/archivePengolahan/assets';
 

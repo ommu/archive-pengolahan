@@ -142,7 +142,7 @@ class ArchivePengolahanSchemaCard extends \app\components\ActiveRecord
 	public function getSchema()
 	{
 		return $this->hasOne(ArchivePengolahanSchema::className(), ['id' => 'schema_id'])
-            ->select(['id', 'parent_id', 'code', 'title']);
+            ->select(['id', 'parent_id', 'level_id', 'code', 'title']);
 	}
 
 	/**

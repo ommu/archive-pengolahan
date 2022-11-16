@@ -33,6 +33,8 @@ use Yii;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use app\models\Users;
+use yii\helpers\ArrayHelper;
+use yii\helpers\Json;
 
 class ArchivePengolahanFinal extends \app\components\ActiveRecord
 {
@@ -41,6 +43,7 @@ class ArchivePengolahanFinal extends \app\components\ActiveRecord
     public $gridForbiddenColumn = ['updated_date'];
 
     public $stayInHere;
+    public $cardsId;
 
 	public $creationDisplayname;
     public $oCard;
@@ -64,7 +67,7 @@ class ArchivePengolahanFinal extends \app\components\ActiveRecord
 			[['fond_name'], 'string'],
 			[['fond_number'], 'string', 'max' => 255],
 			[['fond_schema_id'], 'string', 'max' => 36],
-			[['fond_schema_id', 'stayInHere'], 'safe'],
+			[['fond_schema_id', 'stayInHere', 'cardsId'], 'safe'],
 			[['fond_schema_id'], 'exist', 'skipOnError' => true, 'targetClass' => ArchivePengolahanSchema::className(), 'targetAttribute' => ['fond_schema_id' => 'id']],
 		];
 	}
@@ -141,7 +144,7 @@ class ArchivePengolahanFinal extends \app\components\ActiveRecord
 	public function getSchema()
 	{
 		return $this->hasOne(ArchivePengolahanSchema::className(), ['id' => 'fond_schema_id'])
-            ->select(['id', 'code', 'title']);
+            ->select(['id', 'parent_id', 'level_id', 'code', 'title']);
 	}
 
 	/**
@@ -216,7 +219,8 @@ class ArchivePengolahanFinal extends \app\components\ActiveRecord
         $this->templateColumns['oCard'] = [
             'attribute' => 'oCard',
             'value' => function($model, $key, $index, $column) {
-                return $model->getCards(true);
+                $cards = $model->getCards(true);
+				return Html::a($cards, ['tree', 'id' => $model->primaryKey], ['title' => Yii::t('app', '{count} cards', ['count' => $cards]), 'data-pjax' => 0]);
             },
             'filter' => false,
             'contentOptions' => ['class' => 'text-center'],
@@ -269,6 +273,142 @@ class ArchivePengolahanFinal extends \app\components\ActiveRecord
 	}
 
 	/**
+	 * Displays a single Archives model.
+	 * @param integer $id
+	 * @return mixed
+	 */
+	public function getArchive()
+	{
+        $fondSchema = $this->schema;
+
+        if ($fondSchema == null) return [];
+
+        $data = [];
+        $data = ArrayHelper::merge($data, [$fondSchema->id => $this->getTreeSchema($fondSchema)]);
+
+        $cards = $this->cards;
+        if (is_array($cards) && !empty($cards)) {
+            $data = ArrayHelper::merge($data, $this->getArchiveCards($cards));
+        }
+
+        $data[$this->fond_schema_id]['code'] = $this->fond_number;
+        $data[$this->fond_schema_id]['label'] = $this->fond_name;
+
+        return $data;
+    }
+
+	/**
+	 * Displays a single Archives model.
+	 * @param integer $id
+	 * @return mixed
+	 */
+	public function getTreeSchema($model)
+	{
+		$data[$model->id] = [
+			'id' => $model->id,
+            'level_id' => $model->level_id,
+			'level' => $model->levelTitle->message,
+			'code' => $model->code,
+			'label' => $model::htmlHardDecode($model->title),
+			'inode' => false,
+		];
+
+        $childs = $model->getChilds(false, 1)
+            ->select(['id', 'level_id', 'code', 'title'])
+            ->orderBy('code ASC')
+            ->all();
+
+        if (is_array($childs) && !empty($childs)) {
+            if ($childs[0]->code == 1) {
+                $childs = $model->getChilds(false, 1)
+                    ->select(['id', 'level_id', 'code', 'title'])
+                    ->orderBy(['cast(code as int)' => SORT_ASC])
+                    ->all();
+            }
+        }
+
+        if ($childs) {
+            $cards = [];
+            foreach ($childs as $child) {
+                $cards[$child->id] = $this->getTreeSchema($child);
+            }
+            $data[$model->id] = ArrayHelper::merge($data[$model->id], ['open' => true, 'branch' => $cards]);
+        }
+
+		return $data[$model->id];
+    }
+
+	/**
+	 * Displays a single Archives model.
+	 * @param integer $id
+	 * @return mixed
+	 */
+	public function getArchiveCards($cards)
+	{
+        $data = [];
+        if (is_array($cards) && !empty($cards)) {
+            $i = 0;
+            foreach ($cards as $card) {
+                $data = ArrayHelper::merge($data, $this->getParentSchema($card->schema, [$i => [
+                    'id' => $card->card_id,
+                    'level_id' => 8,
+                    'level' => 'Item',
+                    'code' => 'newitem',
+                    'label' => $card::htmlHardDecode($card->card->archive_description),
+                    'inode' => false,
+                ]]));
+                $i++;
+            }
+        }
+
+        return $data;
+    }
+
+	/**
+	 * Displays a single Archives model.
+	 * @param integer $id
+	 * @return mixed
+	 */
+	public function getParentSchema($model, $codes)
+	{
+		$data[$model->id] = [
+			'id' => $model->id,
+            'level_id' => $model->level_id,
+			'level' => $model->levelTitle->message,
+			'code' => $model->code,
+			'label' => $model::htmlHardDecode($model->title),
+            'inode' => true,
+		];
+        if (!empty($codes)) {
+			$data[$model->id] = ArrayHelper::merge($data[$model->id], ['open' => true, 'branch' => $codes]);
+        }
+		
+        if (isset($model->parent)) {
+			$data = $this->getParentSchema($model->parent, $data);
+        }
+
+		return $data;
+	}
+
+	/**
+	 * Displays a single Archives model.
+	 * @param integer $id
+	 * @return mixed
+	 */
+	public function arrayReset($array)
+	{
+        $array = array_values($array);
+        foreach ($array as $key => $val) {
+            if (is_array($val) && array_key_exists('branch', $val)) {
+                $val = $this->arrayReset($val['branch']);
+                $array[$key]['branch'] = $val;
+            }
+        }
+
+        return $array;
+	}
+
+	/**
 	 * after find attributes
 	 */
 	public function afterFind()
@@ -293,4 +433,23 @@ class ArchivePengolahanFinal extends \app\components\ActiveRecord
         }
         return true;
 	}
+
+	/**
+	 * After save attributes
+	 */
+	public function afterSave($insert, $changedAttributes)
+	{
+        parent::afterSave($insert, $changedAttributes);
+
+        if ($insert) {
+            $schema = $this->getArchive();
+            $model = ArchivePengolahanSchemaCard::find()
+                ->select(['id', 'card_id', 'schema_id'])
+                ->andWhere(['in', 'id', $this->cardsId])
+                ->all();
+            $cards = $this->getArchiveCards($model);
+
+            self::updateAll(['archive_json' => Json::encode(ArrayHelper::merge($schema, $cards))], ['id' => $this->id]);
+		}
+    }
 }

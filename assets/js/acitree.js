@@ -21,12 +21,18 @@ jQuery(document).ready(function ($) {
 		itemHook: function(parent, item, itemData, level) {
             if (itemData.manuver == false) {
                 this.setLabel(item, {
-                    label: itemData.code + ': ' + itemData.label +'<br/><a class="modal-btn" href="'+itemData['view-url']+'" title="Info '+itemData.code+': '+itemData.label+'">Info</a> | <a href="'+itemData['update-url']+'" title="Update '+itemData.code+': '+itemData.label+'">Update</a> | <a href="'+itemData['child-url']+'" title="Childs '+itemData.code+': '+itemData.label+'">Childs</a>',
+                    label: itemData.level + ': ' + itemData.code + '<br/>' + itemData.label +'<br/><a class="modal-btn" href="'+itemData['view-url']+'" title="Info '+itemData.code+': '+itemData.label+'">Info</a> | <a href="'+itemData['update-url']+'" title="Update '+itemData.code+': '+itemData.label+'">Update</a> | <a href="'+itemData['child-url']+'" title="Childs '+itemData.code+': '+itemData.label+'">Childs</a>',
                 });
             } else {
-                this.setLabel(item, {
-                    label: itemData.code + ': ' + itemData.label +'<br/><a href="'+itemData['menuver-url']+'" title="Manuver '+itemData.code+': '+itemData.label+'">Manuver</a>',
-                });
+                if (('branch' in itemData) == false || itemData.level.toLowerCase() == 'fond') {
+                    this.setLabel(item, {
+                        label: itemData.level + ': ' + itemData.code + '<br/>' + itemData.label +'<br/><a href="'+itemData['menuver-url']+'" title="Manuver '+itemData.code+': '+itemData.label+'">Manuver</a>',
+                    });
+                } else {
+                    this.setLabel(item, {
+                        label: itemData.level + ': ' + itemData.code + '<br/>' + itemData.label,
+                    });
+                }
             }
 		}
 	});

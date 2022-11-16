@@ -31,29 +31,26 @@ use yii\helpers\ArrayHelper;
 			'encode' => false,
 		],
 	],
-]); ?>
+]);
+
+$disabled = !$model->isNewRecord && $model->publish == 1 ? true : false;
+?>
 
 <?php //echo $form->errorSummary($model);?>
 
 <?php echo $form->field($model, 'fond_number')
-	->textInput(['maxlength' => true])
+	->textInput(['maxlength' => true, 'disabled' => $disabled])
 	->label($model->getAttributeLabel('fond_number')); ?>
 
 <?php echo $form->field($model, 'fond_name')
-    ->textarea(['rows' => 3, 'cols' => 50])
+    ->textarea(['rows' => 3, 'cols' => 50, 'disabled' => $disabled])
     ->label($model->getAttributeLabel('fond_name')); ?>
 
 <?php echo $form->field($model, 'archive_start_from')
-	->textInput(['type' => 'number', 'min' => '1'])
+	->textInput(['type' => 'number', 'min' => '1', 'disabled' => $disabled])
 	->label($model->getAttributeLabel('archive_start_from')); ?>
 
-<?php 
-if ($model->isNewRecord && !$model->getErrors()) {
-	$model->publish = 1;
-}
-echo $form->field($model, 'publish')
-	->checkbox()
-	->label($model->getAttributeLabel('publish')); ?>
+<hr/>
 
 <?php if (($stayInHere = Yii::$app->request->get('stayInHere')) != null) {
     $model->stayInHere = $stayInHere;

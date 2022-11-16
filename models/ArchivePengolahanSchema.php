@@ -251,7 +251,7 @@ class ArchivePengolahanSchema extends \app\components\ActiveRecord
 	public function getParent()
 	{
 		return $this->hasOne(ArchivePengolahanSchema::className(), ['id' => 'parent_id'])
-            ->select(['id', 'parent_id', 'archive_id', 'level_id', 'code', 'title']);
+            ->select(['id', 'parent_id', 'level_id', 'code', 'title']);
 	}
 
 	/**

@@ -17,7 +17,7 @@ use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\widgets\DetailView;
 
-!$small && !$model->isFond ? \ommu\archivePengolahan\components\assets\ArchiveTree::register($this) : '';
+!$small && !$model->isFond ? \ommu\archivePengolahan\components\assets\SchemaTree::register($this) : '';
 
 if (!$small) {
     $context = $this->context;

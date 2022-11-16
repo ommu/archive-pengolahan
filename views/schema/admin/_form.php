@@ -20,7 +20,7 @@ use app\components\widgets\ActiveForm;
 use yii\helpers\ArrayHelper;
 use ommu\archive\models\ArchiveLevel;
 
-$parent ? \ommu\archivePengolahan\components\assets\ArchiveTree::register($this) : '';
+$parent ? \ommu\archivePengolahan\components\assets\SchemaTree::register($this) : '';
 
 $treeDataUrl = Url::to(['data', 'id' => $model->parent_id]);
 $js = <<<JS

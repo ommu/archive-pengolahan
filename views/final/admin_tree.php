@@ -4,7 +4,6 @@
  * @var $this app\components\View
  * @var $this ommu\archivePengolahan\controllers\FinalController
  * @var $model ommu\archivePengolahan\models\ArchivePengolahanFinal
- * @var $form app\components\widgets\ActiveForm
  *
  * @author Putra Sudaryanto <putra@ommu.id>
  * @contact (+62)856-299-4114
@@ -14,21 +13,27 @@
  *
  */
 
+use yii\helpers\Html;
 use yii\helpers\Url;
+use yii\widgets\DetailView;
+
+\ommu\archivePengolahan\components\assets\ArchiveFinalTree::register($this);
 
 $context = $this->context;
 if ($context->breadcrumbApp) {
-	$this->params['breadcrumbs'][] = ['label' => $context->breadcrumbAppParam['name'], 'url' => [$context->breadcrumbAppParam['url']]];
+    $this->params['breadcrumbs'][] = ['label' => $context->breadcrumbAppParam['name'], 'url' => [$context->breadcrumbAppParam['url']]];
 }
 $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Finalisasi'), 'url' => ['index']];
-$this->params['breadcrumbs'][] = ['label' => $model->fond_number, 'url' => ['view', 'id' => $model->id]];
-$this->params['breadcrumbs'][] = Yii::t('app', 'Update');
+$this->params['breadcrumbs'][] = $model->fond_number;
+
+$treeDataUrl = Url::to(['archive', 'id' => $model->id]);
+$js = <<<JS
+	var treeDataUrl = '$treeDataUrl';
+	var selectedId = '$model->id';
+JS;
+$this->registerJs($js, \yii\web\View::POS_HEAD);
 ?>
 
-<div class="archive-pengolahan-final-update">
-
-<?php echo $this->render('_form', [
-	'model' => $model,
-]); ?>
-
+<div class="archive-pengolahan-final-view">
+    <div id="tree" class="aciTree"></div>
 </div>

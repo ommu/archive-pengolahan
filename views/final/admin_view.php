@@ -18,13 +18,12 @@ use yii\helpers\Url;
 use yii\widgets\DetailView;
 
 if (!$small) {
+    $context = $this->context;
+    if ($context->breadcrumbApp) {
+        $this->params['breadcrumbs'][] = ['label' => $context->breadcrumbAppParam['name'], 'url' => [$context->breadcrumbAppParam['url']]];
+    }
     $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Finalisasi'), 'url' => ['index']];
-    $this->params['breadcrumbs'][] = $model->fond_name;
-
-    $this->params['menu']['content'] = [
-        ['label' => Yii::t('app', 'Update'), 'url' => Url::to(['update', 'id' => $model->id]), 'icon' => 'pencil', 'htmlOptions' => ['class' => 'btn btn-primary']],
-        ['label' => Yii::t('app', 'Delete'), 'url' => Url::to(['delete', 'id' => $model->id]), 'htmlOptions' => ['data-confirm' => Yii::t('app', 'Are you sure you want to delete this item?'), 'data-method' => 'post', 'class' => 'btn btn-danger'], 'icon' => 'trash'],
-    ];
+    $this->params['breadcrumbs'][] = $model->fond_number;
 } ?>
 
 <div class="archive-pengolahan-final-view">
@@ -58,7 +57,8 @@ $attributes = [
     [
         'attribute' => 'oCard',
         'value' => function ($model) {
-            return $model->getCards(true); 
+            $cards = $model->getCards(true); 
+            return Html::a($cards, ['tree', 'id' => $model->primaryKey], ['title' => Yii::t('app', '{count} cards', ['count' => $cards]), 'data-pjax' => 0]);
         }, 
         'format' => 'html',
         'visible' => !$small,

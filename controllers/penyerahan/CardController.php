@@ -257,8 +257,8 @@ class CardController extends Controller
 	{
         if (($model = ArchivePengolahanPenyerahanCard::findOne($id)) !== null) {
             $model->media = array_flip($model->getMedias(true));
-            $model->subject =  implode(',', $model->getSubjects(true, 'title'));
-            $model->function =  implode(',', $model->getFunctions(true, 'title'));
+            $model->subject = implode(',', $model->getSubjects(true, 'title'));
+            $model->function = implode(',', $model->getFunctions(true, 'title'));
 
             return $model;
         }

@@ -133,13 +133,13 @@ schemma_submenu:
         0: 'schema/admin/update'
         id: $_GET*id
       select: action
-  1:
     tree:
       label: Tree
       url:
         0: 'schema/admin/tree'
         id: $_GET*id
       select: action
+  1:
     childs:
       label: Childs
       url:
@@ -150,9 +150,49 @@ schemma_submenu:
     delete:
       label: Delete
       url:
-        0: 'fond/delete'
+        0: 'schema/admin/delete'
         id: $_GET*id
       htmlOptions:
-        data-confirm: Are you sure you want to delete this item?
+        data-confirm: Are you sure you want to delete this schema?
+        data-method: post
+      select: action
+
+final_submenu:
+  0:
+    view:
+      label: Detail
+      url:
+        0: 'final/view'
+        id: $_GET*id
+      select: action
+    update:
+      label: Update
+      url:
+        0: 'final/update'
+        id: $_GET*id
+      select: action
+    tree:
+      label: Tree
+      url:
+        0: 'final/tree'
+        id: $_GET*id
+      select: action
+  1:
+    publish:
+      label: Publish to Layanan
+      url:
+        0: 'final/publish'
+        id: $_GET*id
+      htmlOptions:
+        data-confirm: Are you sure you want to publish to layanan?
+        data-method: post
+      select: action
+    delete:
+      label: Reset Finalisasi
+      url:
+        0: 'final/delete'
+        id: $_GET*id
+      htmlOptions:
+        data-confirm: Are you sure you want to reset this finalisasi?
         data-method: post
       select: action
