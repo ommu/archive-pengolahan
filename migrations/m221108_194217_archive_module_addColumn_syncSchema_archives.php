@@ -25,7 +25,18 @@ class m221108_194217_archive_module_addColumn_syncSchema_archives extends \yii\d
 				$this->tinyInteger(1)
                     ->notNull()
                     ->defaultValue(0)
-                    ->after('senarai_file'),
+                    ->after('archive_file'),
+			);
+		}
+	}
+
+	public function down()
+	{
+		$tableName = Yii::$app->db->tablePrefix . 'ommu_archives';
+		if (Yii::$app->db->getTableSchema($tableName, true)) {
+			$this->dropColumn(
+				$tableName,
+				'sync_schema',
 			);
 		}
 	}

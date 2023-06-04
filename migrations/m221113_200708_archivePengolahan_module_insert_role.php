@@ -48,6 +48,7 @@ class m221113_200708_archivePengolahan_module_insert_role extends \yii\db\Migrat
         if (Yii::$app->db->getTableSchema($tableName, true)) {
 			$this->batchInsert($tableName, ['parent', 'child'], [
 				['archivePengolahan', '/archive-pengolahan/final/*'],
+				['archiveArsiparis', '/archive-pengolahan/final/*'],
 			]);
 		}
 	}

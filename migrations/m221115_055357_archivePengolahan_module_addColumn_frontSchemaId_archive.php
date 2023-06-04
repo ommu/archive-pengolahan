@@ -26,4 +26,15 @@ class m221115_055357_archivePengolahan_module_addColumn_frontSchemaId_archive ex
 			);
 		}
 	}
+
+	public function down()
+	{
+		$tableName = Yii::$app->db->tablePrefix . 'ommu_archives';
+		if (Yii::$app->db->getTableSchema($tableName, true)) {
+			$this->dropColumn(
+				$tableName,
+				'fond_schema_id',
+			);
+		}
+	}
 }
