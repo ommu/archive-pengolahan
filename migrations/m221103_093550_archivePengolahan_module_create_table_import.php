@@ -1,6 +1,6 @@
 <?php
 /**
- * m221103_094147_archivePengolahan_module_create_table_import
+ * m221103_093550_archivePengolahan_module_create_table_import
  * 
  * @author Putra Sudaryanto <putra@ommu.id>
  * @contact (+62)856-299-4114
@@ -13,7 +13,7 @@
 use Yii;
 use yii\db\Schema;
 
-class m221103_094147_archivePengolahan_module_create_table_import extends \yii\db\Migration
+class m221103_093550_archivePengolahan_module_create_table_import extends \yii\db\Migration
 {
 	public function up()
 	{
