@@ -14,7 +14,7 @@ namespace ommu\archivePengolahan\components\assets;
 
 class ImportTemplateAsset extends \yii\web\AssetBundle
 {
-	public $sourcePath = '@ommu/archivePengolahan/assets/templates';
+	public $sourcePath = '@ommu/archive-pengolahan/assets/templates';
 
 	public $publishOptions = [
 		'forceCopy' => YII_DEBUG ? true : false,

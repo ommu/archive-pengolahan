@@ -80,8 +80,8 @@ class ArchivePengolahanFinal extends \app\components\ActiveRecord
 		return [
 			'id' => Yii::t('app', 'ID'),
 			'publish' => Yii::t('app', 'Status'),
-			'fond_number' => Yii::t('app', 'Senarai Number'),
-			'fond_name' => Yii::t('app', 'Senarai Name'),
+			'fond_number' => Yii::t('app', 'Fond Code'),
+			'fond_name' => Yii::t('app', 'Fond Title'),
 			'archive_start_from' => Yii::t('app', 'Archive Start From'),
 			'fond_schema_id' => Yii::t('app', 'From Schema'),
 			'creation_date' => Yii::t('app', 'Creation Date'),

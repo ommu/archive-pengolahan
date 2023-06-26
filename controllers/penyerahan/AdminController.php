@@ -377,7 +377,6 @@ class AdminController extends Controller
         }
 		$types = array_flip($types);
 
-
         if (Yii::$app->request->isPost) {
 			$penyerahanPath = ArchivePengolahanPenyerahan::getUploadPath();
 			$penyerahanImportPath = join('/', [$penyerahanPath, '_import']);

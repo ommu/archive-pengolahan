@@ -14,7 +14,7 @@ namespace ommu\archivePengolahan\components\assets;
 
 class SchemaTree extends \yii\web\AssetBundle
 {
-	public $sourcePath = '@ommu/archivePengolahan/assets';
+	public $sourcePath = '@ommu/archive-pengolahan/assets';
 
 	public $js = [
 		'js/acitree.js',

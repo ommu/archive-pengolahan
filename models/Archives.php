@@ -213,8 +213,10 @@ class Archives extends ArchivesModel
 			'label' => Yii::t('app', 'Sync Schema'),
 			'value' => function($model, $key, $index, $column) {
                 if ($model->sync_schema) {
-                    $schema = $model->getSchemas(false);
-                    return Html::a('<span class="glyphicon glyphicon-ok"></span>', ['schema/admin/tree', 'id' => $schema->id, 'sync' => true], ['title' => Yii::t('app', 'View Schema'), 'data-pjax' => 0]);
+                    if ($model->fond_schema_id == '') {
+                        return '-';
+                    }
+                    return Html::a('<span class="glyphicon glyphicon-ok"></span>', ['schema/admin/tree', 'id' => $model->fond_schema_id, 'sync' => true], ['title' => Yii::t('app', 'View Schema'), 'data-pjax' => 0]);
                 }
 				return $this->quickAction(Url::to(['run', 'id' => $model->primaryKey]), $model->publish, 'Sync,Sync');
 			},
