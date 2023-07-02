@@ -68,10 +68,10 @@ class ArchivePengolahanPenyerahanItem extends \app\components\ActiveRecord
 	public function rules()
 	{
 		return [
-			[['penyerahan_id', 'archive_number', 'archive_description', 'year', 'volume', 'code', 'description'], 'required'],
+			[['penyerahan_id', 'archive_number', 'archive_description', 'year', 'volume', 'description'], 'required'],
 			[['publish', 'penyerahan_id', 'creation_id', 'modified_id', 'stayInHere'], 'integer'],
 			[['archive_description'], 'string'],
-			[['stayInHere'], 'safe'],
+			[['code', 'stayInHere'], 'safe'],
 			[['archive_number', 'volume', 'code'], 'string', 'max' => 16],
 			[['year'], 'string', 'max' => 8],
 			[['description'], 'string', 'max' => 64],
