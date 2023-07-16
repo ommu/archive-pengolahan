@@ -64,7 +64,7 @@ echo $form->field($model, 'user_id', ['template' => '{label}{beginWrapper}{input
 
 <?php 
 if ($model->isNewRecord && !$model->getErrors()) {
-    $model->temporary_number = $user ? $user->user_code.($user->archives + 1) : null;
+    $model->temporary_number = $user ? $user->user_code .'/'. ($user->archives + 1) : null;
 }
 echo $form->field($model, 'temporary_number', ['template' => '{label}{beginWrapper}{input}{error}{hint}'.$model->temporary_number.'{endWrapper}'])
     ->hiddenInput()

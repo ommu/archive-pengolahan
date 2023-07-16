@@ -127,7 +127,7 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 			'pengolahan_status' => Yii::t('app', 'Status Pengolahan'),
 			'pengolahan_tahun' => Yii::t('app', 'Tahun Pengolahan'),
 			'color_code' => Yii::t('app', 'Color Code'),
-			'description' => Yii::t('app', 'Description'),
+			'description' => Yii::t('app', 'Developmental Level'),
 			'publication_file' => Yii::t('app', 'Publication File'),
 			'import_id' => Yii::t('app', 'Import'),
 			'creation_date' => Yii::t('app', 'Creation Date'),
