@@ -323,7 +323,7 @@ class FinalController extends Controller
 	}
 
 	/**
-	 * actionPublish an existing ArchivePengolahanFinal model.
+	 * actionArchive an existing ArchivePengolahanFinal model.
 	 * If publish is successful, the browser will be redirected to the 'index' page.
 	 * @param integer $id
 	 * @return mixed

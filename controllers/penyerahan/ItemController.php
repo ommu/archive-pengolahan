@@ -114,6 +114,13 @@ class ItemController extends Controller
         if (($penyerahan = Yii::$app->request->get('penyerahan')) != null) {
             $this->subMenuParam = $penyerahan;
             $penyerahan = ArchivePengolahanPenyerahan::findOne($penyerahan);
+
+            if (empty($penyerahan->type->feature) || !in_array('item', $penyerahan->type->feature)) {
+                unset($this->subMenu[1]['item']);
+            }
+            if (empty($penyerahan->type->feature) || !in_array('publication', $penyerahan->type->feature)) {
+                unset($this->subMenu[1]['publication']);
+            }
         }
 
 		$this->view->title = Yii::t('app', 'Penyerahan Items');
@@ -162,6 +169,13 @@ class ItemController extends Controller
             }
         }
 
+        if (empty($penyerahan->type->feature) || !in_array('item', $penyerahan->type->feature)) {
+            unset($this->subMenu[1]['item']);
+        }
+        if (empty($penyerahan->type->feature) || !in_array('publication', $penyerahan->type->feature)) {
+            unset($this->subMenu[1]['publication']);
+        }
+
         $this->subMenuParam = $id;
 		$this->view->title = Yii::t('app', 'Create Penyerahan Item');
 		$this->view->description = '';
@@ -202,6 +216,14 @@ class ItemController extends Controller
             }
         }
 
+        $penyerahan = $model->penyerahan;
+        if (empty($penyerahan->type->feature) || !in_array('item', $penyerahan->type->feature)) {
+            unset($this->subMenu[1]['item']);
+        }
+        if (empty($penyerahan->type->feature) || !in_array('publication', $penyerahan->type->feature)) {
+            unset($this->subMenu[1]['publication']);
+        }
+
         $this->subMenuParam = $model->penyerahan_id;
 		$this->view->title = Yii::t('app', 'Update Penyerahan Item: {penyerahan-tipeId} {penyerahan-kodeBox}', ['penyerahan-tipeId' => $model->type->type_name, 'penyerahan-kodeBox' => $model->penyerahan->kode_box]);
 		$this->view->description = '';
@@ -219,6 +241,14 @@ class ItemController extends Controller
 	public function actionView($id)
 	{
         $model = $this->findModel($id);
+
+        $penyerahan = $model->penyerahan;
+        if (empty($penyerahan->type->feature) || !in_array('item', $penyerahan->type->feature)) {
+            unset($this->subMenu[1]['item']);
+        }
+        if (empty($penyerahan->type->feature) || !in_array('publication', $penyerahan->type->feature)) {
+            unset($this->subMenu[1]['publication']);
+        }
 
         $this->subMenuParam = $model->penyerahan_id;
 		$this->view->title = Yii::t('app', 'Detail Penyerahan Item: {penyerahan-tipeId} {penyerahan-kodeBox}', ['penyerahan-tipeId' => $model->type->type_name, 'penyerahan-kodeBox' => $model->penyerahan->kode_box]);

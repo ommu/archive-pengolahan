@@ -105,6 +105,13 @@ class CardController extends Controller
         if (($penyerahan = Yii::$app->request->get('penyerahan')) != null) {
             $this->subMenuParam = $penyerahan;
             $penyerahan = ArchivePengolahanPenyerahan::findOne($penyerahan);
+
+            if (empty($penyerahan->type->feature) || !in_array('item', $penyerahan->type->feature)) {
+                unset($this->subMenu[1]['item']);
+            }
+            if (empty($penyerahan->type->feature) || !in_array('publication', $penyerahan->type->feature)) {
+                unset($this->subMenu[1]['publication']);
+            }
         }
 
 		$this->view->title = Yii::t('app', 'Description Cards');
@@ -130,6 +137,7 @@ class CardController extends Controller
         }
 
         $penyerahan = ArchivePengolahanPenyerahan::findOne($id);
+
         $user = ArchivePengolahanUsers::find()
             ->select(['id', 'publish', 'user_id', 'user_code', 'archives'])
             ->andWhere(['in', 'publish', [0,1]])
@@ -159,6 +167,13 @@ class CardController extends Controller
                     return \yii\helpers\Json::encode(\app\components\widgets\ActiveForm::validate($model));
                 }
             }
+        }
+
+        if (empty($penyerahan->type->feature) || !in_array('item', $penyerahan->type->feature)) {
+            unset($this->subMenu[1]['item']);
+        }
+        if (empty($penyerahan->type->feature) || !in_array('publication', $penyerahan->type->feature)) {
+            unset($this->subMenu[1]['publication']);
         }
 
 		$this->view->title = Yii::t('app', 'Create Description Card');
@@ -201,6 +216,14 @@ class CardController extends Controller
             }
         }
 
+        $penyerahan = $model->penyerahan;
+        if (empty($penyerahan->type->feature) || !in_array('item', $penyerahan->type->feature)) {
+            unset($this->subMenu[1]['item']);
+        }
+        if (empty($penyerahan->type->feature) || !in_array('publication', $penyerahan->type->feature)) {
+            unset($this->subMenu[1]['publication']);
+        }
+
         $this->subMenuParam = $model->penyerahan_id;
 		$this->view->title = Yii::t('app', 'Update Description Card: {penyerahan-tipeId} {penyerahan-kodeBox}', ['penyerahan-tipeId' => $model->type->type_name, 'penyerahan-kodeBox' => $model->penyerahan->kode_box]);
 		$this->view->description = '';
@@ -218,6 +241,14 @@ class CardController extends Controller
 	public function actionView($id)
 	{
         $model = $this->findModel($id);
+
+        $penyerahan = $model->penyerahan;
+        if (empty($penyerahan->type->feature) || !in_array('item', $penyerahan->type->feature)) {
+            unset($this->subMenu[1]['item']);
+        }
+        if (empty($penyerahan->type->feature) || !in_array('publication', $penyerahan->type->feature)) {
+            unset($this->subMenu[1]['publication']);
+        }
 
         $this->subMenuParam = $model->penyerahan_id;
 		$this->view->title = Yii::t('app', 'Detail Description Card: {penyerahan-tipeId} {penyerahan-kodeBox}', ['penyerahan-tipeId' => $model->type->type_name, 'penyerahan-kodeBox' => $model->penyerahan->kode_box]);
