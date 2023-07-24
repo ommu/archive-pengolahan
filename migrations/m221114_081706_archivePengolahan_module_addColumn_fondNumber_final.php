@@ -10,7 +10,6 @@
  *
  */
 
-use Yii;
 use yii\db\Schema;
 
 class m221114_081706_archivePengolahan_module_addColumn_fondNumber_final extends \yii\db\Migration

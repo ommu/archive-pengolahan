@@ -10,7 +10,6 @@
  *
  */
 
-use Yii;
 use yii\db\Schema;
 
 class m221115_235036_archivePengolahan_module_addColumn_archiveJson_final extends \yii\db\Migration

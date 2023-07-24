@@ -10,7 +10,6 @@
  *
  */
 
-use Yii;
 use mdm\admin\components\Configs;
 use app\models\Menu;
 

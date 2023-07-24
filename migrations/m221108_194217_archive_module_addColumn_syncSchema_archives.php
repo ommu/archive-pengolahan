@@ -10,7 +10,6 @@
  *
  */
 
-use Yii;
 use yii\db\Schema;
 
 class m221108_194217_archive_module_addColumn_syncSchema_archives extends \yii\db\Migration

@@ -10,7 +10,6 @@
  *
  */
 
-use Yii;
 use yii\db\Schema;
 
 class m221108_153325_archivePengolahan_module_addTrigger_afterUpdate_card extends \yii\db\Migration

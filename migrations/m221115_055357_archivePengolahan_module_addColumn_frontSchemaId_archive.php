@@ -10,7 +10,6 @@
  *
  */
 
-use Yii;
 use yii\db\Schema;
 
 class m221115_055357_archivePengolahan_module_addColumn_frontSchemaId_archive extends \yii\db\Migration

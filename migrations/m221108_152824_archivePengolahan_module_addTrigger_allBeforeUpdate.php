@@ -10,7 +10,6 @@
  *
  */
 
-use Yii;
 use yii\db\Schema;
 
 class m221108_152824_archivePengolahan_module_addTrigger_allBeforeUpdate extends \yii\db\Migration

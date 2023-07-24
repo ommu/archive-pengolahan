@@ -10,7 +10,6 @@
  *
  */
 
-use Yii;
 use yii\db\Schema;
 
 class m221103_230128_archivePengolahan_module_addTrigger_ArchivePengolahanPenyerahanGrid_Roles extends \yii\db\Migration

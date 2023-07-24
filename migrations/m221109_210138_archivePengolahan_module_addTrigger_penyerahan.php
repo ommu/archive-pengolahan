@@ -10,7 +10,6 @@
  *
  */
 
-use Yii;
 use yii\db\Schema;
 
 class m221109_210138_archivePengolahan_module_addTrigger_penyerahan extends \yii\db\Migration

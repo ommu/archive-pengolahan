@@ -10,7 +10,6 @@
  *
  */
 
-use Yii;
 use yii\db\Schema;
 
 class m221110_100906_archivePengolahan_module_addTrigger_afterDelete_item_card extends \yii\db\Migration

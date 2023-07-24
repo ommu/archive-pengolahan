@@ -10,7 +10,6 @@
  *
  */
 
-use Yii;
 use yii\db\Schema;
 
 class m221103_225437_archivePengolahan_module_insertRow_ArchivePengolahanPenyerahanGrid extends \yii\db\Migration

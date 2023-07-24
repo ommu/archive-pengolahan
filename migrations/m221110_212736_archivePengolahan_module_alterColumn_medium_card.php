@@ -10,7 +10,6 @@
  *
  */
 
-use Yii;
 use yii\db\Schema;
 
 class m221110_212736_archivePengolahan_module_alterColumn_medium_card extends \yii\db\Migration

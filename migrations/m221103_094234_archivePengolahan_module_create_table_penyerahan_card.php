@@ -10,7 +10,6 @@
  *
  */
 
-use Yii;
 use yii\db\Schema;
 
 class m221103_094234_archivePengolahan_module_create_table_penyerahan_card extends \yii\db\Migration
