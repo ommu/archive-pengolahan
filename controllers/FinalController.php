@@ -233,8 +233,17 @@ class FinalController extends Controller
                         $subject = implode(',', $card->getSubjects(true, 'title'));
                         $function = implode(',', $card->getFunctions(true, 'title'));
                         $model->medium = $card->medium;
-                        $model->archive_date = join(' - ', [$card->from_archive_date, $card->to_archive_date]);
                         $model->archive_type = $card->archive_type ?? null;
+                        if ($card->from_archive_date || $card->to_archive_date) {
+                            $archiveDate = [];
+                            $archiveDate[] = $card->from_archive_date;
+                            $archiveDate[] = $card->to_archive_date;
+                            $model->archive_date = join(' - ', $archiveDate);
+                        }
+                        $model->developmental_level = $card->developmental_level;
+                        if (is_array($card->medium_json) && array_key_exists('condition', $card->medium_json) && $card->medium_json['condition'] != '') {
+                            $model->condition = $card->medium_json['condition'];
+                        }
                         $model->media = $media;
                         $model->subject =  $subject;
                         $model->function = $function;
@@ -280,8 +289,17 @@ class FinalController extends Controller
                 $subject = implode(',', $card->getSubjects(true, 'title'));
                 $function = implode(',', $card->getFunctions(true, 'title'));
                 $model->medium = $card->medium;
-                $model->archive_date = join(' - ', [$card->from_archive_date, $card->to_archive_date]);
                 $model->archive_type = $card->archive_type ?? null;
+                if ($card->from_archive_date || $card->to_archive_date) {
+                    $archiveDate = [];
+                    $archiveDate[] = $card->from_archive_date;
+                    $archiveDate[] = $card->to_archive_date;
+                    $model->archive_date = join(' - ', $archiveDate);
+                }
+                $model->developmental_level = $card->developmental_level;
+                if (is_array($card->medium_json) && array_key_exists('condition', $card->medium_json) && $card->medium_json['condition'] != '') {
+                    $model->condition = $card->medium_json['condition'];
+                }
                 $model->media = $media;
                 $model->subject = $subject;
                 $model->function = $function;
