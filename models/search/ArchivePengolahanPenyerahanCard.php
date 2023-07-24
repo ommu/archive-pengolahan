@@ -27,7 +27,7 @@ class ArchivePengolahanPenyerahanCard extends ArchivePengolahanPenyerahanCardMod
 	public function rules()
 	{
 		return [
-			[['id', 'temporary_number', 'archive_description', 'archive_type', 'from_archive_date', 'to_archive_date', 'archive_date', 'medium', 'creation_date', 'modified_date', 'updated_date', 
+			[['id', 'temporary_number', 'archive_description', 'archive_type', 'from_archive_date', 'to_archive_date', 'archive_date', 'medium', 'developmental_level', 'creation_date', 'modified_date', 'updated_date', 
                 'userDisplayname', 'creationDisplayname', 'modifiedDisplayname', 'penyerahanPenciptaArsip', 'subject', 'function', 'subjectId', 'functionId', 'schemaId'], 'safe'],
 			[['publish', 'penyerahan_id', 'user_id', 'creation_id', 'modified_id', 
                 'media', 'penyerahanTypeId', 'oManuver'], 'integer'],
@@ -245,6 +245,7 @@ class ArchivePengolahanPenyerahanCard extends ArchivePengolahanPenyerahanCardMod
 			->andFilterWhere(['like', 't.to_archive_date', $this->to_archive_date])
 			->andFilterWhere(['like', 't.archive_date', $this->archive_date])
 			->andFilterWhere(['like', 't.medium', $this->medium])
+			->andFilterWhere(['like', 't.developmental_level', $this->developmental_level])
 			->andFilterWhere(['or', 
                 ['like', 'penyerahan.kode_box', $this->penyerahanPenciptaArsip],
                 ['like', 'penyerahan.pencipta_arsip', $this->penyerahanPenciptaArsip]

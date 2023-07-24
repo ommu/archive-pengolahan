@@ -145,6 +145,10 @@ echo $form->field($model, 'media', ['options' => ['class' => 'form-group row fie
 	->label($model->getAttributeLabel('medium'))
     ->hint($model->getAttributeLabel('total')); ?>
 
+<?php echo $form->field($model, 'developmental_level')
+	->textInput(['maxlength' => true])
+	->label($model->getAttributeLabel('developmental_level')); ?>
+
 <hr/>
 
 <?php

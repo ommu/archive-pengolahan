@@ -111,6 +111,11 @@ $attributes = [
 		'visible' => !$small,
 	],
 	[
+        'attribute' => 'developmental_level',
+		'value' => $model->developmental_level ? $model->developmental_level : '-',
+		'visible' => !$small,
+	],
+	[
 		'attribute' => 'subject',
 		'value' => $model::parseFilter($model->getSubjects(true, 'title'), 'subjectId', ', '),
 		'format' => 'html',

@@ -22,6 +22,7 @@
  * @property string $to_archive_date
  * @property string $archive_date
  * @property string $medium
+ * @property string $developmental_level
  * @property string $medium_json
  * @property string $creation_date
  * @property integer $creation_id
@@ -96,7 +97,8 @@ class ArchivePengolahanPenyerahanCard extends \app\components\ActiveRecord
 			[['publish', 'penyerahan_id', 'user_id', 'creation_id', 'modified_id', 'stayInHere'], 'integer'],
 			[['id', 'archive_description', 'archive_type'], 'string'],
 			//[['archive_date', 'medium_json'], 'json'],
-			[['from_archive_date', 'to_archive_date', 'archive_date', 'medium', 'medium_json', 'stayInHere', 'media', 'subject', 'function'], 'safe'],
+			[['from_archive_date', 'to_archive_date', 'archive_date', 'medium', 'developmental_level', 'medium_json', 'stayInHere', 'media', 'subject', 'function'], 'safe'],
+			[['developmental_level'], 'string', 'max' => 32],
 			[['id', 'temporary_number'], 'string', 'max' => 36],
 			[['from_archive_date', 'to_archive_date'], 'string', 'max' => 64],
 			[['medium'], 'string', 'max' => 255],
@@ -123,6 +125,7 @@ class ArchivePengolahanPenyerahanCard extends \app\components\ActiveRecord
 			'to_archive_date' => Yii::t('app', 'To Archive Date'),
 			'archive_date' => Yii::t('app', 'Archive Date'),
 			'medium' => Yii::t('app', 'Volume'),
+			'developmental_level' => Yii::t('app', 'Developmental Level'),
 			'medium_json' => Yii::t('app', 'Volume'),
 			'creation_date' => Yii::t('app', 'Creation Date'),
 			'creation_id' => Yii::t('app', 'Creation'),
@@ -373,6 +376,13 @@ class ArchivePengolahanPenyerahanCard extends \app\components\ActiveRecord
 			'attribute' => 'medium',
 			'value' => function($model, $key, $index, $column) {
 				return $model->medium;
+			},
+			'visible' => !$this->isMenuver ? true : false,
+		];
+		$this->templateColumns['developmental_level'] = [
+			'attribute' => 'developmental_level',
+			'value' => function($model, $key, $index, $column) {
+				return $model->developmental_level ? $model->developmental_level : '-';
 			},
 			'visible' => !$this->isMenuver ? true : false,
 		];
