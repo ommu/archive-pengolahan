@@ -14,7 +14,7 @@ penyerahan_submenu:
       select: action
   1:
     publication:
-      label: Publication Document
+      label: Berita Acara (BA) Document
       url:
         0: 'penyerahan/admin/publication'
         id: $_GET*id

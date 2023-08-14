@@ -136,7 +136,7 @@ class ArchivePengolahanPenyerahan extends \app\components\ActiveRecord
 			'modified_id' => Yii::t('app', 'Modified'),
 			'updated_date' => Yii::t('app', 'Updated Date'),
 			'stayInHere' => Yii::t('app', 'stayInHere'),
-			'creator' => Yii::t('app', 'Name of creator(s)'),
+			'creator' => Yii::t('app', 'Asal Arsip (Meta)'),
 			'jenisArsip' => Yii::t('app', 'Jenis Arsip'),
 			'old_publication_file' => Yii::t('app', 'Old Publication File'),
 			'typeName' => Yii::t('app', 'Type'),

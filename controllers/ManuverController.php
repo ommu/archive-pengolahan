@@ -111,6 +111,67 @@ class ManuverController extends Controller
 	}
 
 	/**
+	 * actionPublish an existing ArchivePengolahanSchemaCard model.
+	 * If publish is successful, the browser will be redirected to the 'index' page.
+	 * @param string $id
+	 * @return mixed
+	 */
+	public function actionCreate($id, $schema)
+	{
+        if (($card = ArchivePengolahanPenyerahanCard::findOne($id)) === null) {
+            throw new \yii\web\NotFoundHttpException(Yii::t('app', 'The requested page does not exist.'));
+        }
+        $schema = $this->findModel($schema);
+        $fondSchemaId = array_key_first($schema->referenceCode);
+
+        $model = new ArchivePengolahanSchemaCard();
+        $model->id = UuidHelper::uuid();
+		$model->card_id = $card->id;
+		$model->fond_schema_id = $fondSchemaId;
+		$model->schema_id = $schema->id;
+
+        if ($model->save(false, ['id', 'fond_schema_id', 'card_id', 'schema_id'])) {
+            Yii::$app->session->setFlash('success', Yii::t('app', 'Manuver kartu success created.'));
+            return $this->redirect(Yii::$app->request->referrer ?: ['card', 'id' => $schema]);
+        }
+	}
+
+	/**
+	 * actionPublish an existing ArchivePengolahanPenyerahanType model.
+	 * If publish is successful, the browser will be redirected to the 'index' page.
+	 * @param integer $id
+	 * @return mixed
+	 */
+	public function actionDelete($id)
+	{
+        if (($model = ArchivePengolahanSchemaCard::findOne($id)) === null) {
+            throw new \yii\web\NotFoundHttpException(Yii::t('app', 'The requested page does not exist.'));
+        }
+		$model->publish = 2;
+
+        if ($model->save(false, ['publish','modified_id'])) {
+            Yii::$app->session->setFlash('success', Yii::t('app', 'Manuver kartu success deleted.'));
+            return $this->redirect(Yii::$app->request->referrer ?: ['card', 'id' => $model->schema_id]);
+        }
+	}
+
+	/**
+	 * Finds the ArchivePengolahanSchema model based on its primary key value.
+	 * If the model is not found, a 404 HTTP exception will be thrown.
+	 * @param string $id
+	 * @return ArchivePengolahanSchema the loaded model
+	 * @throws NotFoundHttpException if the model cannot be found
+	 */
+	protected function findModel($id)
+	{
+        if (($model = ArchivePengolahanSchema::findOne($id)) !== null) {
+            return $model;
+        }
+
+		throw new \yii\web\NotFoundHttpException(Yii::t('app', 'The requested page does not exist.'));
+	}
+
+	/**
 	 * Creates a new ArchivePengolahanSchema model.
 	 * If creation is successful, the browser will be redirected to the 'view' page.
 	 * @return mixed
@@ -160,51 +221,6 @@ class ManuverController extends Controller
 			'dataProvider' => $dataProvider,
 			'columns' => $columns,
 		]);
-	}
-
-	/**
-	 * actionPublish an existing ArchivePengolahanSchemaCard model.
-	 * If publish is successful, the browser will be redirected to the 'index' page.
-	 * @param string $id
-	 * @return mixed
-	 */
-	public function actionCreate($id, $schema)
-	{
-        if (($card = ArchivePengolahanPenyerahanCard::findOne($id)) === null) {
-            throw new \yii\web\NotFoundHttpException(Yii::t('app', 'The requested page does not exist.'));
-        }
-        $schema = $this->findModel($schema);
-        $fondSchemaId = array_key_first($schema->referenceCode);
-
-        $model = new ArchivePengolahanSchemaCard();
-        $model->id = UuidHelper::uuid();
-		$model->card_id = $card->id;
-		$model->fond_schema_id = $fondSchemaId;
-		$model->schema_id = $schema->id;
-
-        if ($model->save(false, ['id', 'fond_schema_id', 'card_id', 'schema_id'])) {
-            Yii::$app->session->setFlash('success', Yii::t('app', 'Manuver kartu success created.'));
-            return $this->redirect(Yii::$app->request->referrer ?: ['card', 'id' => $schema]);
-        }
-	}
-
-	/**
-	 * actionPublish an existing ArchivePengolahanPenyerahanType model.
-	 * If publish is successful, the browser will be redirected to the 'index' page.
-	 * @param integer $id
-	 * @return mixed
-	 */
-	public function actionDelete($id)
-	{
-        if (($model = ArchivePengolahanSchemaCard::findOne($id)) === null) {
-            throw new \yii\web\NotFoundHttpException(Yii::t('app', 'The requested page does not exist.'));
-        }
-		$model->publish = 2;
-
-        if ($model->save(false, ['publish','modified_id'])) {
-            Yii::$app->session->setFlash('success', Yii::t('app', 'Manuver kartu success deleted.'));
-            return $this->redirect(Yii::$app->request->referrer ?: ['card', 'id' => $model->schema_id]);
-        }
 	}
 
 	/**
@@ -260,22 +276,5 @@ class ManuverController extends Controller
 		return $this->oRender('admin_final', [
 			'model' => $model,
 		]);
-	}
-
-	/**
-	 * Finds the ArchivePengolahanSchema model based on its primary key value.
-	 * If the model is not found, a 404 HTTP exception will be thrown.
-	 * @param string $id
-	 * @return ArchivePengolahanSchema the loaded model
-	 * @throws NotFoundHttpException if the model cannot be found
-	 */
-	protected function findModel($id)
-	{
-        if (($model = ArchivePengolahanSchema::findOne($id)) !== null) {
-
-            return $model;
-        }
-
-		throw new \yii\web\NotFoundHttpException(Yii::t('app', 'The requested page does not exist.'));
 	}
 }

@@ -444,8 +444,13 @@ class ArchivePengolahanFinal extends \app\components\ActiveRecord
         if ($insert) {
             $schema = $this->getArchive();
             $model = ArchivePengolahanSchemaCard::find()
-                ->select(['id', 'card_id', 'schema_id'])
-                ->andWhere(['in', 'id', $this->cardsId])
+                ->alias('schemaCard')
+                ->select(['schemaCard.id', 'schemaCard.card_id', 'schemaCard.schema_id'])
+                ->joinWith([
+                    'card card', 
+                ])
+                ->andWhere(['in', 'schemaCard.id', $this->cardsId])
+                ->orderBy(['card.from_archive_date_totime' => SORT_ASC])
                 ->all();
             $cards = $this->getArchiveCards($model);
 

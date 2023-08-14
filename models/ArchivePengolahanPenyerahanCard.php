@@ -20,6 +20,8 @@
  * @property string $archive_type
  * @property string $from_archive_date
  * @property string $to_archive_date
+ * @property string $from_archive_date_totime
+ * @property string $to_archive_date_totime
  * @property string $archive_date
  * @property string $medium
  * @property string $developmental_level
@@ -94,10 +96,10 @@ class ArchivePengolahanPenyerahanCard extends \app\components\ActiveRecord
 	{
 		return [
 			[['id', 'penyerahan_id', 'user_id', 'temporary_number', 'archive_description'], 'required'],
-			[['publish', 'penyerahan_id', 'user_id', 'creation_id', 'modified_id', 'stayInHere'], 'integer'],
+			[['publish', 'penyerahan_id', 'user_id', 'from_archive_date_totime', 'to_archive_date_totime', 'creation_id', 'modified_id', 'stayInHere'], 'integer'],
 			[['id', 'archive_description', 'archive_type'], 'string'],
 			//[['archive_date', 'medium_json'], 'json'],
-			[['from_archive_date', 'to_archive_date', 'archive_date', 'medium', 'developmental_level', 'medium_json', 'stayInHere', 'media', 'subject', 'function'], 'safe'],
+			[['from_archive_date', 'to_archive_date', 'from_archive_date_totime', 'to_archive_date_totime', 'archive_date', 'medium', 'developmental_level', 'medium_json', 'stayInHere', 'media', 'subject', 'function'], 'safe'],
 			[['developmental_level'], 'string', 'max' => 32],
 			[['id', 'temporary_number'], 'string', 'max' => 36],
 			[['from_archive_date', 'to_archive_date'], 'string', 'max' => 64],
@@ -134,8 +136,8 @@ class ArchivePengolahanPenyerahanCard extends \app\components\ActiveRecord
 			'updated_date' => Yii::t('app', 'Updated Date'),
 			'stayInHere' => Yii::t('app', 'stayInHere'),
 			'media' => Yii::t('app', 'Media Type'),
-			'subject' => Yii::t('app', 'Subject'),
-			'function' => Yii::t('app', 'Function'),
+			'subject' => Yii::t('app', 'Subject (Meta)'),
+			'function' => Yii::t('app', 'Function (Meta)'),
 			'penyerahanTypeId' => Yii::t('app', 'Penyerahan Type'),
 			'penyerahanPenciptaArsip' => Yii::t('app', 'Kode Box / Pencipta Arsip'),
 			'userDisplayname' => Yii::t('app', 'User'),
@@ -518,19 +520,19 @@ class ArchivePengolahanPenyerahanCard extends \app\components\ActiveRecord
 	 */
 	public static function parseCard($model, $urlTitle=true)
 	{
-        $data[] = $model->getAttributeLabel('temporary_number').': '.$model->temporary_number;
+        $data[] = Html::button($model->getAttributeLabel('temporary_number').': '.$model->temporary_number, ['class' => 'btn btn-primary active btn-xs', 'role' => 'button']);
 
         if ($model->isMenuver && $model->isFond) {
             if (is_array($model->schemas) && !empty($model->schemas)) {
                 $referenceCode = $model->schemas[0]->schema->referenceCode;
-                $data[] = Yii::t('app', 'Recommendation Number').': '.implode(' - ', ArrayHelper::map($referenceCode, 'id', 'code'));
+                $data[] = Html::button(Yii::t('app', 'Recommendation Number').': '.implode(' - ', ArrayHelper::map($referenceCode, 'id', 'code')), ['class' => 'btn btn-warning active btn-xs', 'role' => 'button']);
             }
         }
 
 		$title = $model::htmlHardDecode($model->archive_description);
         $data[] = $urlTitle == true ? Html::a($title, ['penyerahan/card/view', 'id' => $model->id], ['title' => $title, 'class' => 'modal-btn d-block mt-3 pt-3 border-top']) : $title ;
 
-		return Html::ul($data, ['encode' => false, 'class' => 'list-boxed']);
+		return Html::ul($data, ['encode' => false, 'class' => 'list-unstyled']);
 	}
 
 	/**
@@ -622,8 +624,15 @@ class ArchivePengolahanPenyerahanCard extends \app\components\ActiveRecord
                 $this->archive_date = Json::encode($this->archive_date);
                 $from_archive_date = array_filter($archive_date['from']);
                 $this->from_archive_date = implode(' ', $from_archive_date);
+
+                $from_archive_date_totime = array_filter(array_reverse($archive_date['from']));
+                $this->from_archive_date_totime = strtotime(implode('-', $from_archive_date_totime));
+
                 $to_archive_date = array_filter($archive_date['to']);
                 $this->to_archive_date = implode(' ', $to_archive_date);
+
+                $to_archive_date_totime = array_filter(array_reverse($archive_date['to']));
+                $this->to_archive_date_totime = strtotime(implode('-', $to_archive_date_totime));
             }
 
             if (is_array($this->medium_json)) {
