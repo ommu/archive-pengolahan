@@ -3,7 +3,7 @@
  * ArchivePengolahanPenyerahanJenis
  * 
  * @author Putra Sudaryanto <putra@ommu.id>
- * @contact (+62)856-299-4114
+ * @contact (+62)811-2540-432
  * @copyright Copyright (c) 2022 OMMU (www.ommu.id)
  * @created date 12 October 2022, 19:11 WIB
  * @link https://bitbucket.org/ommu/archive-pengolahan
@@ -231,6 +231,29 @@ class ArchivePengolahanPenyerahanJenis extends \app\components\ActiveRecord
             $model = self::findOne($id);
             return $model;
         }
+	}
+
+	/**
+	 * function getJenis
+	 */
+	public static function getJenis($array=true) 
+	{
+		$model = self::find()
+            ->alias('t')
+            ->joinWith([
+                'tag tag', 
+            ])
+			->select(['t.tag_id', 'tag.body']);
+
+		$model = $model->orderBy('tag.body ASC')
+            ->groupBy(['t.tag_id'])
+            ->all();
+
+        if ($array == true) {
+            return \yii\helpers\ArrayHelper::map($model, 't.tag_id', 'tag.body');
+        }
+
+		return $model;
 	}
 
 	/**

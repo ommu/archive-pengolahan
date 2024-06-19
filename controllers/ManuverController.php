@@ -15,7 +15,7 @@
  *  findModel
  *
  * @author Putra Sudaryanto <putra@ommu.id>
- * @contact (+62)856-299-4114
+ * @contact (+62)811-2540-432
  * @copyright Copyright (c) 2022 OMMU (www.ommu.id)
  * @created date 11 November 2022, 23:35 WIB
  * @link https://bitbucket.org/ommu/archive-pengolahan
@@ -230,6 +230,34 @@ class ManuverController extends Controller
 	 */
 	public function actionFinal($id)
 	{
+		// Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+    
+        $model = new ArchivePengolahanFinal();
+        $model->fond_schema_id = $id;
+
+        $schema = $this->findModel($id);
+        $cardsAllId = $schema->getCards(false, 1, true)
+            ->select(['id'])
+            ->all();
+        $cardsAll = ArchivePengolahanSchemaCard::find()
+            ->alias('schemaCard')
+            ->select(['schemaCard.id', 'schemaCard.card_id', 'schemaCard.schema_id'])
+            ->joinWith([
+                'card card', 
+            ])
+            ->andWhere(['in', 'schemaCard.id', ArrayHelper::map($cardsAllId, 'id', 'id')])
+            ->orderBy(['card.from_archive_date_totime' => SORT_ASC])
+            ->all();
+        $cards = $model->getArchiveCards($cardsAll);
+
+        $schemaFromFinal = $model->getArchive();
+
+        // return $schemaFromFinal;
+        // return $cards;
+        // return ArrayHelper::merge($schemaFromFinal, $cards);
+
+        // exit();
+
         $schema = $this->findModel($id);
         $cards = $schema->getCards(false, 1, true)
             ->select(['id'])

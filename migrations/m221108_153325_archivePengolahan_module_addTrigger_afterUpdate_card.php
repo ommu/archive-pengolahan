@@ -3,7 +3,7 @@
  * m221108_153325_archivePengolahan_module_addTrigger_afterUpdate_card
  * 
  * @author Putra Sudaryanto <putra@ommu.id>
- * @contact (+62)856-299-4114
+ * @contact (+62)811-2540-432
  * @copyright Copyright (c) 2022 OMMU (www.ommu.id)
  * @created date 8 November 2022, 15:34 WIB
  * @link https://bitbucket.org/ommu/archive-pengolahan

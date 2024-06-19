@@ -6,7 +6,7 @@
  * @var $model ommu\archivePengolahan\models\Archives
  *
  * @author Putra Sudaryanto <putra@ommu.id>
- * @contact (+62)856-299-4114
+ * @contact (+62)811-2540-432
  * @copyright Copyright (c) 2022 OMMU (www.ommu.id)
  * @created date 24 October 2022, 17:23 WIB
  * @link https://bitbucket.org/ommu/archive-pengolahan
