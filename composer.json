@@ -12,20 +12,19 @@
 		"sikn",
 		"jikn",
 		"anri",
-		"ommu",
-		"ommu-platform",
+		"ommu2",
 		"yii2"
 	],
 	"license": "Apache-2.0",
-	"homepage": "https://bitbucket.org/ommu/archive-pengolahan",
+	"homepage": "https://github.com/ommu/archive-pengolahan",
 	"support": {
-		"issues": "https://bitbucket.org/ommu/archive-pengolahan/issues",
-		"wiki": "https://bitbucket.org/ommu/archive-pengolahan/wiki",
-		"source": "https://bitbucket.org/ommu/archive-pengolahan"
+		"issues": "https://github.com/ommu/archive-pengolahan/issues",
+		"wiki": "https://github.com/ommu/archive-pengolahan/wiki",
+		"source": "https://github.com/ommu/archive-pengolahan"
 	},
 	"repository": {
 		"type": "git",
-		"url": "https://bitbucket.org/ommu/archive-pengolahan.git"
+		"url": "https://github.com/ommu/archive-pengolahan.git"
 	},
 	"authors": [
 		{
