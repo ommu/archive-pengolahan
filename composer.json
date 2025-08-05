@@ -16,15 +16,15 @@
 		"yii2"
 	],
 	"license": "Apache-2.0",
-	"homepage": "https://github.com/ommu/archive-pengolahan",
+	"homepage": "https://github.com/ommu/mod-archive-pengolahan",
 	"support": {
-		"issues": "https://github.com/ommu/archive-pengolahan/issues",
-		"wiki": "https://github.com/ommu/archive-pengolahan/wiki",
-		"source": "https://github.com/ommu/archive-pengolahan"
+		"issues": "https://github.com/ommu/mod-archive-pengolahan/issues",
+		"wiki": "https://github.com/ommu/mod-archive-pengolahan/wiki",
+		"source": "https://github.com/ommu/mod-archive-pengolahan"
 	},
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/ommu/archive-pengolahan.git"
+		"url": "https://github.com/ommu/mod-archive-pengolahan.git"
 	},
 	"authors": [
 		{
